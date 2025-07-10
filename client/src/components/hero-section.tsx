@@ -45,35 +45,35 @@ export default function HeroSection() {
               </div>
             </div>
             
-            {/* Floating particles */}
-            <div className="absolute top-10 left-10 w-12 h-12 rounded-full animate-particle opacity-60 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '0s'}}>
+            {/* Floating particles - arranged in natural circular pattern */}
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full animate-particle opacity-60 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '0s'}}>
               <img src={googleLogo} alt="Google" className="w-8 h-8 opacity-90" />
             </div>
-            <div className="absolute top-20 right-20 w-10 h-10 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1s'}}>
+            <div className="absolute top-8 -right-8 w-10 h-10 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1s'}}>
               <img src={facebookLogo} alt="Facebook" className="w-6 h-6 opacity-80" />
             </div>
-            <div className="absolute bottom-16 left-20 w-10 h-10 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '2s'}}>
+            <div className="absolute -bottom-8 left-1/3 w-10 h-10 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '2s'}}>
               <img src={googleLogo} alt="Google" className="w-6 h-6 opacity-80" />
             </div>
-            <div className="absolute bottom-32 right-16 w-8 h-8 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '0.5s'}}>
+            <div className="absolute bottom-8 -right-12 w-8 h-8 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '0.5s'}}>
               <img src={facebookLogo} alt="Facebook" className="w-5 h-5 opacity-70" />
             </div>
-            <div className="absolute top-1/2 left-0 w-8 h-8 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '3s'}}>
+            <div className="absolute top-1/2 -left-16 w-8 h-8 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '3s'}}>
               <img src={googleLogo} alt="Google" className="w-5 h-5 opacity-70" />
             </div>
-            <div className="absolute top-1/3 right-10 w-12 h-12 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1.5s'}}>
+            <div className="absolute top-1/4 right-2 w-12 h-12 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1.5s'}}>
               <img src={chatIcon} alt="Chat" className="w-8 h-8 opacity-80" />
             </div>
-            <div className="absolute bottom-20 left-32 w-10 h-10 rounded-full animate-particle opacity-45 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '2.5s'}}>
+            <div className="absolute bottom-1/4 left-2 w-10 h-10 rounded-full animate-particle opacity-45 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '2.5s'}}>
               <img src={chatIcon} alt="Chat" className="w-6 h-6 opacity-75" />
             </div>
-            <div className="absolute top-16 left-1/2 w-8 h-8 rounded-full animate-particle opacity-35 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '4s'}}>
+            <div className="absolute -top-4 right-1/3 w-8 h-8 rounded-full animate-particle opacity-35 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '4s'}}>
               <img src={networkIcon} alt="Network" className="w-5 h-5 opacity-70" />
             </div>
-            <div className="absolute bottom-8 right-8 w-10 h-10 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1.8s'}}>
+            <div className="absolute -bottom-4 right-1/4 w-10 h-10 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1.8s'}}>
               <img src={networkIcon} alt="Network" className="w-6 h-6 opacity-75" />
             </div>
-            <div className="absolute top-40 left-6 w-8 h-8 rounded-full animate-particle opacity-30 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '3.2s'}}>
+            <div className="absolute top-3/4 -left-8 w-8 h-8 rounded-full animate-particle opacity-30 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '3.2s'}}>
               <img src={networkIcon} alt="Network" className="w-5 h-5 opacity-65" />
             </div>
           </div>
