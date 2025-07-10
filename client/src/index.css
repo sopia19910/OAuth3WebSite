@@ -34,6 +34,11 @@
   --oauth3-gradient-start: hsl(220, 40%, 4%);
   --oauth3-gradient-mid: hsl(260, 30%, 8%);
   --oauth3-gradient-end: hsl(280, 25%, 6%);
+  
+  /* Logo Gradient Colors */
+  --logo-blue: #a8d6e9;
+  --logo-lavender: #b19ffb;
+  --logo-coral: #ff9b9e;
 }
 
 .dark {
@@ -167,6 +172,11 @@
     letter-spacing: -0.025em;
     text-shadow: none;
     font-family: 'IBM Plex Sans', sans-serif;
+    background: linear-gradient(to right, var(--logo-blue), var(--logo-lavender), var(--logo-coral));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: var(--logo-lavender); /* Fallback for browsers without gradient text support */
   }
   
   .clean-title {

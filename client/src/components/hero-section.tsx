@@ -9,7 +9,7 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight clean-title">
-              OAuth 3: The Future of{" "}
+              <span className="clean-logo">OAuth 3</span>: The Future of{" "}
               <span className="text-primary">Hybrid Authentication</span>
             </h1>
             <p className="text-lg text-foreground/80 tech-body">
