@@ -1,0 +1,351 @@
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Users, Building2, Shield, Key, Globe, Check, ArrowRight, Zap, Network, Lock, Coins, Settings } from "lucide-react";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
+
+export default function Services() {
+  const individualFeatures = [
+    {
+      icon: <Globe className="w-12 h-12 text-primary mb-4" />,
+      title: "Familiar Web2 Login",
+      description: "Access blockchain accounts using Google, Kakao, Facebook, and email—no seed phrases required."
+    },
+    {
+      icon: <Network className="w-12 h-12 text-accent mb-4" />,
+      title: "Multi-Chain Support",
+      description: "Control assets across Ethereum, Solana, BNB Chain, Avalanche, and Tron with a single interface."
+    },
+    {
+      icon: <Shield className="w-12 h-12 text-primary mb-4" />,
+      title: "Zero-Knowledge Privacy",
+      description: "Verify identity without exposing personal information using advanced ZKP technology."
+    },
+    {
+      icon: <Settings className="w-12 h-12 text-accent mb-4" />,
+      title: "Account Abstraction",
+      description: "Automated gas fee payments and transaction bundling for seamless user experience."
+    }
+  ];
+
+  const enterpriseFeatures = [
+    {
+      icon: <Building2 className="w-12 h-12 text-primary mb-4" />,
+      title: "Smart Contract Automation",
+      description: "Automate fund disbursement rules with programmable multi-signature approvals."
+    },
+    {
+      icon: <Users className="w-12 h-12 text-accent mb-4" />,
+      title: "Multisig Governance",
+      description: "Support complex internal governance structures with customizable approval workflows."
+    },
+    {
+      icon: <Network className="w-12 h-12 text-primary mb-4" />,
+      title: "Cross-Chain Management",
+      description: "Unified asset management across multiple blockchain networks in one interface."
+    },
+    {
+      icon: <Coins className="w-12 h-12 text-accent mb-4" />,
+      title: "Cost Reduction",
+      description: "Over 90% reduction in custodial expenses compared to traditional third-party solutions."
+    }
+  ];
+
+  const blockchainSupport = [
+    {
+      name: "Ethereum",
+      strength: "Largest DeFi ecosystem",
+      useCases: ["DeFi", "NFTs", "dApps"],
+      color: "text-blue-400"
+    },
+    {
+      name: "BNB Chain",
+      strength: "Low fees, fast confirmation",
+      useCases: ["DEXs", "Gaming", "DeFi"],
+      color: "text-yellow-400"
+    },
+    {
+      name: "Solana",
+      strength: "Ultra-fast transaction speeds",
+      useCases: ["NFTs", "Web3 apps"],
+      color: "text-purple-400"
+    },
+    {
+      name: "Avalanche",
+      strength: "Subnet architecture",
+      useCases: ["Enterprise", "DeFi"],
+      color: "text-red-400"
+    },
+    {
+      name: "Tron",
+      strength: "High throughput, media focus",
+      useCases: ["Content platforms", "Payments"],
+      color: "text-green-400"
+    }
+  ];
+
+  const serviceComparison = [
+    { category: "Target Users", individual: "General consumers", enterprise: "Token foundations, Web3 companies" },
+    { category: "Login Method", individual: "Google, Kakao, Facebook, email", enterprise: "Custom email domain + ZKP" },
+    { category: "Blockchain Support", individual: "Ethereum, Solana, Avalanche, BNB, Tron", enterprise: "Broad cross-chain compatibility" },
+    { category: "Main Features", individual: "Easy wallet access, no seed phrase required", enterprise: "Smart contract automation, multisig control" },
+    { category: "Privacy Protection", individual: "ZKP-based identity verification", enterprise: "ZKP-enhanced governance" },
+    { category: "Key Benefits", individual: "Ease of use, security, privacy", enterprise: "Reduced cost, transparency, decentralization" }
+  ];
+
+  const userBenefits = [
+    "Significantly reduced entry barriers for Web3 adoption",
+    "Seamless experience similar to using a traditional fintech app",
+    "Secure asset management without compromising privacy or control"
+  ];
+
+  const enterpriseAdvantages = [
+    "Over 90% cost reduction in custodial expenses",
+    "Enhanced security and operational transparency",
+    "Scalable infrastructure for multi-chain token strategies"
+  ];
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 gradient-bg tech-grid">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
+              <span className="clean-logo">OAuth 3</span> Services
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto tech-body leading-relaxed">
+              OAuth 3 is more than just a secure authentication protocol—it's a complete service ecosystem designed for both individuals and enterprises. By combining Web2-style convenience with Web3-level security and privacy, OAuth 3 delivers customized solutions that simplify blockchain access, improve digital asset management, and empower ecosystem participants through innovative incentive models.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        
+        {/* Individual User Services */}
+        <div className="mb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">Individual User Services</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body mb-6">
+              "Web3 wallet that feels like Web2"
+            </p>
+            <p className="text-base text-muted-foreground max-w-4xl mx-auto tech-body">
+              OAuth 3 enables users to access and manage multiple blockchain accounts using familiar Web2 social logins. It eliminates the need to memorize seed phrases or manage private keys manually, providing a single, intuitive interface to control assets across multiple networks.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {individualFeatures.map((feature, index) => (
+              <Card key={index} className="bg-card shadow-lg card-hover">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    {feature.icon}
+                    <h3 className="text-lg font-semibold text-foreground mb-3">{feature.title}</h3>
+                    <p className="text-muted-foreground text-sm">{feature.description}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="bg-card shadow-lg card-hover">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-semibold text-foreground mb-6 text-center">User Benefits</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {userBenefits.map((benefit, index) => (
+                  <div key={index} className="flex items-start space-x-3">
+                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <span className="text-muted-foreground">{benefit}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Enterprise Services */}
+        <div className="mb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">Enterprise Services</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body mb-6">
+              "Secure and cost-efficient asset management for token foundations"
+            </p>
+            <p className="text-base text-muted-foreground max-w-4xl mx-auto tech-body">
+              OAuth 3 provides an all-in-one solution for token-issuing companies and blockchain-based foundations to securely manage digital assets without relying on expensive third-party custodians.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {enterpriseFeatures.map((feature, index) => (
+              <Card key={index} className="bg-card shadow-lg card-hover">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    {feature.icon}
+                    <h3 className="text-lg font-semibold text-foreground mb-3">{feature.title}</h3>
+                    <p className="text-muted-foreground text-sm">{feature.description}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="bg-card shadow-lg card-hover">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-semibold text-foreground mb-6 text-center">Strategic Advantages</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {enterpriseAdvantages.map((advantage, index) => (
+                  <div key={index} className="flex items-start space-x-3">
+                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <span className="text-muted-foreground">{advantage}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Blockchain Ecosystem Support */}
+        <div className="mb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">Blockchain Ecosystem Support</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body">
+              OAuth 3 supports five major blockchain networks, each optimized for specific use cases. OAuth 3 is designed to unify the user experience across these chains, allowing frictionless interaction within a multi-chain world.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {blockchainSupport.map((blockchain, index) => (
+              <Card key={index} className="bg-card shadow-lg card-hover">
+                <CardContent className="p-6">
+                  <div className="text-center mb-4">
+                    <Network className={`w-12 h-12 mx-auto mb-3 ${blockchain.color}`} />
+                    <h3 className="text-xl font-semibold text-foreground mb-2">{blockchain.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-4">{blockchain.strength}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold text-foreground">Main Use Cases:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {blockchain.useCases.map((useCase, useCaseIndex) => (
+                        <span key={useCaseIndex} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                          {useCase}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Unified Service Architecture */}
+        <div className="mb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">Unified Service Architecture</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body">
+              A comprehensive comparison of OAuth 3's individual and enterprise service offerings.
+            </p>
+          </div>
+
+          <Card className="bg-card shadow-lg card-hover overflow-hidden">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-muted/20">
+                    <tr>
+                      <th className="text-left p-4 font-semibold text-foreground">Category</th>
+                      <th className="text-left p-4 font-semibold text-primary">Individual Services</th>
+                      <th className="text-left p-4 font-semibold text-accent">Enterprise Services</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {serviceComparison.map((row, index) => (
+                      <tr key={index} className="border-t border-border">
+                        <td className="p-4 font-medium text-foreground">{row.category}</td>
+                        <td className="p-4 text-muted-foreground">{row.individual}</td>
+                        <td className="p-4 text-muted-foreground">{row.enterprise}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Technical Foundation */}
+        <div className="mb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">Technical Foundation</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body">
+              OAuth 3 services are built on cutting-edge blockchain technologies that ensure security, privacy, and seamless user experience.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="bg-card shadow-lg card-hover">
+              <CardContent className="p-8">
+                <div className="text-center">
+                  <Settings className="w-16 h-16 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-4">Account Abstraction (ERC-4337)</h3>
+                  <p className="text-muted-foreground">
+                    Automates gas fee payments and bundles multi-step transactions into a single action for enhanced user experience.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card shadow-lg card-hover">
+              <CardContent className="p-8">
+                <div className="text-center">
+                  <Shield className="w-16 h-16 text-accent mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-4">Zero-Knowledge Proof (ZKP)</h3>
+                  <p className="text-muted-foreground">
+                    Ensures privacy by verifying user identity without exposing personal information on the blockchain.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card shadow-lg card-hover">
+              <CardContent className="p-8">
+                <div className="text-center">
+                  <Lock className="w-16 h-16 text-primary mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-4">Smart Contract 2FA</h3>
+                  <p className="text-muted-foreground">
+                    Dual-layer security using both Web2 login and Web3 key signature for maximum protection.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-foreground mb-6 professional-heading">Ready to Transform Your Digital Experience?</h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body mb-8">
+            Whether you're an individual looking for seamless Web3 access or an enterprise seeking cost-efficient asset management, OAuth 3 has the perfect solution for you.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
+              <Users className="mr-2 h-5 w-5" />
+              Get Started - Individual
+            </Button>
+            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 px-8 py-3 font-semibold">
+              <Building2 className="mr-2 h-5 w-5" />
+              Contact Sales - Enterprise
+            </Button>
+          </div>
+        </div>
+      </div>
+      
+      <Footer />
+    </div>
+  );
+}

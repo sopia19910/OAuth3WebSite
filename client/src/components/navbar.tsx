@@ -13,7 +13,7 @@ export default function Navbar() {
     { label: "Home", href: "/", isRoute: true },
     { label: "About OAuth 3", href: "/about", isRoute: true },
     { label: "Technology", href: "/technology", isRoute: true },
-    { label: "Services", href: "#services", isRoute: false },
+    { label: "Services", href: "/services", isRoute: true },
     { label: "Demo", href: "#demo", isRoute: false },
     { label: "Resources", href: "#resources", isRoute: false },
     { label: "Contact Us", href: "#contact", isRoute: false },
