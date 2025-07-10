@@ -269,11 +269,425 @@ export default function Whitepaper() {
                   </div>
                 </section>
 
+                {/* Section 5: Services & Use Cases */}
+                <section className="mb-12">
+                  <h2 className="text-2xl font-bold text-primary mb-6">5. Services & Use Cases</h2>
+                  <div className="space-y-4 text-foreground/80 leading-relaxed">
+                    <p>
+                      OAuth 3 is not merely a conceptual authentication framework—it is a fully deployable platform that delivers tangible value to both individual users and enterprises. By adapting its architecture to different needs, OAuth 3 serves as a universal bridge between traditional and decentralized identity systems.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">5.1 Individual User Service: Web2-Simple, Web3-Secure Wallet</h3>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Core Value: Simplicity without Sacrificing Sovereignty</h4>
+                    <p>
+                      OAuth 3 enables users to manage digital assets across multiple blockchains—including Ethereum, Solana, BNB Chain, Avalanche, and TRON—using familiar Web2 logins (Google, Kakao, Facebook, email). No more seed phrases. No more manual key storage.
+                    </p>
+                    <p>
+                      Behind the scenes, account abstraction (ERC-4337) and gas sponsorship streamline complex blockchain operations into single-click transactions. The result is a wallet experience that feels like a Web2 finance app—but with full user ownership and decentralization.
+                    </p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Key Features</h4>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Unified interface for multi-chain wallet management</li>
+                      <li>Secure access via Web2 + EOA dual authentication</li>
+                      <li>Gasless transactions for seamless UX</li>
+                      <li>ZKP-based login proofs for privacy preservation</li>
+                      <li>Automatic backup and recovery options</li>
+                    </ul>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Expected Impact</h4>
+                    <p>
+                      OAuth 3 drastically lowers the entry barrier for mainstream users by eliminating the complexity of traditional Web3 wallets, accelerating Web3 adoption on a global scale.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">5.2 Enterprise Service: Decentralized Asset Custody & Governance</h3>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Core Value: Security and Cost Efficiency</h4>
+                    <p>
+                      For token-issuing foundations, DAOs, and Web3 startups, OAuth 3 offers a smart contract-based custody solution that replaces expensive centralized custodians (e.g., BitGo). Organizations can enforce multi-signature controls, spending rules, and time locks via immutable on-chain governance logic.
+                    </p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Key Features</h4>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Programmable fund access policies (e.g., multi-approval for large withdrawals)</li>
+                      <li>Full control without relying on third-party custodians</li>
+                      <li>90%+ reduction in custody costs</li>
+                      <li>Cross-chain asset management and multi-chain compatibility</li>
+                      <li>Transparent auditing and traceability</li>
+                    </ul>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Expected Impact</h4>
+                    <p>
+                      OAuth 3 empowers Web3 organizations to securely manage digital assets while optimizing operational efficiency. It removes the need for trust in intermediaries, aligning perfectly with the ethos of decentralization.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">5.3 Cross-Chain Support & Ecosystem Compatibility</h3>
+                    <p>OAuth 3 is natively compatible with multiple blockchain environments, each with unique advantages:</p>
+                    
+                    <div className="overflow-x-auto mt-6">
+                      <table className="w-full border-collapse border border-primary/20">
+                        <thead>
+                          <tr className="bg-primary/10">
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Blockchain</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Strengths</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">OAuth 3 Role</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-foreground/80">
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Ethereum</td>
+                            <td className="border border-primary/20 px-4 py-3">DeFi ecosystem, smart contract maturity</td>
+                            <td className="border border-primary/20 px-4 py-3">Core identity and asset layer</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Solana</td>
+                            <td className="border border-primary/20 px-4 py-3">High throughput, fast finality</td>
+                            <td className="border border-primary/20 px-4 py-3">Real-time UX, NFT compatibility</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">BNB Chain</td>
+                            <td className="border border-primary/20 px-4 py-3">Low fees, rapid deployment</td>
+                            <td className="border border-primary/20 px-4 py-3">Gas-efficient multi-chain wallet</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Avalanche</td>
+                            <td className="border border-primary/20 px-4 py-3">Subnet architecture, scalability</td>
+                            <td className="border border-primary/20 px-4 py-3">Custom enterprise environments</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">TRON</td>
+                            <td className="border border-primary/20 px-4 py-3">Content-centric, high TPS</td>
+                            <td className="border border-primary/20 px-4 py-3">Media and gaming identity use cases</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <p className="mt-4">
+                      This broad compatibility ensures that OAuth 3 users and enterprises can manage assets and identities seamlessly across ecosystems.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">5.4 Competitive Advantage</h3>
+                    <p>
+                      OAuth 3 outperforms traditional authentication methods and Web3 wallets in security, usability, cost efficiency, scalability, and privacy. By bridging the gap between centralized and decentralized identity systems, OAuth 3 redefines the UX standard for secure authentication.
+                    </p>
+                  </div>
+                </section>
+
+                {/* Section 6: Reward & Incentive System */}
+                <section className="mb-12">
+                  <h2 className="text-2xl font-bold text-primary mb-6">6. Reward & Incentive System</h2>
+                  <div className="space-y-4 text-foreground/80 leading-relaxed">
+                    <p>
+                      OAuth 3 introduces a sustainable, token-powered incentive model that not only secures the network but also rewards active participants, including individual users and token-issuing organizations. By aligning economic incentives with security and engagement, OAuth 3 fosters a self-reinforcing ecosystem where usage drives value, and value fuels growth.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">6.1 Individual Holder Rewards</h3>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Mechanism: Stake-by-Holding</h4>
+                    <p>
+                      Users who hold digital assets (e.g., ETH, SOL) within their OAuth 3 smart wallets receive periodic rewards in the form of OA3 tokens, the native utility token of the platform. Simply by maintaining asset balances, users are recognized as contributors to the ecosystem's security and liquidity.
+                    </p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">How It Works</h4>
+                    <ol className="list-decimal list-inside space-y-2 mt-4">
+                      <li>Users authenticate via OAuth 3 and deposit assets in their hybrid wallet.</li>
+                      <li>The system calculates rewards based on average balance and holding duration.</li>
+                      <li>Rewards are distributed in OA3 tokens at regular intervals.</li>
+                      <li>ZKP ensures that all reward claims preserve privacy and identity confidentiality.</li>
+                    </ol>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Example Payouts</h4>
+                    <div className="overflow-x-auto mt-6">
+                      <table className="w-full border-collapse border border-primary/20">
+                        <thead>
+                          <tr className="bg-primary/10">
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">User</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Assets Held</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Monthly Reward (OA3)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-foreground/80">
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">User A</td>
+                            <td className="border border-primary/20 px-4 py-3">1 ETH</td>
+                            <td className="border border-primary/20 px-4 py-3">10 OA3</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">User B</td>
+                            <td className="border border-primary/20 px-4 py-3">5 ETH</td>
+                            <td className="border border-primary/20 px-4 py-3">50 OA3</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">User C</td>
+                            <td className="border border-primary/20 px-4 py-3">10 ETH</td>
+                            <td className="border border-primary/20 px-4 py-3">100 OA3</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="text-sm text-foreground/60 mt-2">Note: OA3 is an ERC-20 token used across the OAuth 3 ecosystem.</p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">6.2 Foundation & DAO Rewards</h3>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Mechanism: Cross-Chain Payment Pools</h4>
+                    <p>
+                      Organizations and foundations that manage their native tokens using OAuth 3 pay monthly usage fees (e.g., 1 ETH or 1 SOL per chain). These payments are pooled and redistributed to users across other blockchains via cross-chain reward mechanisms.
+                    </p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Key Features</h4>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Each chain has a dedicated "reward pool" funded by usage fees.</li>
+                      <li>The reward ratio is determined through decentralized governance votes.</li>
+                      <li>Rewards are distributed to individual holders in alternative native tokens (e.g., users on Ethereum may receive SOL or AVAX).</li>
+                    </ul>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Example Distribution</h4>
+                    <div className="overflow-x-auto mt-6">
+                      <table className="w-full border-collapse border border-primary/20">
+                        <thead>
+                          <tr className="bg-primary/10">
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Pool Chain</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Monthly Fee Paid</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Cross-Chain Rewards</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-foreground/80">
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Ethereum</td>
+                            <td className="border border-primary/20 px-4 py-3">1 ETH</td>
+                            <td className="border border-primary/20 px-4 py-3">0.1 SOL, 0.05 AVAX</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Solana</td>
+                            <td className="border border-primary/20 px-4 py-3">1 SOL</td>
+                            <td className="border border-primary/20 px-4 py-3">0.2 AVAX, 0.1 ETH</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Avalanche</td>
+                            <td className="border border-primary/20 px-4 py-3">1 AVAX</td>
+                            <td className="border border-primary/20 px-4 py-3">0.15 ETH, 0.05 SOL</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="text-sm text-foreground/60 mt-2">Figures shown are illustrative.</p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">6.3 Governance Participation</h3>
+                    <p>All OA3 token holders gain governance rights to vote on key parameters such as:</p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Reward distribution ratios</li>
+                      <li>Fee structures</li>
+                      <li>Supported blockchains</li>
+                      <li>Feature rollouts and ecosystem upgrades</li>
+                    </ul>
+                    <p className="mt-4">
+                      This DAO-based system ensures transparency, fairness, and decentralization, giving the community a direct role in shaping the network's evolution.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">6.4 Key Differences: Individual vs Foundation Incentives</h3>
+                    <div className="overflow-x-auto mt-6">
+                      <table className="w-full border-collapse border border-primary/20">
+                        <thead>
+                          <tr className="bg-primary/10">
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Category</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Individual Users</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Foundations / Enterprises</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-foreground/80">
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Authentication</td>
+                            <td className="border border-primary/20 px-4 py-3">Web2 OAuth + EOA</td>
+                            <td className="border border-primary/20 px-4 py-3">ZKP + enterprise email domains</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Asset Rewards</td>
+                            <td className="border border-primary/20 px-4 py-3">Based on balance & duration</td>
+                            <td className="border border-primary/20 px-4 py-3">Based on monthly usage fees</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Reward Token</td>
+                            <td className="border border-primary/20 px-4 py-3">OA3</td>
+                            <td className="border border-primary/20 px-4 py-3">Cross-chain native tokens (e.g., ETH)</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Payout Schedule</td>
+                            <td className="border border-primary/20 px-4 py-3">Periodic (monthly or weekly)</td>
+                            <td className="border border-primary/20 px-4 py-3">Monthly</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Governance Role</td>
+                            <td className="border border-primary/20 px-4 py-3">OA3 holders vote</td>
+                            <td className="border border-primary/20 px-4 py-3">Participate via token-weighted DAO</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Cross-Chain Benefit</td>
+                            <td className="border border-primary/20 px-4 py-3">Multi-chain wallet access</td>
+                            <td className="border border-primary/20 px-4 py-3">Cross-chain treasury optimization</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="mt-4">
+                      OAuth 3's reward system is designed to create positive feedback loops that incentivize secure usage, deepen engagement, and empower both individuals and institutions in a unified digital identity framework.
+                    </p>
+                  </div>
+                </section>
+
+                {/* Section 7: Tokenomics */}
+                <section className="mb-12">
+                  <h2 className="text-2xl font-bold text-primary mb-6">7. Tokenomics</h2>
+                  <div className="space-y-4 text-foreground/80 leading-relaxed">
+                    <p>
+                      The OAuth 3 ecosystem is powered by OA3, an ERC-20 utility and governance token that fuels authentication services, incentivizes participation, and enables decentralized decision-making. The tokenomics of OA3 are designed for long-term sustainability, ecosystem alignment, and community empowerment.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">7.1 Token Overview</h3>
+                    <div className="overflow-x-auto mt-6">
+                      <table className="w-full border-collapse border border-primary/20">
+                        <thead>
+                          <tr className="bg-primary/10">
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Parameter</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Details</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-foreground/80">
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Token Name</td>
+                            <td className="border border-primary/20 px-4 py-3">OAuth 3 Token</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Symbol</td>
+                            <td className="border border-primary/20 px-4 py-3">OA3</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Token Standard</td>
+                            <td className="border border-primary/20 px-4 py-3">ERC-20</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Total Supply</td>
+                            <td className="border border-primary/20 px-4 py-3">1,000,000,000 OA3 (1 billion)</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Initial Circulating</td>
+                            <td className="border border-primary/20 px-4 py-3">300,000,000 OA3 (30% of total supply)</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Issuance Networks</td>
+                            <td className="border border-primary/20 px-4 py-3">Ethereum, BNB Chain, Avalanche (multi-chain support)</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">7.2 Token Utility</h3>
+                    <p>OA3 serves three core functions within the OAuth 3 ecosystem:</p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">1. Governance</h4>
+                    <p>OA3 holders can participate in on-chain governance to vote on:</p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Reward distribution policies</li>
+                      <li>Authentication fees</li>
+                      <li>Supported blockchains</li>
+                      <li>Protocol upgrades and roadmap initiatives</li>
+                    </ul>
+                    <p className="mt-4">This ensures a DAO-powered framework where control lies in the hands of the community.</p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">2. Reward Distribution</h4>
+                    <p>OA3 is used to reward:</p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Individual users who hold digital assets in OAuth 3 wallets</li>
+                      <li>Developers or ecosystem participants contributing value</li>
+                      <li>Early adopters and referral agents</li>
+                    </ul>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">3. Service Payments</h4>
+                    <p>
+                      Future OAuth 3 premium services (e.g., enterprise dashboards, compliance modules, identity analytics) may require payment in OA3, increasing the token's functional utility and demand.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">7.3 Token Allocation</h3>
+                    <div className="overflow-x-auto mt-6">
+                      <table className="w-full border-collapse border border-primary/20">
+                        <thead>
+                          <tr className="bg-primary/10">
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Category</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Allocation %</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Amount (OA3)</th>
+                            <th className="border border-primary/20 px-4 py-3 text-left text-primary">Notes</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-foreground/80">
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Ecosystem Rewards (Users)</td>
+                            <td className="border border-primary/20 px-4 py-3">20%</td>
+                            <td className="border border-primary/20 px-4 py-3">200,000,000 OA3</td>
+                            <td className="border border-primary/20 px-4 py-3">For individual asset-holding rewards</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Ecosystem Incentives</td>
+                            <td className="border border-primary/20 px-4 py-3">20%</td>
+                            <td className="border border-primary/20 px-4 py-3">200,000,000 OA3</td>
+                            <td className="border border-primary/20 px-4 py-3">Used to bootstrap participation and activity</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Partnerships & Marketing</td>
+                            <td className="border border-primary/20 px-4 py-3">15%</td>
+                            <td className="border border-primary/20 px-4 py-3">150,000,000 OA3</td>
+                            <td className="border border-primary/20 px-4 py-3">Strategic partners, market growth, and promotional campaigns</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Team & Founders</td>
+                            <td className="border border-primary/20 px-4 py-3">15%</td>
+                            <td className="border border-primary/20 px-4 py-3">150,000,000 OA3</td>
+                            <td className="border border-primary/20 px-4 py-3">1-year lockup, 3-year monthly vesting (36 months)</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Development & Operations</td>
+                            <td className="border border-primary/20 px-4 py-3">10%</td>
+                            <td className="border border-primary/20 px-4 py-3">100,000,000 OA3</td>
+                            <td className="border border-primary/20 px-4 py-3">R&D, infrastructure, audits, and maintenance</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Reserve Fund</td>
+                            <td className="border border-primary/20 px-4 py-3">10%</td>
+                            <td className="border border-primary/20 px-4 py-3">100,000,000 OA3</td>
+                            <td className="border border-primary/20 px-4 py-3">Long-term strategic reserves and emergency liquidity</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Early Investors</td>
+                            <td className="border border-primary/20 px-4 py-3">5%</td>
+                            <td className="border border-primary/20 px-4 py-3">50,000,000 OA3</td>
+                            <td className="border border-primary/20 px-4 py-3">Private round, subject to vesting</td>
+                          </tr>
+                          <tr className="bg-primary/5">
+                            <td className="border border-primary/20 px-4 py-3 font-medium">Seed Funding Participants</td>
+                            <td className="border border-primary/20 px-4 py-3">5%</td>
+                            <td className="border border-primary/20 px-4 py-3">50,000,000 OA3</td>
+                            <td className="border border-primary/20 px-4 py-3">Seed backers and early ecosystem supporters</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">7.4 Vesting and Distribution Strategy</h3>
+                    <p>To ensure stability and prevent speculative volatility:</p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li><strong>Team & Founders:</strong> 12-month cliff, then monthly vesting over 36 months</li>
+                      <li><strong>Ecosystem Rewards & Incentives:</strong> Distributed gradually based on on-chain activity</li>
+                      <li><strong>Marketing & Partnerships:</strong> Released based on milestone-based engagements</li>
+                      <li><strong>Investor allocations:</strong> Subject to linear vesting and lockups to align with long-term growth</li>
+                    </ul>
+                  </div>
+                </section>
+
                 {/* Footer note */}
                 <div className="mt-16 pt-8 border-t border-primary/20">
                   <p className="text-center text-foreground/60 text-sm">
-                    This is a preview of the OAuth 3 Whitepaper. The complete document includes additional sections on
-                    Token Economics, Governance Model, Implementation Roadmap, and Technical Specifications.
+                    This whitepaper provides a comprehensive overview of OAuth 3's architecture, tokenomics, and implementation strategy. 
+                    For the latest updates and technical specifications, please visit our official documentation.
                   </p>
                 </div>
               </div>
