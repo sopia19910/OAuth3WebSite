@@ -44,8 +44,10 @@
 /* BNB Chain logo transparent background */
 .bnb-logo-transparent {
   background-color: transparent !important;
-  mix-blend-mode: multiply;
-  filter: brightness(1.2) contrast(1.1);
+  /* Use darken blend mode to remove white background */
+  mix-blend-mode: darken;
+  /* Enhance visibility and remove background artifacts */
+  filter: brightness(1.1) contrast(1.2) saturate(1.1);
 }
 
 .dark {
