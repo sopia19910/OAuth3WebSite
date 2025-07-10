@@ -14,7 +14,7 @@ export default function Navbar() {
     { label: "Technology", href: "/technology", isRoute: true },
     { label: "Services", href: "/services", isRoute: true },
     { label: "Demo", href: "#demo", isRoute: false },
-    { label: "Resources", href: "#resources", isRoute: false },
+    { label: "Resources", href: "/resources", isRoute: true },
     { label: "Contact Us", href: "#contact", isRoute: false },
   ];
 
