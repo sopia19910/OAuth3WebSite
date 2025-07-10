@@ -1,0 +1,86 @@
+## OAuth 3 Website Technical Focus Plan
+
+### Overview
+
+OAuth 3 is a next-generation hybrid authentication protocol that combines the intuitive convenience of Web2 with the robust security of Web3. This website emphasizes the innovative technical features and user experience of OAuth 3, providing visitors with a clear and professional impression, closely aligning with the design aesthetics of [oauth3.io](https://oauth3.io).
+
+---
+
+### Website Menu Structure
+
+* Home
+* About OAuth 3
+
+  * Concept and Necessity
+  * Core Technical Components
+  * Multi-layered Security Structure
+* Technology
+
+  * Account Abstraction (ERC-4337)
+  * Smart Contract Automation
+  * Zero-Knowledge Proof (ZKP)
+* Services
+
+  * Individual User Services
+  * Corporate User Services
+* Demo
+* Resources
+
+  * Technical Whitepapers and Reports
+  * API Documentation
+  * FAQ
+* Contact Us
+
+---
+
+### Main Visual Background
+
+* Use a dark, sleek background similar to [oauth3.io](https://oauth3.io), incorporating dynamic and fluid animations.
+* Abstract visualizations of blockchain technology with sophisticated particle effects and subtle interactive animations to captivate attention.
+* Emphasize gradients blending shades of dark blue, purple, and subtle neon accents to convey technological innovation and mystery.
+
+---
+
+### Key Design Elements Inspired by oauth3.io
+
+#### 1. Color Palette
+
+* Main Colors: Dark shades with vibrant neon accents (Blue, Purple, Neon accents)
+* Secondary Colors: Subdued dark grays and blacks
+* Accent Color: Neon blue or purple highlights
+
+#### 2. Typography
+
+* Main Font: Modern and sleek sans-serif font
+* Heading Font Size: Large and impactful (36-48px)
+* Body Font Size: Comfortable readability (16-18px)
+
+#### 3. Icon Style
+
+* Sleek, minimalistic icons with a futuristic and tech-oriented aesthetic
+* Consistent thin line style
+
+#### 4. Interactive Elements
+
+* Smooth hover animations and transitions to enhance user experience
+* Subtle, sophisticated animations that respond dynamically to user interactions
+
+#### 5. Layout and Structure
+
+* Clean, minimalist, and futuristic layout emphasizing visual elements and readability
+* Use strategic spacing and structured card-based design
+* Fully responsive and optimized for all devices (desktop, tablet, mobile)
+
+#### 6. Images and Illustrations
+
+* Futuristic, abstract illustrations emphasizing blockchain technology and security
+* High-quality imagery reflecting professionalism and advanced technology
+
+#### 7. Buttons and Link Styles
+
+* Distinct CTA (Call-To-Action) buttons with futuristic and clean designs
+* Clear visual feedback on interactions with neon highlights
+
+---
+
+This plan ensures that the OAuth 3 website closely resembles the design aesthetics and interactive experience found on [oauth3.io](https://oauth3.io), providing a clear, modern, and compelling technical message suitable for both individual users and corporate clients.

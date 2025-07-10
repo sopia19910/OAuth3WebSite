@@ -3,32 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(0, 0%, 20%);
-  --muted: hsl(210, 40%, 96%);
-  --muted-foreground: hsl(215, 13%, 65%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(0, 0%, 20%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(0, 0%, 20%);
-  --border: hsl(214, 32%, 91%);
-  --input: hsl(214, 32%, 91%);
-  --primary: hsl(217, 91%, 60%);
+  --background: hsl(220, 40%, 5%);
+  --foreground: hsl(0, 0%, 95%);
+  --muted: hsl(220, 30%, 10%);
+  --muted-foreground: hsl(220, 10%, 60%);
+  --popover: hsl(220, 40%, 8%);
+  --popover-foreground: hsl(0, 0%, 95%);
+  --card: hsl(220, 35%, 8%);
+  --card-foreground: hsl(0, 0%, 95%);
+  --border: hsl(220, 25%, 15%);
+  --input: hsl(220, 25%, 15%);
+  --primary: hsl(260, 100%, 70%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(210, 40%, 96%);
-  --secondary-foreground: hsl(0, 0%, 20%);
-  --accent: hsl(35, 100%, 50%);
+  --secondary: hsl(220, 30%, 12%);
+  --secondary-foreground: hsl(0, 0%, 95%);
+  --accent: hsl(260, 100%, 70%);
   --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(217, 91%, 60%);
+  --ring: hsl(260, 100%, 70%);
   --radius: 0.5rem;
   
-  /* OAuth 3 specific colors */
-  --oauth3-primary: hsl(217, 91%, 60%);
-  --oauth3-secondary: hsl(210, 40%, 96%);
-  --oauth3-dark: hsl(0, 0%, 20%);
-  --oauth3-accent: hsl(35, 100%, 50%);
+  /* OAuth 3 dark theme colors */
+  --oauth3-primary: hsl(260, 100%, 70%);
+  --oauth3-secondary: hsl(220, 30%, 12%);
+  --oauth3-dark: hsl(220, 40%, 5%);
+  --oauth3-accent: hsl(190, 100%, 60%);
+  --oauth3-purple: hsl(280, 100%, 70%);
+  --oauth3-blue: hsl(220, 100%, 70%);
 }
 
 .dark {
@@ -70,24 +72,91 @@
 
 @layer components {
   .gradient-bg {
-    background: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(217, 91%, 50%) 100%);
+    background: linear-gradient(135deg, hsl(220, 40%, 5%) 0%, hsl(260, 30%, 10%) 50%, hsl(220, 40%, 5%) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .gradient-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, hsla(260, 100%, 70%, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, hsla(190, 100%, 60%, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, hsla(280, 100%, 70%, 0.2) 0%, transparent 50%);
+    pointer-events: none;
   }
   
   .card-hover {
     transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
   }
   
   .card-hover:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    border-color: hsl(260, 100%, 70%);
+    background: rgba(255,255,255,0.1);
   }
   
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
   
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  .animate-particle {
+    animation: particle-float 4s ease-in-out infinite;
+  }
+  
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px rgba(160, 100, 255, 0.3);
+    }
+    50% { 
+      box-shadow: 0 0 30px rgba(160, 100, 255, 0.6);
+    }
+  }
+  
+  @keyframes particle-float {
+    0%, 100% { 
+      transform: translateY(0px) translateX(0px);
+      opacity: 0.6;
+    }
+    25% { 
+      transform: translateY(-20px) translateX(10px);
+      opacity: 1;
+    }
+    50% { 
+      transform: translateY(-10px) translateX(-5px);
+      opacity: 0.8;
+    }
+    75% { 
+      transform: translateY(-30px) translateX(5px);
+      opacity: 0.9;
+    }
+  }
+  
+  .neon-text {
+    text-shadow: 0 0 10px hsl(260, 100%, 70%), 0 0 20px hsl(260, 100%, 70%), 0 0 30px hsl(260, 100%, 70%);
+  }
+  
+  .tech-grid {
+    background-image: 
+      linear-gradient(rgba(160, 100, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(160, 100, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
   }
 }

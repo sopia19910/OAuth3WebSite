@@ -27,12 +27,12 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[hsl(0,0%,20%)] text-white py-12">
+    <footer className="bg-background border-t border-border text-foreground py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-2xl font-bold mb-4">OAuth 3</h3>
-            <p className="text-gray-300">
+            <h3 className="text-2xl font-bold mb-4 text-primary neon-text">OAuth 3</h3>
+            <p className="text-muted-foreground">
               Next-generation hybrid authentication protocol bridging Web2 and Web3.
             </p>
           </div>
@@ -44,7 +44,7 @@ export default function Footer() {
                   <li key={linkIndex}>
                     <a 
                       href="#" 
-                      className="text-gray-300 hover:text-[hsl(35,100%,50%)] transition-colors"
+                      className="text-muted-foreground hover:text-accent transition-colors"
                     >
                       {link}
                     </a>
@@ -54,7 +54,7 @@ export default function Footer() {
             </div>
           ))}
         </div>
-        <div className="border-t border-gray-600 mt-8 pt-8 text-center text-gray-300">
+        <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
           <p>&copy; 2024 OAuth 3. All rights reserved.</p>
         </div>
       </div>

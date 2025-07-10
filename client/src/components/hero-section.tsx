@@ -3,41 +3,47 @@ import { Shield, Play } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <section id="home" className="pt-16 gradient-bg text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <section id="home" className="pt-16 gradient-bg text-white min-h-screen flex items-center tech-grid">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
-            <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+            <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
               OAuth 3: The Future of{" "}
-              <span className="text-[hsl(35,100%,50%)]">Hybrid Authentication</span>
+              <span className="text-primary neon-text">Hybrid Authentication</span>
             </h1>
-            <p className="text-xl text-blue-100">
+            <p className="text-xl text-foreground/80">
               Combining the intuitive convenience of Web2 with the robust security of Web3. 
               Experience next-generation authentication that bridges traditional and blockchain ecosystems.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
-                className="bg-[hsl(35,100%,50%)] hover:bg-[hsl(35,100%,45%)] text-white px-8 py-3 font-semibold"
+                className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold animate-pulse-glow"
               >
                 Get Started
               </Button>
               <Button 
                 size="lg" 
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-[hsl(217,91%,60%)] px-8 py-3 font-semibold"
+                className="border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 font-semibold"
               >
                 <Play className="mr-2 h-4 w-4" />
                 View Demo
               </Button>
             </div>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center relative">
             <div className="animate-float">
-              <div className="w-80 h-80 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
-                <Shield className="w-32 h-32 text-white opacity-80" />
+              <div className="w-80 h-80 bg-primary/10 rounded-full flex items-center justify-center border border-primary/30 animate-pulse-glow">
+                <Shield className="w-32 h-32 text-primary opacity-90" />
               </div>
             </div>
+            
+            {/* Floating particles */}
+            <div className="absolute top-10 left-10 w-4 h-4 bg-primary rounded-full animate-particle opacity-60"></div>
+            <div className="absolute top-20 right-20 w-3 h-3 bg-accent rounded-full animate-particle opacity-40" style={{animationDelay: '1s'}}></div>
+            <div className="absolute bottom-16 left-20 w-2 h-2 bg-primary rounded-full animate-particle opacity-50" style={{animationDelay: '2s'}}></div>
+            <div className="absolute bottom-32 right-16 w-5 h-5 bg-accent rounded-full animate-particle opacity-30" style={{animationDelay: '0.5s'}}></div>
           </div>
         </div>
       </div>
