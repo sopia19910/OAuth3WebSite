@@ -33,12 +33,14 @@ Preferred communication style: Simple, everyday language.
 - **Schema**: Centralized schema definition in `/shared/schema.ts`
 - **Database**: PostgreSQL (configured for Neon Database in production)
 - **Migration**: Drizzle Kit for database migrations
+- **Connection**: Neon PostgreSQL with connection pooling via `@neondatabase/serverless`
 
 #### Authentication System
 - Basic user model with username/password authentication
 - Extensible storage interface for CRUD operations
-- In-memory storage for development (MemStorage class)
+- DatabaseStorage class for persistent data storage
 - Session-based authentication ready for implementation
+- Full CRUD operations for user management
 
 #### UI Components
 - Comprehensive component library based on Radix UI
