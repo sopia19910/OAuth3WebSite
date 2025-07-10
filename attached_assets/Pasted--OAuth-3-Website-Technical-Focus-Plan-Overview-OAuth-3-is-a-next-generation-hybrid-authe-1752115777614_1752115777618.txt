@@ -1,0 +1,77 @@
+## OAuth 3 Website Technical Focus Plan
+
+### Overview
+
+OAuth 3 is a next-generation hybrid authentication protocol that combines the intuitive convenience of Web2 with the robust security of Web3. This website emphasizes the innovative technical features and user experience of OAuth 3, providing visitors with a clear and professional impression.
+
+---
+
+### Website Menu Structure
+
+* Home
+* About OAuth 3
+
+  * Concept and Necessity
+  * Core Technical Components
+  * Multi-layered Security Structure
+* Technology
+
+  * Account Abstraction (ERC-4337)
+  * Smart Contract Automation
+  * Zero-Knowledge Proof (ZKP)
+* Services
+
+  * Individual User Services
+  * Corporate User Services
+* Demo
+* Resources
+
+  * Technical Whitepapers and Reports
+  * API Documentation
+  * FAQ
+* Contact Us
+
+---
+
+### Key Design Elements
+
+#### 1. Color Palette
+
+* Main Colors: Blue (#3A76F0) and White (#FFFFFF)
+* Secondary Colors: Gray (#F4F6F9) and Dark Gray (#333333)
+* Accent Color: Orange (#FF9C00)
+
+#### 2. Typography
+
+* Main Font: Noto Sans (focusing on readability and modern aesthetics)
+* Heading Font Size: 36px, Body Font Size: 16px
+
+#### 3. Icon Style
+
+* Minimalistic and intuitive icons
+* Consistent line style
+
+#### 4. Interactive Elements
+
+* Mouse-over effects and smooth animations to enhance user experience
+* Motion graphics illustrating key technological features during page loading
+
+#### 5. Layout and Structure
+
+* Clean, card-based layout for clear information delivery
+* Sufficient white space and organized structure for enhanced readability
+* Responsive web design optimized for mobile and tablet devices
+
+#### 6. Images and Illustrations
+
+* Custom illustrations intuitively expressing technical elements
+* High-resolution images to emphasize professionalism and trustworthiness
+
+#### 7. Buttons and Link Styles
+
+* Clear Call-To-Action (CTA) button styles (rounded rectangles, vivid colors)
+* Links highlighted with underline and accent color to increase clickability
+
+---
+
+This plan ensures that the OAuth 3 website delivers a clear and compelling technical message suitable for both individual users and corporate clients.
