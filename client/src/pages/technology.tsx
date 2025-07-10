@@ -183,16 +183,13 @@ export default function Technology() {
                     )}
                     
                     <Card className="bg-card/80 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:border-primary/40 group-hover:bg-card/90">
-                      <CardContent className="p-6">
-                        <div className="text-center">
-                          {/* Step Number with Animated Ring */}
-                          <div className="relative w-16 h-16 mx-auto mb-6">
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-accent opacity-20 animate-pulse"></div>
-                            <div className="absolute inset-2 rounded-full bg-primary/10 flex items-center justify-center">
-                              <span className="text-primary font-bold text-xl">{step.step}</span>
-                            </div>
-                          </div>
-                          
+                      <CardContent className="p-6 relative">
+                        {/* Simple Step Number on Left */}
+                        <div className="absolute -left-3 top-6 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                          <span className="text-white font-bold text-sm">{step.step}</span>
+                        </div>
+                        
+                        <div className="text-center pl-4">
                           {/* Animated Icon */}
                           <div className="mb-4 transform transition-transform duration-300 group-hover:scale-110 flex justify-center">
                             {step.icon}
