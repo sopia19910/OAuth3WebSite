@@ -4,6 +4,7 @@ import logoImage from "@assets/image_1752117480535.png";
 import googleLogo from "@assets/image_1752137026323.png";
 import facebookLogo from "@assets/image_1752144869558.png";
 import chatIcon from "@assets/image_1752148691176.png";
+import networkIcon from "@assets/image_1752148793381.png";
 
 export default function HeroSection() {
   return (
@@ -65,6 +66,15 @@ export default function HeroSection() {
             </div>
             <div className="absolute bottom-20 left-32 w-10 h-10 rounded-full animate-particle opacity-45 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '2.5s'}}>
               <img src={chatIcon} alt="Chat" className="w-6 h-6 opacity-75" />
+            </div>
+            <div className="absolute top-16 left-1/2 w-8 h-8 rounded-full animate-particle opacity-35 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '4s'}}>
+              <img src={networkIcon} alt="Network" className="w-5 h-5 opacity-70" />
+            </div>
+            <div className="absolute bottom-8 right-8 w-10 h-10 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1.8s'}}>
+              <img src={networkIcon} alt="Network" className="w-6 h-6 opacity-75" />
+            </div>
+            <div className="absolute top-40 left-6 w-8 h-8 rounded-full animate-particle opacity-30 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '3.2s'}}>
+              <img src={networkIcon} alt="Network" className="w-5 h-5 opacity-65" />
             </div>
           </div>
         </div>
