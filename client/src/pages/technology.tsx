@@ -62,25 +62,25 @@ export default function Technology() {
       step: "1",
       title: "Web2 Authentication",
       description: "User logs in with familiar Web2 account (Google, Kakao, Facebook)",
-      icon: <Globe className="w-12 h-12 text-accent" />
+      icon: <Globe className="w-12 h-12 text-accent" strokeWidth={1.5} />
     },
     {
       step: "2",
       title: "Web3 Signature",
       description: "Transaction signed with private Web3 key for cryptographic verification",
-      icon: <Key className="w-12 h-12 text-primary" />
+      icon: <Key className="w-12 h-12 text-primary" strokeWidth={1.5} />
     },
     {
       step: "3",
       title: "ZKP Verification",
       description: "Zero-Knowledge Proof confirms identity without revealing personal data",
-      icon: <Shield className="w-12 h-12 text-primary" />
+      icon: <Shield className="w-12 h-12 text-primary" strokeWidth={1.5} />
     },
     {
       step: "4",
       title: "Transaction Execution",
       description: "Smart contract executes transaction only when all conditions are met",
-      icon: <Lock className="w-12 h-12 text-accent" />
+      icon: <Lock className="w-12 h-12 text-accent" strokeWidth={1.5} />
     }
   ];
 
