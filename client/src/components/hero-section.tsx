@@ -3,6 +3,7 @@ import { Shield, Play } from "lucide-react";
 import logoImage from "@assets/image_1752117480535.png";
 import googleLogo from "@assets/image_1752137026323.png";
 import facebookLogo from "@assets/image_1752144869558.png";
+import chatIcon from "@assets/image_1752148691176.png";
 
 export default function HeroSection() {
   return (
@@ -58,6 +59,12 @@ export default function HeroSection() {
             </div>
             <div className="absolute top-1/2 left-0 w-8 h-8 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '3s'}}>
               <img src={googleLogo} alt="Google" className="w-5 h-5 opacity-70" />
+            </div>
+            <div className="absolute top-1/3 right-10 w-12 h-12 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1.5s'}}>
+              <img src={chatIcon} alt="Chat" className="w-8 h-8 opacity-80" />
+            </div>
+            <div className="absolute bottom-20 left-32 w-10 h-10 rounded-full animate-particle opacity-45 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '2.5s'}}>
+              <img src={chatIcon} alt="Chat" className="w-6 h-6 opacity-75" />
             </div>
           </div>
         </div>
