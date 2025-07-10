@@ -683,10 +683,207 @@ export default function Whitepaper() {
                   </div>
                 </section>
 
+                {/* Section 8: Ecosystem & Growth Strategy */}
+                <section className="mb-12">
+                  <h2 className="text-2xl font-bold text-primary mb-6">8. Ecosystem & Growth Strategy</h2>
+                  <div className="space-y-4 text-foreground/80 leading-relaxed">
+                    <p>
+                      OAuth 3 aims to establish itself as the global authentication standard for both decentralized and traditional digital services. To realize this vision, the project is backed by a comprehensive ecosystem and growth strategy that emphasizes partnership development, community-led expansion, and cross-chain scalability.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">8.1 Ecosystem Vision</h3>
+                    <p>
+                      At its core, OAuth 3 envisions a self-sustaining, interoperable identity network where users own their credentials, enterprises secure their assets, and developers build privacy-first applications using shared authentication infrastructure.
+                    </p>
+                    <p>
+                      OAuth 3 does not operate as a closed system; it is a modular, extensible protocol designed to integrate with:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Web3 wallets and DeFi platforms</li>
+                      <li>NFT marketplaces and GameFi ecosystems</li>
+                      <li>Centralized apps seeking blockchain-based security layers</li>
+                      <li>Cross-chain bridges, oracles, and decentralized identity (DID) services</li>
+                    </ul>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">8.2 Growth Pillars</h3>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">1. Strategic Partnerships</h4>
+                    <p>OAuth 3 is pursuing integrations with:</p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Major blockchain foundations (Ethereum, Solana, BNB Chain, etc.)</li>
+                      <li>Web2 identity providers and Single Sign-On (SSO) systems</li>
+                      <li>Custody solutions, Layer-2 rollups, and account abstraction protocols</li>
+                    </ul>
+                    <p className="mt-4">
+                      These alliances aim to accelerate user acquisition, liquidity inflow, and protocol utility across verticals.
+                    </p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">2. Community Engagement</h4>
+                    <p>Community growth is a central tenet of OAuth 3's strategy. Through:</p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>DAO governance onboarding</li>
+                      <li>Ambassador programs</li>
+                      <li>Developer grants and hackathons</li>
+                    </ul>
+                    <p className="mt-4">
+                      OAuth 3 empowers grassroots contributors to shape the protocol's future while incentivizing active participation through OA3 token rewards.
+                    </p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">3. Cross-Chain Infrastructure</h4>
+                    <p>
+                      OAuth 3 is built for multi-chain compatibility from day one. The protocol will continually expand integration with high-performance and emerging chains to:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Maximize ecosystem reach</li>
+                      <li>Support localized adoption strategies</li>
+                      <li>Enable seamless identity management across fragmented blockchain environments</li>
+                    </ul>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">8.3 Go-to-Market Strategy</h3>
+                    <p>OAuth 3's go-to-market plan is structured in three progressive waves:</p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Early Adopters (Web3 Native Users)</h4>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li><strong>Target:</strong> DeFi users, DAO contributors, crypto wallets</li>
+                      <li><strong>Messaging:</strong> Enhanced security + ZKP privacy for crypto-native applications</li>
+                    </ul>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Enterprise & Institutional Use</h4>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li><strong>Target:</strong> Token foundations, compliance-focused Web3 firms, dApp platforms</li>
+                      <li><strong>Messaging:</strong> Cost-efficient custody + programmable compliance</li>
+                    </ul>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Mass Market & Web2 Onboarding</h4>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li><strong>Target:</strong> Everyday internet users, fintech apps, consumer-facing platforms</li>
+                      <li><strong>Messaging:</strong> Seamless Web2 login + Web3 control with zero onboarding complexity</li>
+                    </ul>
+                    
+                    <p className="mt-4">
+                      Each stage is supported by performance marketing, educational campaigns, and incentive-based user growth programs.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">8.4 Developer Ecosystem</h3>
+                    <p>OAuth 3 offers extensive support for builders:</p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Open SDKs and APIs for easy authentication integration</li>
+                      <li>Smart contract templates for on-chain identity control</li>
+                      <li>Support for ERC-4337-based account abstraction</li>
+                      <li>Documentation, tutorials, and sandbox environments</li>
+                    </ul>
+                    <p className="mt-4">
+                      Developer grants will be distributed through the DAO to incentivize dApps, security audits, tools, and plugins that grow the ecosystem.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">8.5 Sustainability & Decentralization</h3>
+                    <p>To ensure long-term sustainability:</p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Protocol upgrades are proposed and ratified via on-chain governance</li>
+                      <li>Token incentives are designed to reward value-aligned behaviors</li>
+                      <li>A treasury reserve supports emergency funding, R&D, and risk mitigation</li>
+                    </ul>
+                    <p className="mt-4">
+                      By decentralizing control and distributing value, OAuth 3 ensures that no single entity dictates the network's evolution—the community does.
+                    </p>
+                    <p className="mt-4">
+                      <strong className="text-primary">The OAuth 3 ecosystem is more than a product—it's an evolving collaborative infrastructure for digital identity.</strong> By combining technological innovation, robust token incentives, and a decentralized governance model, OAuth 3 is poised to scale as the authentication backbone of the next internet.
+                    </p>
+                  </div>
+                </section>
+
+                {/* Section 9: Security & Privacy */}
+                <section className="mb-12">
+                  <h2 className="text-2xl font-bold text-primary mb-6">9. Security & Privacy</h2>
+                  <div className="space-y-4 text-foreground/80 leading-relaxed">
+                    <p>
+                      Security and privacy are the cornerstones of OAuth 3's architecture. Designed for a future where digital identity is sovereign, verifiable, and private, OAuth 3 introduces an authentication model that surpasses traditional standards by integrating blockchain-level resilience, cryptographic integrity, and zero-knowledge technologies.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">9.1 Multi-Layered Security Architecture</h3>
+                    <p>
+                      OAuth 3 employs a dual-authentication mechanism enforced by smart contracts on-chain, effectively eliminating single points of failure.
+                    </p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Two-Factor Authentication (2FA) on the Blockchain</h4>
+                    <div className="bg-primary/5 p-6 rounded-lg border border-primary/20 mt-4">
+                      <p><strong className="text-primary">Factor 1:</strong> Web2 Social Login (e.g., Google, Facebook, Kakao)</p>
+                      <ul className="list-disc list-inside ml-4 mt-2 space-y-1">
+                        <li>Validated through Zero-Knowledge Proofs (ZKP)</li>
+                      </ul>
+                      
+                      <p className="mt-4"><strong className="text-primary">Factor 2:</strong> Web3 Private Key Signature (EOA)</p>
+                      <ul className="list-disc list-inside ml-4 mt-2 space-y-1">
+                        <li>Required for executing any transaction on the blockchain</li>
+                      </ul>
+                    </div>
+                    
+                    <p className="mt-4">This hybrid model ensures that:</p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>A stolen Web2 login cannot access assets without the private key</li>
+                      <li>A compromised private key cannot operate without passing social login validation</li>
+                    </ul>
+                    <p className="mt-4">
+                      <strong className="text-primary">Result:</strong> Even if one layer is breached, user assets remain secure.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">9.2 Smart Contract-Based Access Control</h3>
+                    <p>
+                      OAuth 3's Contract Account (CA) operates as a programmable guardian of user assets. Its capabilities include:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Conditional execution logic (e.g., dual-auth confirmation, time-locked transfers)</li>
+                      <li>Role-based access for enterprise wallets</li>
+                      <li>Configurable thresholds for multi-signature approval</li>
+                    </ul>
+                    <p className="mt-4">
+                      Unlike centralized 2FA apps (e.g., Google Authenticator), OAuth 3's security is fully transparent, verifiable, and tamper-proof, enforced at the protocol level.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">9.3 Zero-Knowledge Proofs (ZKP)</h3>
+                    <p>
+                      OAuth 3 incorporates Zero-Knowledge Proofs to preserve user privacy without compromising authentication integrity.
+                    </p>
+                    
+                    <h4 className="text-lg font-medium text-primary mt-6 mb-3">Key Benefits:</h4>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>No personal data is stored or transmitted on-chain</li>
+                      <li>Users can prove they've successfully logged in via Web2 without revealing emails or passwords</li>
+                      <li>Compliance with privacy regulations (e.g., GDPR, CCPA) is enhanced through cryptographic anonymization</li>
+                    </ul>
+                    <p className="mt-4">
+                      <strong className="text-primary">ZKP turns identity verification into data-minimized authentication</strong>, providing a breakthrough in Web3 privacy and UX.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">9.4 Key Recovery & Backup Mechanisms</h3>
+                    <p>
+                      Recognizing the real-world risks of key loss, OAuth 3 introduces secure backup and recovery tools, including:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>Social recovery protocols using designated guardians</li>
+                      <li>Encrypted key shards with multi-party computation (MPC) support</li>
+                      <li>Optional Web2-linked key fragments (e.g., email-triggered recovery under DAO-governed rules)</li>
+                    </ul>
+                    <p className="mt-4">
+                      These methods ensure that users can regain access without compromising decentralization or handing control back to centralized platforms.
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">9.5 Compliance & Auditing</h3>
+                    <ul className="list-disc list-inside space-y-2 mt-4">
+                      <li>All smart contracts undergo rigorous third-party security audits</li>
+                      <li>Open-source codebases and on-chain transparency ensure trust</li>
+                      <li>DAO-governed upgrade paths prevent unilateral changes and promote collective responsibility</li>
+                    </ul>
+                    <p className="mt-4">
+                      <strong className="text-primary">OAuth 3 is engineered not just to meet today's best practices—but to set the new benchmark for secure, decentralized digital identity systems.</strong>
+                    </p>
+                  </div>
+                </section>
+
                 {/* Footer note */}
                 <div className="mt-16 pt-8 border-t border-primary/20">
                   <p className="text-center text-foreground/60 text-sm">
-                    This whitepaper provides a comprehensive overview of OAuth 3's architecture, tokenomics, and implementation strategy. 
+                    This comprehensive whitepaper outlines OAuth 3's complete vision, architecture, and implementation strategy. 
                     For the latest updates and technical specifications, please visit our official documentation.
                   </p>
                 </div>
