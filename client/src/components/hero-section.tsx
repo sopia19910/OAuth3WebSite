@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, Play } from "lucide-react";
 import logoImage from "@assets/image_1752117480535.png";
 import googleLogo from "@assets/image_1752137026323.png";
+import globalNetworkImage from "@assets/image_1752137747093.png";
 
 export default function HeroSection() {
   return (
@@ -37,8 +38,11 @@ export default function HeroSection() {
           </div>
           <div className="flex justify-center relative">
             <div className="animate-float">
-              <div className="w-80 h-80 bg-primary/10 rounded-full flex items-center justify-center border border-primary/30 animate-pulse-glow">
-                <img src={logoImage} alt="OAuth 3 Logo" className="w-32 h-32 opacity-90" />
+              <div className="w-80 h-80 rounded-full flex items-center justify-center relative overflow-hidden border border-primary/30 animate-pulse-glow bg-gradient-to-br from-primary/20 to-accent/20 backdrop-blur-sm">
+                <img src={globalNetworkImage} alt="Global Network" className="w-72 h-72 opacity-90 object-cover rounded-full" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <img src={logoImage} alt="OAuth 3 Logo" className="w-24 h-24 opacity-95 z-10 filter drop-shadow-lg" />
+                </div>
               </div>
             </div>
             
