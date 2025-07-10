@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Download, Check, Users, Code, Building2, FileText, ExternalLink, Shield, Network, Key } from "lucide-react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { Link } from "wouter";
 
 export default function Resources() {
   const whitepaperFeatures = [
@@ -127,10 +128,12 @@ export default function Resources() {
               </div>
 
               <div className="text-center">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
-                  <Download className="mr-2 h-5 w-5" />
-                  👉 Download the OAuth 3 Whitepaper
-                </Button>
+                <Link href="/whitepaper">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
+                    <Download className="mr-2 h-5 w-5" />
+                    👉 Download the OAuth 3 Whitepaper
+                  </Button>
+                </Link>
                 <p className="text-muted-foreground text-sm mt-2">(Click to view the full PDF document)</p>
               </div>
             </CardContent>

@@ -1,0 +1,33 @@
+4. Core Architecture
+OAuth 3 introduces a novel hybrid authentication architecture that merges the operational simplicity of Web2 login systems with the cryptographic rigor and decentralization of Web3. This section outlines the three foundational components and the multi-layered security model that power OAuth 3.
+
+4.1 Key Components
+1. EOA (Externally Owned Account)
+An EOA is a traditional blockchain account controlled by a user's private key. In OAuth 3, it represents the user’s true ownership over digital assets and identity. The EOA is used to sign transactions and serves as the Web3 anchor in the authentication process.
+
+2. CA (Contract Account)
+A CA is a smart contract-based programmable wallet that serves as the core engine of OAuth 3. It enforces rules such as requiring dual authentication before any transaction is executed. The CA acts as a secure middle layer, ensuring that both the user’s Web2 social login and Web3 private key signature are verified before approving asset movement or access requests.
+
+3. ZKP (Zero-Knowledge Proof)
+ZKPs allow OAuth 3 to prove that a user has successfully authenticated via Web2 (e.g., Google login) without revealing any personal data such as email addresses or passwords. This maintains privacy on public blockchains and enhances trust by decoupling identity verification from data exposure.
+
+4.2 Multi-Layered Security Model
+OAuth 3's security is not simply additive—it is multiplicative by design. It establishes a two-factor authentication (2FA) model that operates entirely on-chain via smart contracts:
+
+First Layer: Web2 social login (verified using ZKP)
+
+Second Layer: EOA signature (Web3 private key)
+
+This ensures that both factors must be independently verified before a transaction is approved. If a malicious actor compromises a user's Web2 account, they still cannot move assets without the private key. Conversely, if a private key is leaked, the CA will still reject access unless the social login is also authenticated. This eliminates the risk of single-point compromise.
+
+Additionally, OAuth 3 supports optional recovery keys and backup authentication options, providing a safer user experience without reintroducing central points of control.
+
+4.3 Comparison with Traditional Systems
+Feature	OAuth 2.0 (Web2)	Web3 (Pure)	OAuth 3 (Hybrid)
+Authentication Type	Centralized OAuth	Blockchain-Based	Web2 + Web3 Hybrid
+Security Level	Moderate	High	Very High
+Data Ownership	Platform-Owned	User-Owned	User-Owned
+UX	Simple	Complex	Balanced
+Privacy Protection	Limited	Strong	Enhanced (ZKP)
+Interoperability	High	Low	High
+

@@ -1,0 +1,27 @@
+2. Problem Statement
+The digital identity landscape is currently defined by two dominant paradigms—Web2 centralized authentication and Web3 decentralized authentication—each with its own critical shortcomings. To understand the necessity of OAuth 3, we must first examine the fundamental limitations inherent in both systems.
+
+2.1 Limitations of Web2 Authentication (OAuth 2.0)
+Centralized Risk Exposure
+OAuth 2.0 allows users to log in via third-party accounts (e.g., Google, Facebook), significantly simplifying the onboarding process for web services. However, this convenience relies on centralized identity providers that control and store sensitive user credentials. If a provider is compromised, millions of downstream services and users are simultaneously exposed. This creates a classic single point of failure that contradicts the very principle of resilient internet architecture.
+
+Lack of Data Sovereignty
+In centralized systems, users do not truly own or control their identity data. They are subject to platform policies, opaque data usage terms, and potential surveillance. This violates the growing demand for self-sovereign identity in the digital era, where individuals seek greater agency over their personal information.
+
+2.2 Limitations of Web3 Authentication
+High Entry Barrier
+Web3 offers full ownership and control via private keys, but this shifts the responsibility of key security entirely to the user. Losing a private key often results in irrecoverable loss of digital assets or identity, a risk many users are not prepared or willing to take. The technical complexity involved in wallet setup, seed phrase management, and transaction handling further discourages mass adoption.
+
+Subpar User Experience
+Web3 platforms require users to pay transaction (gas) fees, often in volatile native tokens, and suffer from slower processing times compared to Web2 systems. For mainstream users accustomed to seamless, instant interactions, these factors contribute to a frustrating and unfamiliar user experience.
+
+2.3 The Core Dilemma
+Ultimately, users are forced into a trade-off between convenience and control:
+
+Web2 offers ease of use but demands trust in centralized authorities.
+
+Web3 offers autonomy and security but burdens users with complexity and risk.
+
+This dichotomy creates a deadlock in the evolution of digital identity, where neither model fully satisfies both security and usability. The growing frequency and severity of Web3 security breaches—amounting to over $2.36 billion in losses in 2024 alone—underscore the urgent need for a new paradigm.
+
+OAuth 3 is designed to break this deadlock by integrating the strengths of both systems, while addressing their weaknesses through hybrid architecture, smart contract automation, and privacy-enhancing technologies.
