@@ -17,7 +17,7 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with custom OAuth 3 color scheme
 - **State Management**: TanStack Query for server state management
 - **Routing**: Wouter for client-side routing
-- **Typography**: Montserrat font family for modern sans-serif aesthetics
+- **Typography**: IBM Plex Sans and Inter fonts for technical sophistication and excellent readability
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js framework
@@ -44,11 +44,13 @@ Preferred communication style: Simple, everyday language.
 
 #### UI Components
 - Comprehensive component library based on Radix UI
-- Custom styling with OAuth 3 brand colors:
-  - Primary: Blue (#3A76F0)
-  - Secondary: Light Gray (#F4F6F9)
-  - Accent: Orange (#FF9C00)
-  - Dark: Dark Gray (#333333)
+- Professional OAuth 3 brand colors following oauth3.io aesthetic:
+  - Primary: Purple (#B454FF - hsl(260, 100%, 70%))
+  - Secondary: Deep Navy (#0C0F1A - hsl(220, 30%, 10%))
+  - Accent: Cyan (#00D9FF - hsl(190, 100%, 60%))
+  - Background: Dark Navy (#050814 - hsl(220, 40%, 4%))
+  - Glass morphism cards with subtle hover effects
+  - Smooth transitions and professional animations
 
 ## Data Flow
 
@@ -103,6 +105,9 @@ Preferred communication style: Simple, everyday language.
 - Comprehensive documentation sections
 - Modern UI with smooth animations and transitions
 - Integrated OAuth 3 logo branding throughout the site
-- Clean, professional typography with Montserrat font
+- Clean, professional typography with IBM Plex Sans and Inter fonts
+- Sophisticated dark theme with deep navy to purple gradients  
+- Glassmorphism design elements with subtle neon accents
+- Professional color palette inspired by oauth3.io aesthetic
 
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.

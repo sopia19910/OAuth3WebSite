@@ -30,8 +30,8 @@ export default function AboutSection() {
     <section id="about" className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-foreground mb-4">About OAuth 3</h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-foreground mb-4 professional-heading">About OAuth 3</h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body">
             OAuth 3 represents a paradigm shift in authentication, seamlessly integrating Web2 user experience with Web3 security infrastructure.
           </p>
         </div>

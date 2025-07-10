@@ -8,11 +8,11 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
-            <h1 className="text-5xl lg:text-6xl font-bold leading-tight clean-title">
+            <h1 className="text-4xl lg:text-5xl font-bold leading-tight clean-title">
               OAuth 3: The Future of{" "}
               <span className="text-primary">Hybrid Authentication</span>
             </h1>
-            <p className="text-xl text-foreground/80">
+            <p className="text-lg text-foreground/80 tech-body">
               Combining the intuitive convenience of Web2 with the robust security of Web3. 
               Experience next-generation authentication that bridges traditional and blockchain ecosystems.
             </p>

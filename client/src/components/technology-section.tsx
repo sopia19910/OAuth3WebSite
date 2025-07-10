@@ -42,8 +42,8 @@ export default function TechnologySection() {
     <section id="technology" className="py-20 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-foreground mb-4">Core Technologies</h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-foreground mb-4 professional-heading">Core Technologies</h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body">
             OAuth 3 leverages cutting-edge blockchain and cryptographic technologies to deliver unparalleled security and user experience.
           </p>
         </div>
