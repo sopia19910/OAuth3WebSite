@@ -12,7 +12,7 @@ export default function Navbar() {
   const navItems = [
     { label: "Home", href: "/", isRoute: true },
     { label: "About OAuth 3", href: "/about", isRoute: true },
-    { label: "Technology", href: "#technology", isRoute: false },
+    { label: "Technology", href: "/technology", isRoute: true },
     { label: "Services", href: "#services", isRoute: false },
     { label: "Demo", href: "#demo", isRoute: false },
     { label: "Resources", href: "#resources", isRoute: false },
