@@ -41,14 +41,7 @@
   --logo-coral: #ff9b9e;
 }
 
-/* BNB Chain logo transparent background */
-.bnb-logo-transparent {
-  background-color: transparent !important;
-  /* Use darken blend mode to remove white background */
-  mix-blend-mode: darken;
-  /* Enhance visibility and remove background artifacts */
-  filter: brightness(1.1) contrast(1.2) saturate(1.1);
-}
+
 
 .dark {
   --background: hsl(222, 84%, 5%);

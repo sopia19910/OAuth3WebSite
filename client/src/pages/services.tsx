@@ -5,7 +5,7 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ethereumLogo from "@assets/image_1752123792166.png";
 import avalancheLogo from "@assets/image_1752123808428.png";
-import binanceLogo from "@assets/image_1752123826149.png";
+import binanceLogo from "@assets/image_1752124480119.png";
 import solanaLogo from "@assets/image_1752123844961.png";
 import tronLogo from "@assets/image_1752123864401.png";
 
@@ -236,7 +236,7 @@ export default function Services() {
                       <img 
                         src={blockchain.logo} 
                         alt={`${blockchain.name} logo`} 
-                        className={`w-12 h-12 object-contain ${blockchain.name === 'BNB Chain' ? 'bnb-logo-transparent' : ''}`}
+                        className="w-12 h-12 object-contain"
                       />
                     </div>
                     <div className="flex-1">
