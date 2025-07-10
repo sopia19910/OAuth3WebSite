@@ -4,8 +4,65 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Share2 } from "lucide-react";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Whitepaper() {
+  const { toast } = useToast();
+
+  const handleDownloadPDF = () => {
+    // Hide navigation and footer for clean PDF
+    const navbar = document.querySelector('nav');
+    const footer = document.querySelector('footer');
+    const backButton = document.querySelector('[data-back-button]');
+    const actionButtons = document.querySelector('[data-action-buttons]');
+    
+    if (navbar) navbar.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+    if (backButton) backButton.style.display = 'none';
+    if (actionButtons) actionButtons.style.display = 'none';
+
+    // Trigger print dialog
+    window.print();
+
+    // Restore elements after print
+    setTimeout(() => {
+      if (navbar) navbar.style.display = '';
+      if (footer) footer.style.display = '';
+      if (backButton) backButton.style.display = '';
+      if (actionButtons) actionButtons.style.display = '';
+    }, 1000);
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'OAuth 3 Whitepaper',
+        text: 'The Future of Hybrid Authentication: Bridging Web2 Convenience with Web3 Security',
+        url: window.location.href
+      }).catch(() => {
+        // Fallback to clipboard
+        copyToClipboard();
+      });
+    } else {
+      copyToClipboard();
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      toast({
+        title: "Link copied!",
+        description: "Whitepaper URL has been copied to clipboard.",
+      });
+    }).catch(() => {
+      toast({
+        title: "Share",
+        description: "Copy this URL to share: " + window.location.href,
+      });
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/95">
       <Navbar />
@@ -15,7 +72,7 @@ export default function Whitepaper() {
           {/* Header */}
           <div className="mb-8">
             <Link href="/resources">
-              <Button variant="ghost" className="mb-4 text-primary hover:text-primary/80">
+              <Button variant="ghost" className="mb-4 text-primary hover:text-primary/80" data-back-button>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Resources
               </Button>
@@ -29,12 +86,18 @@ export default function Whitepaper() {
                 </p>
               </div>
               
-              <div className="flex gap-3">
-                <Button className="bg-primary hover:bg-primary/90">
+              <div className="flex gap-3" data-action-buttons>
+                <Button 
+                  className="bg-primary hover:bg-primary/90"
+                  onClick={handleDownloadPDF}
+                >
                   <Download className="mr-2 h-4 w-4" />
                   Download PDF
                 </Button>
-                <Button variant="outline">
+                <Button 
+                  variant="outline"
+                  onClick={handleShare}
+                >
                   <Share2 className="mr-2 h-4 w-4" />
                   Share
                 </Button>
@@ -894,6 +957,7 @@ export default function Whitepaper() {
       </div>
       
       <Footer />
+      <Toaster />
     </div>
   );
 }
