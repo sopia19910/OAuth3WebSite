@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Play } from "lucide-react";
 import logoImage from "@assets/image_1752117480535.png";
+import googleLogo from "@assets/image_1752137026323.png";
 
 export default function HeroSection() {
   return (
@@ -42,10 +43,17 @@ export default function HeroSection() {
             </div>
             
             {/* Floating particles */}
-            <div className="absolute top-10 left-10 w-4 h-4 bg-primary rounded-full animate-particle opacity-60"></div>
+            <div className="absolute top-10 left-10 w-12 h-12 rounded-full animate-particle opacity-60 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '0s'}}>
+              <img src={googleLogo} alt="Google" className="w-8 h-8 opacity-90" />
+            </div>
             <div className="absolute top-20 right-20 w-3 h-3 bg-accent rounded-full animate-particle opacity-40" style={{animationDelay: '1s'}}></div>
-            <div className="absolute bottom-16 left-20 w-2 h-2 bg-primary rounded-full animate-particle opacity-50" style={{animationDelay: '2s'}}></div>
+            <div className="absolute bottom-16 left-20 w-10 h-10 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '2s'}}>
+              <img src={googleLogo} alt="Google" className="w-6 h-6 opacity-80" />
+            </div>
             <div className="absolute bottom-32 right-16 w-5 h-5 bg-accent rounded-full animate-particle opacity-30" style={{animationDelay: '0.5s'}}></div>
+            <div className="absolute top-1/2 left-0 w-8 h-8 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '3s'}}>
+              <img src={googleLogo} alt="Google" className="w-5 h-5 opacity-70" />
+            </div>
           </div>
         </div>
       </div>
