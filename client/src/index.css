@@ -215,6 +215,45 @@
     100% { background-position: 60px 60px, 60px 60px; }
   }
   
+  /* Security layer animations */
+  @keyframes security-pulse {
+    0% { 
+      transform: scale(1); 
+      opacity: 1; 
+    }
+    50% { 
+      transform: scale(1.05); 
+      opacity: 0.8; 
+    }
+    100% { 
+      transform: scale(1); 
+      opacity: 1; 
+    }
+  }
+  
+  @keyframes flow-line {
+    0% { 
+      opacity: 0.3; 
+      transform: scaleX(0);
+    }
+    50% { 
+      opacity: 1; 
+      transform: scaleX(1);
+    }
+    100% { 
+      opacity: 0.3; 
+      transform: scaleX(0);
+    }
+  }
+  
+  .security-layer-animation {
+    animation: security-pulse 3s ease-in-out infinite;
+  }
+  
+  .flow-line-animation {
+    animation: flow-line 2s ease-in-out infinite;
+  }
+  
   /* Print styles for whitepaper */
   @media print {
     body {
