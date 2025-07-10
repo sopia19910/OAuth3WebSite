@@ -185,8 +185,8 @@ export default function Technology() {
                     <Card className="bg-card/80 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:border-primary/40 group-hover:bg-card/90">
                       <CardContent className="p-6 relative">
                         {/* Simple Step Number on Left */}
-                        <div className="absolute -left-3 top-6 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
-                          <span className="text-white font-bold text-sm">{step.step}</span>
+                        <div className="absolute -left-3 top-6 w-8 h-8 border-2 border-primary rounded-full flex items-center justify-center shadow-lg bg-background">
+                          <span className="text-primary font-bold text-sm">{step.step}</span>
                         </div>
                         
                         <div className="text-center pl-4">
