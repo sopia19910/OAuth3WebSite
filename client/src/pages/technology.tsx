@@ -194,7 +194,7 @@ export default function Technology() {
                           </div>
                           
                           {/* Animated Icon */}
-                          <div className="mb-4 transform transition-transform duration-300 group-hover:scale-110">
+                          <div className="mb-4 transform transition-transform duration-300 group-hover:scale-110 flex justify-center">
                             {step.icon}
                           </div>
                           
