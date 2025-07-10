@@ -182,14 +182,14 @@ export default function Technology() {
                       </div>
                     )}
                     
-                    <Card className="bg-card/80 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:border-primary/40 group-hover:bg-card/90">
-                      <CardContent className="p-6 relative">
+                    <Card className="bg-card/80 backdrop-blur-sm border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:border-primary/40 group-hover:bg-card/90 h-full">
+                      <CardContent className="p-6 relative h-full flex flex-col">
                         {/* Simple Step Number on Left */}
                         <div className="absolute -left-3 top-6 w-8 h-8 border-2 border-primary/20 rounded-full flex items-center justify-center shadow-lg bg-background group-hover:border-primary/40 transition-colors duration-300">
                           <span className="text-muted-foreground font-bold text-sm group-hover:text-primary transition-colors">{step.step}</span>
                         </div>
                         
-                        <div className="text-center pl-4">
+                        <div className="text-center pl-4 flex-1 flex flex-col">
                           {/* Animated Icon */}
                           <div className="mb-4 transform transition-transform duration-300 group-hover:scale-110 flex justify-center">
                             {step.icon}
@@ -198,7 +198,7 @@ export default function Technology() {
                           <h3 className="text-lg font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
                             {step.title}
                           </h3>
-                          <p className="text-muted-foreground text-sm leading-relaxed">
+                          <p className="text-muted-foreground text-sm leading-relaxed flex-1">
                             {step.description}
                           </p>
                         </div>
