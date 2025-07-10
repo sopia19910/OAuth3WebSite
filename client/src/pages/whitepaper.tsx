@@ -34,33 +34,75 @@ export default function Whitepaper() {
     }, 1000);
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'OAuth 3 Whitepaper',
-        text: 'The Future of Hybrid Authentication: Bridging Web2 Convenience with Web3 Security',
-        url: window.location.href
-      }).catch(() => {
+  const handleShare = async () => {
+    const shareData = {
+      title: 'OAuth 3 Whitepaper',
+      text: 'The Future of Hybrid Authentication: Bridging Web2 Convenience with Web3 Security',
+      url: window.location.href
+    };
+
+    try {
+      // Check if Web Share API is available and supported
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        toast({
+          title: "Shared successfully!",
+          description: "Whitepaper has been shared.",
+        });
+      } else {
         // Fallback to clipboard
         copyToClipboard();
-      });
-    } else {
-      copyToClipboard();
+      }
+    } catch (error) {
+      // User cancelled sharing or error occurred
+      if (error.name !== 'AbortError') {
+        copyToClipboard();
+      }
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href).then(() => {
+  const copyToClipboard = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(window.location.href);
+        toast({
+          title: "Link copied!",
+          description: "Whitepaper URL has been copied to clipboard.",
+        });
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = window.location.href;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          document.execCommand('copy');
+          toast({
+            title: "Link copied!",
+            description: "Whitepaper URL has been copied to clipboard.",
+          });
+        } catch (err) {
+          toast({
+            title: "Share whitepaper",
+            description: "Copy this URL to share: " + window.location.href,
+            duration: 8000,
+          });
+        } finally {
+          document.body.removeChild(textArea);
+        }
+      }
+    } catch (error) {
       toast({
-        title: "Link copied!",
-        description: "Whitepaper URL has been copied to clipboard.",
-      });
-    }).catch(() => {
-      toast({
-        title: "Share",
+        title: "Share whitepaper",
         description: "Copy this URL to share: " + window.location.href,
+        duration: 8000,
       });
-    });
+    }
   };
 
   return (
