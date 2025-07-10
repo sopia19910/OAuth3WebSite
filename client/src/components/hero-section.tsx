@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Play } from "lucide-react";
+import logoImage from "@assets/image_1752117480535.png";
 
 export default function HeroSection() {
   return (
@@ -35,7 +36,7 @@ export default function HeroSection() {
           <div className="flex justify-center relative">
             <div className="animate-float">
               <div className="w-80 h-80 bg-primary/10 rounded-full flex items-center justify-center border border-primary/30 animate-pulse-glow">
-                <Shield className="w-32 h-32 text-primary opacity-90" />
+                <img src={logoImage} alt="OAuth 3 Logo" className="w-32 h-32 opacity-90" />
               </div>
             </div>
             

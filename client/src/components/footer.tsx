@@ -1,3 +1,5 @@
+import logoImage from "@assets/image_1752117480535.png";
+
 export default function Footer() {
   const footerSections = [
     {
@@ -31,7 +33,10 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-2xl font-bold mb-4 text-primary clean-logo">OAuth 3</h3>
+            <div className="flex items-center space-x-3 mb-4">
+              <img src={logoImage} alt="OAuth 3 Logo" className="h-8 w-8" />
+              <h3 className="text-2xl font-bold text-primary clean-logo">OAuth 3</h3>
+            </div>
             <p className="text-muted-foreground">
               Next-generation hybrid authentication protocol bridging Web2 and Web3.
             </p>
