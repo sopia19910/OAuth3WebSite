@@ -1,6 +1,5 @@
 import Navbar from "@/components/navbar";
 import HeroSection from "@/components/hero-section";
-import AboutSection from "@/components/about-section";
 import TechnologySection from "@/components/technology-section";
 import ServicesSection from "@/components/services-section";
 import DemoSection from "@/components/demo-section";
@@ -13,7 +12,6 @@ export default function Home() {
     <div className="min-h-screen">
       <Navbar />
       <HeroSection />
-      <AboutSection />
       <TechnologySection />
       <ServicesSection />
       <DemoSection />
