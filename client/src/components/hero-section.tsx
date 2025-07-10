@@ -2,11 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Shield, Play } from "lucide-react";
 import logoImage from "@assets/image_1752117480535.png";
 import googleLogo from "@assets/image_1752137026323.png";
-import globalNetworkImage from "@assets/image_1752137747093.png";
 
 export default function HeroSection() {
   return (
-    <section id="home" className="pt-16 text-white min-h-screen flex items-center">
+    <section id="home" className="pt-16 gradient-bg text-white min-h-screen flex items-center tech-grid">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
@@ -38,11 +37,8 @@ export default function HeroSection() {
           </div>
           <div className="flex justify-center relative">
             <div className="animate-float">
-              <div className="w-80 h-80 rounded-full flex items-center justify-center relative overflow-hidden border border-primary/30 animate-pulse-glow bg-gradient-to-br from-primary/20 to-accent/20 backdrop-blur-sm">
-                <img src={globalNetworkImage} alt="Global Network" className="w-72 h-72 opacity-90 object-cover rounded-full" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <img src={logoImage} alt="OAuth 3 Logo" className="w-24 h-24 opacity-95 z-10 filter drop-shadow-lg" />
-                </div>
+              <div className="w-80 h-80 bg-primary/10 rounded-full flex items-center justify-center border border-primary/30 animate-pulse-glow">
+                <img src={logoImage} alt="OAuth 3 Logo" className="w-32 h-32 opacity-90" />
               </div>
             </div>
             
