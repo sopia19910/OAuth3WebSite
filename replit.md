@@ -17,7 +17,7 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with custom OAuth 3 color scheme
 - **State Management**: TanStack Query for server state management
 - **Routing**: Wouter for client-side routing
-- **Typography**: Noto Sans font family for modern aesthetics
+- **Typography**: Roboto Slab font family for modern serif aesthetics
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js framework
