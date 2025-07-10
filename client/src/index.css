@@ -150,11 +150,25 @@
   }
   
   .neon-text {
-    text-shadow: 0 0 5px hsl(260, 100%, 70%), 0 0 10px hsl(260, 100%, 70%);
+    text-shadow: none;
+    color: hsl(260, 100%, 70%);
   }
   
   .neon-text-subtle {
-    text-shadow: 0 0 3px hsl(260, 100%, 70%), 0 0 6px hsl(260, 100%, 70%);
+    text-shadow: 0 0 1px hsl(260, 100%, 70%);
+    color: hsl(260, 100%, 70%);
+  }
+  
+  .clean-logo {
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    text-shadow: none;
+  }
+  
+  .clean-title {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    text-shadow: none;
   }
   
   .tech-grid {
