@@ -31,7 +31,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-2xl font-bold mb-4 text-primary neon-text">OAuth 3</h3>
+            <h3 className="text-2xl font-bold mb-4 text-primary neon-text-subtle">OAuth 3</h3>
             <p className="text-muted-foreground">
               Next-generation hybrid authentication protocol bridging Web2 and Web3.
             </p>

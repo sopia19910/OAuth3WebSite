@@ -30,7 +30,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <span className="text-2xl font-bold text-primary neon-text">OAuth 3</span>
+            <span className="text-2xl font-bold text-primary neon-text-subtle">OAuth 3</span>
           </div>
           
           {/* Desktop Navigation */}

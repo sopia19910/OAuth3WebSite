@@ -9,7 +9,7 @@ export default function HeroSection() {
           <div className="space-y-8">
             <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
               OAuth 3: The Future of{" "}
-              <span className="text-primary neon-text">Hybrid Authentication</span>
+              <span className="text-primary neon-text-subtle">Hybrid Authentication</span>
             </h1>
             <p className="text-xl text-foreground/80">
               Combining the intuitive convenience of Web2 with the robust security of Web3. 

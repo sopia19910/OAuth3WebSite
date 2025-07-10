@@ -150,7 +150,11 @@
   }
   
   .neon-text {
-    text-shadow: 0 0 10px hsl(260, 100%, 70%), 0 0 20px hsl(260, 100%, 70%), 0 0 30px hsl(260, 100%, 70%);
+    text-shadow: 0 0 5px hsl(260, 100%, 70%), 0 0 10px hsl(260, 100%, 70%);
+  }
+  
+  .neon-text-subtle {
+    text-shadow: 0 0 3px hsl(260, 100%, 70%), 0 0 6px hsl(260, 100%, 70%);
   }
   
   .tech-grid {
