@@ -236,7 +236,7 @@ export default function Services() {
                       <img 
                         src={blockchain.logo} 
                         alt={`${blockchain.name} logo`} 
-                        className="w-12 h-12 object-contain"
+                        className={`w-12 h-12 object-contain ${blockchain.name === 'BNB Chain' ? 'bnb-logo-transparent' : ''}`}
                       />
                     </div>
                     <div className="flex-1">
