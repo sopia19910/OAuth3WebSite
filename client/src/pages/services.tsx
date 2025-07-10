@@ -3,6 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Users, Building2, Shield, Key, Globe, Check, ArrowRight, Zap, Network, Lock, Coins, Settings } from "lucide-react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import ethereumLogo from "@assets/image_1752123792166.png";
+import avalancheLogo from "@assets/image_1752123808428.png";
+import binanceLogo from "@assets/image_1752123826149.png";
+import solanaLogo from "@assets/image_1752123844961.png";
+import tronLogo from "@assets/image_1752123864401.png";
 
 export default function Services() {
   const individualFeatures = [
@@ -56,31 +61,36 @@ export default function Services() {
       name: "Ethereum",
       strength: "Largest DeFi ecosystem",
       useCases: ["DeFi", "NFTs", "dApps"],
-      color: "text-blue-400"
+      color: "text-blue-400",
+      logo: ethereumLogo
     },
     {
       name: "BNB Chain",
       strength: "Low fees, fast confirmation",
       useCases: ["DEXs", "Gaming", "DeFi"],
-      color: "text-yellow-400"
+      color: "text-yellow-400",
+      logo: binanceLogo
     },
     {
       name: "Solana",
       strength: "Ultra-fast transaction speeds",
       useCases: ["NFTs", "Web3 apps"],
-      color: "text-purple-400"
+      color: "text-purple-400",
+      logo: solanaLogo
     },
     {
       name: "Avalanche",
       strength: "Subnet architecture",
       useCases: ["Enterprise", "DeFi"],
-      color: "text-red-400"
+      color: "text-red-400",
+      logo: avalancheLogo
     },
     {
       name: "Tron",
       strength: "High throughput, media focus",
       useCases: ["Content platforms", "Payments"],
-      color: "text-green-400"
+      color: "text-green-400",
+      logo: tronLogo
     }
   ];
 
@@ -221,10 +231,18 @@ export default function Services() {
             {blockchainSupport.map((blockchain, index) => (
               <Card key={index} className="bg-card shadow-lg card-hover">
                 <CardContent className="p-6">
-                  <div className="text-center mb-4">
-                    <Network className={`w-12 h-12 mx-auto mb-3 ${blockchain.color}`} />
-                    <h3 className="text-xl font-semibold text-foreground mb-2">{blockchain.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-4">{blockchain.strength}</p>
+                  <div className="flex items-start space-x-4 mb-4">
+                    <div className="flex-shrink-0">
+                      <img 
+                        src={blockchain.logo} 
+                        alt={`${blockchain.name} logo`} 
+                        className="w-12 h-12 object-contain"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold text-foreground mb-2">{blockchain.name}</h3>
+                      <p className="text-muted-foreground text-sm mb-4">{blockchain.strength}</p>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <h4 className="text-sm font-semibold text-foreground">Main Use Cases:</h4>
