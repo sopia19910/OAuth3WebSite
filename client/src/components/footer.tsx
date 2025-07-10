@@ -1,4 +1,5 @@
 import logoImage from "@assets/image_1752117480535.png";
+import { FaXTwitter, FaGithub, FaYoutube, FaMedium } from "react-icons/fa6";
 
 export default function Footer() {
   const footerSections = [
@@ -37,9 +38,49 @@ export default function Footer() {
               <img src={logoImage} alt="OAuth 3 Logo" className="h-8 w-8" />
               <h3 className="text-2xl font-bold text-primary clean-logo">OAuth 3</h3>
             </div>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-6">
               Next-generation hybrid authentication protocol bridging Web2 and Web3.
             </p>
+            
+            {/* Social Media Links */}
+            <div className="flex space-x-4">
+              <a 
+                href="https://x.com/oauth3" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+                aria-label="Follow us on X"
+              >
+                <FaXTwitter className="h-5 w-5" />
+              </a>
+              <a 
+                href="https://github.com/oauth3" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+                aria-label="View our GitHub"
+              >
+                <FaGithub className="h-5 w-5" />
+              </a>
+              <a 
+                href="https://youtube.com/@oauth3" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+                aria-label="Subscribe to our YouTube"
+              >
+                <FaYoutube className="h-5 w-5" />
+              </a>
+              <a 
+                href="https://medium.com/@oauth3" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+                aria-label="Read our Medium blog"
+              >
+                <FaMedium className="h-5 w-5" />
+              </a>
+            </div>
           </div>
           {footerSections.map((section, index) => (
             <div key={index}>
