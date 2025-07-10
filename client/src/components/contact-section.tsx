@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, MessageSquare, Github, Twitter } from "lucide-react";
+import { Mail, MessageSquare, Github, Twitter, CheckCircle, AlertCircle } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -14,16 +17,68 @@ export default function ContactSection() {
     company: "",
     message: ""
   });
+  
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { toast } = useToast();
+
+  const contactMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      return await apiRequest("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Message sent successfully!",
+        description: "Thank you for your message. We'll get back to you soon.",
+      });
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        company: "",
+        message: ""
+      });
+      setErrors({});
+    },
+    onError: (error: any) => {
+      console.error("Contact form error:", error);
+      
+      if (error.errors) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err: any) => {
+          if (err.path && err.path.length > 0) {
+            newErrors[err.path[0]] = err.message;
+          }
+        });
+        setErrors(newErrors);
+      }
+      
+      toast({
+        title: "Error sending message",
+        description: error.message || "Please check your form data and try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // TODO: Implement form submission logic
+    contactMutation.mutate(formData);
   };
 
   const contactMethods = [
@@ -75,8 +130,14 @@ export default function ContactSection() {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                        errors.firstName ? 'border-red-500' : 'border-border'
+                      }`}
+                      required
                     />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="lastName" className="text-sm font-medium text-foreground mb-2">
@@ -87,8 +148,14 @@ export default function ContactSection() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                        errors.lastName ? 'border-red-500' : 'border-border'
+                      }`}
+                      required
                     />
+                    {errors.lastName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -101,8 +168,14 @@ export default function ContactSection() {
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.email ? 'border-red-500' : 'border-border'
+                    }`}
+                    required
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="company" className="text-sm font-medium text-foreground mb-2">
@@ -126,14 +199,28 @@ export default function ContactSection() {
                     rows={4}
                     value={formData.message}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.message ? 'border-red-500' : 'border-border'
+                    }`}
+                    required
                   />
+                  {errors.message && (
+                    <p className="text-red-500 text-sm mt-1">{errors.message}</p>
+                  )}
                 </div>
                 <Button 
                   type="submit" 
                   className="w-full bg-primary hover:bg-primary/90 text-white py-3 font-semibold"
+                  disabled={contactMutation.isPending}
                 >
-                  Send Message
+                  {contactMutation.isPending ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Sending...
+                    </>
+                  ) : (
+                    "Send Message"
+                  )}
                 </Button>
               </form>
             </CardContent>

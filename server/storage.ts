@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+import { users, contacts, type User, type InsertUser, type Contact, type InsertContact } from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -7,6 +7,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  createContact(contact: InsertContact): Promise<Contact>;
 }
 
 export class MemStorage implements IStorage {
@@ -33,6 +34,18 @@ export class MemStorage implements IStorage {
     const user: User = { ...insertUser, id };
     this.users.set(id, user);
     return user;
+  }
+
+  async createContact(insertContact: InsertContact): Promise<Contact> {
+    const id = this.currentId++;
+    const contact: Contact = { 
+      ...insertContact, 
+      id,
+      createdAt: new Date()
+    };
+    // In memory storage for contacts (in real app, this would be persisted)
+    console.log("Contact submitted:", contact);
+    return contact;
   }
 }
 
@@ -64,6 +77,17 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async createContact(insertContact: InsertContact): Promise<Contact> {
+    const { db } = await import("./db");
+    const { contacts } = await import("@shared/schema");
+    
+    const [contact] = await db
+      .insert(contacts)
+      .values(insertContact)
+      .returning();
+    return contact;
   }
 }
 
