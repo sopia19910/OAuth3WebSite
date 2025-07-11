@@ -149,7 +149,7 @@ export default function AboutSection() {
             <CardContent className="p-8">
               <div className="flex items-center justify-center space-x-8">
                 <div className="text-center">
-                  <Globe className="w-16 h-16 text-accent mx-auto mb-4" strokeWidth={1.5} />
+                  <Globe className="w-16 h-16 text-accent mx-auto mb-4" strokeWidth={1.0} />
                   <h4 className="text-lg font-semibold text-foreground mb-2">Web2 Login</h4>
                   <p className="text-muted-foreground">Google, Kakao, etc.</p>
                 </div>
@@ -157,15 +157,15 @@ export default function AboutSection() {
                   <div className="text-2xl font-bold text-primary">+</div>
                 </div>
                 <div className="text-center">
-                  <Key className="w-16 h-16 text-primary mx-auto mb-4" strokeWidth={1.5} />
+                  <Key className="w-16 h-16 text-primary mx-auto mb-4" strokeWidth={1.0} />
                   <h4 className="text-lg font-semibold text-foreground mb-2">Web3 Signature</h4>
                   <p className="text-muted-foreground">Private key validation</p>
                 </div>
                 <div className="text-center">
-                  <ArrowRight className="w-8 h-8 text-muted-foreground" strokeWidth={1.5} />
+                  <ArrowRight className="w-8 h-8 text-muted-foreground" strokeWidth={1.0} />
                 </div>
                 <div className="text-center">
-                  <Shield className="w-16 h-16 text-primary mx-auto mb-4" strokeWidth={1.5} />
+                  <Shield className="w-16 h-16 text-primary mx-auto mb-4" strokeWidth={1.0} />
                   <h4 className="text-lg font-semibold text-foreground mb-2">Secure Transaction</h4>
                   <p className="text-muted-foreground">Smart contract verified</p>
                 </div>
