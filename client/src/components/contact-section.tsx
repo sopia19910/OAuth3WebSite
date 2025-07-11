@@ -23,13 +23,8 @@ export default function ContactSection() {
 
   const contactMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      return await apiRequest("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await apiRequest("POST", "/api/contact", data);
+      return await response.json();
     },
     onSuccess: (data) => {
       toast({
