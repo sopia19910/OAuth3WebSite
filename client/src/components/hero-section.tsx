@@ -1,12 +1,104 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Play } from "lucide-react";
+import { useState, useEffect } from "react";
 import logoImage from "@assets/image_1752117480535.png";
 import googleLogo from "@assets/image_1752137026323.png";
 import facebookLogo from "@assets/image_1752144869558.png";
 import chatIcon from "@assets/image_1752148691176.png";
 import networkIcon from "@assets/image_1752148793381.png";
 
+interface ParticlePosition {
+  top: number;
+  left: number;
+  size: number;
+  opacity: number;
+  delay: number;
+}
+
 export default function HeroSection() {
+  const [particlePositions, setParticlePositions] = useState<ParticlePosition[]>([]);
+
+  const particles = [
+    { icon: googleLogo, alt: "Google", baseSize: 8 },
+    { icon: facebookLogo, alt: "Facebook", baseSize: 6 },
+    { icon: googleLogo, alt: "Google", baseSize: 6 },
+    { icon: facebookLogo, alt: "Facebook", baseSize: 5 },
+    { icon: googleLogo, alt: "Google", baseSize: 5 },
+    { icon: chatIcon, alt: "Chat", baseSize: 8 },
+    { icon: chatIcon, alt: "Chat", baseSize: 6 },
+    { icon: networkIcon, alt: "Network", baseSize: 5 },
+    { icon: networkIcon, alt: "Network", baseSize: 6 },
+    { icon: networkIcon, alt: "Network", baseSize: 5 },
+  ];
+
+  useEffect(() => {
+    const generatePositions = () => {
+      const positions: ParticlePosition[] = [];
+      const centerX = 50; // 50% from left
+      const centerY = 50; // 50% from top
+      const minRadius = 25; // Minimum distance from center
+      const maxRadius = 45; // Maximum distance from center
+      const minDistance = 12; // Minimum distance between particles
+
+      for (let i = 0; i < particles.length; i++) {
+        let attempts = 0;
+        let validPosition = false;
+        let newPosition: ParticlePosition;
+
+        while (!validPosition && attempts < 50) {
+          // Generate random angle and radius
+          const angle = Math.random() * 2 * Math.PI;
+          const radius = minRadius + Math.random() * (maxRadius - minRadius);
+          
+          // Convert to x, y coordinates
+          const x = centerX + Math.cos(angle) * radius;
+          const y = centerY + Math.sin(angle) * radius;
+
+          // Ensure position is within bounds
+          if (x >= 5 && x <= 95 && y >= 5 && y <= 95) {
+            newPosition = {
+              top: y,
+              left: x,
+              size: particles[i].baseSize + Math.random() * 4, // Add some size variation
+              opacity: 0.3 + Math.random() * 0.3, // Random opacity between 0.3-0.6
+              delay: Math.random() * 4, // Random delay 0-4s
+            };
+
+            // Check if this position is too close to existing particles
+            const tooClose = positions.some(pos => {
+              const distance = Math.sqrt(
+                Math.pow(pos.left - newPosition.left, 2) + 
+                Math.pow(pos.top - newPosition.top, 2)
+              );
+              return distance < minDistance;
+            });
+
+            if (!tooClose) {
+              positions.push(newPosition);
+              validPosition = true;
+            }
+          }
+          attempts++;
+        }
+
+        // If we couldn't find a valid position, use a fallback
+        if (!validPosition) {
+          const fallbackAngle = (i / particles.length) * 2 * Math.PI;
+          positions.push({
+            top: centerY + Math.cos(fallbackAngle) * 35,
+            left: centerX + Math.sin(fallbackAngle) * 35,
+            size: particles[i].baseSize,
+            opacity: 0.4,
+            delay: i * 0.5,
+          });
+        }
+      }
+
+      setParticlePositions(positions);
+    };
+
+    generatePositions();
+  }, []);
   return (
     <section id="home" className="pt-16 gradient-bg text-white min-h-screen flex items-center tech-grid">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
@@ -45,37 +137,32 @@ export default function HeroSection() {
               </div>
             </div>
             
-            {/* Floating particles - arranged in natural circular pattern */}
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full animate-particle opacity-60 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '0s'}}>
-              <img src={googleLogo} alt="Google" className="w-8 h-8 opacity-90" />
-            </div>
-            <div className="absolute top-8 -right-8 w-10 h-10 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1s'}}>
-              <img src={facebookLogo} alt="Facebook" className="w-6 h-6 opacity-80" />
-            </div>
-            <div className="absolute -bottom-8 left-1/3 w-10 h-10 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '2s'}}>
-              <img src={googleLogo} alt="Google" className="w-6 h-6 opacity-80" />
-            </div>
-            <div className="absolute bottom-8 -right-12 w-8 h-8 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '0.5s'}}>
-              <img src={facebookLogo} alt="Facebook" className="w-5 h-5 opacity-70" />
-            </div>
-            <div className="absolute top-1/2 -left-16 w-8 h-8 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '3s'}}>
-              <img src={googleLogo} alt="Google" className="w-5 h-5 opacity-70" />
-            </div>
-            <div className="absolute top-1/4 right-2 w-12 h-12 rounded-full animate-particle opacity-50 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1.5s'}}>
-              <img src={chatIcon} alt="Chat" className="w-8 h-8 opacity-80" />
-            </div>
-            <div className="absolute bottom-1/4 left-2 w-10 h-10 rounded-full animate-particle opacity-45 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '2.5s'}}>
-              <img src={chatIcon} alt="Chat" className="w-6 h-6 opacity-75" />
-            </div>
-            <div className="absolute -top-4 right-1/3 w-8 h-8 rounded-full animate-particle opacity-35 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '4s'}}>
-              <img src={networkIcon} alt="Network" className="w-5 h-5 opacity-70" />
-            </div>
-            <div className="absolute -bottom-4 right-1/4 w-10 h-10 rounded-full animate-particle opacity-40 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '1.8s'}}>
-              <img src={networkIcon} alt="Network" className="w-6 h-6 opacity-75" />
-            </div>
-            <div className="absolute top-3/4 -left-8 w-8 h-8 rounded-full animate-particle opacity-30 flex items-center justify-center bg-white/10 backdrop-blur-sm" style={{animationDelay: '3.2s'}}>
-              <img src={networkIcon} alt="Network" className="w-5 h-5 opacity-65" />
-            </div>
+            {/* Floating particles - dynamically positioned around the large circle */}
+            {particlePositions.map((position, index) => (
+              <div
+                key={index}
+                className="absolute rounded-full animate-particle flex items-center justify-center bg-white/10 backdrop-blur-sm"
+                style={{
+                  top: `${position.top}%`,
+                  left: `${position.left}%`,
+                  width: `${position.size * 4}px`,
+                  height: `${position.size * 4}px`,
+                  opacity: position.opacity,
+                  animationDelay: `${position.delay}s`,
+                  transform: 'translate(-50%, -50%)'
+                }}
+              >
+                <img 
+                  src={particles[index].icon} 
+                  alt={particles[index].alt} 
+                  className="opacity-90"
+                  style={{
+                    width: `${position.size * 4}px`,
+                    height: `${position.size * 4}px`
+                  }}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
