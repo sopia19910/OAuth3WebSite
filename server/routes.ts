@@ -23,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(400).json({
           success: false,
           message: "Please check your form data",
-          errors: error.issues
+          errors: (error as any).issues
         });
       } else {
         res.status(500).json({

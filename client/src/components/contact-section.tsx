@@ -23,8 +23,23 @@ export default function ContactSection() {
 
   const contactMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await apiRequest("POST", "/api/contact", data);
-      return await response.json();
+      try {
+        const response = await apiRequest("POST", "/api/contact", data);
+        return await response.json();
+      } catch (error: any) {
+        // Try to parse error response
+        const errorMessage = error.message || '';
+        const statusMatch = errorMessage.match(/^\d+:\s*(.+)$/);
+        if (statusMatch) {
+          try {
+            const errorData = JSON.parse(statusMatch[1]);
+            throw errorData;
+          } catch (parseError) {
+            throw { message: statusMatch[1] };
+          }
+        }
+        throw error;
+      }
     },
     onSuccess: (data) => {
       toast({
@@ -51,13 +66,19 @@ export default function ContactSection() {
           }
         });
         setErrors(newErrors);
+        
+        toast({
+          title: "Please check your form",
+          description: "Some fields need to be corrected before sending.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error sending message",
+          description: error.message || "Please check your form data and try again.",
+          variant: "destructive",
+        });
       }
-      
-      toast({
-        title: "Error sending message",
-        description: error.message || "Please check your form data and try again.",
-        variant: "destructive",
-      });
     },
   });
 
