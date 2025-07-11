@@ -9,6 +9,7 @@ import Technology from "@/pages/technology";
 import Services from "@/pages/services";
 import Resources from "@/pages/resources";
 import Whitepaper from "@/pages/whitepaper";
+import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/services" component={Services} />
       <Route path="/resources" component={Resources} />
       <Route path="/whitepaper" component={Whitepaper} />
+      <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>
   );
