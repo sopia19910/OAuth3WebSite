@@ -1,13 +1,25 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Shield, Key, Users, Settings, Lock, Globe, Check, ArrowRight, Zap, Network, Building2 } from "lucide-react";
+import { 
+  ShieldCheckIcon, 
+  KeyIcon, 
+  UsersIcon, 
+  CogIcon, 
+  LockClosedIcon, 
+  GlobeAltIcon, 
+  CheckIcon, 
+  ArrowRightIcon, 
+  BoltIcon, 
+  GlobeAmericasIcon,
+  BuildingOfficeIcon 
+} from "@heroicons/react/24/outline";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
 export default function Technology() {
   const coreComponents = [
     {
-      icon: <Users className="w-16 h-16 text-primary mb-6" />,
+      icon: <UsersIcon className="w-16 h-16 text-primary mb-6" />,
       title: "EOA (Externally Owned Account)",
       description: "This is a standard Web3 blockchain account, managed by a user's private key. It ensures full ownership and control of assets and identity.",
       features: [
@@ -18,7 +30,7 @@ export default function Technology() {
       ]
     },
     {
-      icon: <Settings className="w-16 h-16 text-accent mb-6" />,
+      icon: <CogIcon className="w-16 h-16 text-accent mb-6" />,
       title: "CA (Contract Account)",
       description: "A programmable smart contract wallet that authorizes transactions only when both Web2 and Web3 authentications are satisfied. It acts as a decentralized two-factor authentication (2FA) mechanism.",
       features: [
@@ -29,7 +41,7 @@ export default function Technology() {
       ]
     },
     {
-      icon: <Shield className="w-16 h-16 text-primary mb-6" />,
+      icon: <ShieldCheckIcon className="w-16 h-16 text-primary mb-6" />,
       title: "ZKP (Zero-Knowledge Proof)",
       description: "ZKP allows the system to confirm login success without disclosing sensitive user data on-chain. It enables secure, private verification of identity credentials.",
       features: [
@@ -62,25 +74,25 @@ export default function Technology() {
       step: "1",
       title: "Web2 Authentication",
       description: "User logs in with familiar Web2 account (Google, Kakao, Facebook)",
-      icon: <Globe className="w-12 h-12 text-accent" strokeWidth={1.5} />
+      icon: <GlobeAltIcon className="w-12 h-12 text-accent" strokeWidth={1.5} />
     },
     {
       step: "2",
       title: "Web3 Signature",
       description: "Transaction signed with private Web3 key for cryptographic verification",
-      icon: <Key className="w-12 h-12 text-primary" strokeWidth={1.5} />
+      icon: <KeyIcon className="w-12 h-12 text-primary" strokeWidth={1.5} />
     },
     {
       step: "3",
       title: "ZKP Verification",
       description: "Zero-Knowledge Proof confirms identity without revealing personal data",
-      icon: <Shield className="w-12 h-12 text-primary" strokeWidth={1.5} />
+      icon: <ShieldCheckIcon className="w-12 h-12 text-primary" strokeWidth={1.5} />
     },
     {
       step: "4",
       title: "Transaction Execution",
       description: "Smart contract executes transaction only when all conditions are met",
-      icon: <Lock className="w-12 h-12 text-accent" strokeWidth={1.5} />
+      icon: <LockClosedIcon className="w-12 h-12 text-accent" strokeWidth={1.5} />
     }
   ];
 
@@ -117,7 +129,7 @@ export default function Technology() {
           <Card className="bg-card shadow-lg card-hover">
             <CardContent className="p-8">
               <div className="text-center mb-8">
-                <Network className="w-24 h-24 text-primary mx-auto mb-4" />
+                <GlobeAmericasIcon className="w-24 h-24 text-primary mx-auto mb-4" />
                 <h3 className="text-2xl font-semibold text-foreground mb-4">Balanced Security & Usability</h3>
                 <p className="text-muted-foreground text-lg">
                   This hybrid approach balances ease of use with the highest levels of security and privacy, ensuring that identity is verified without revealing personal data.
@@ -148,7 +160,7 @@ export default function Technology() {
                   <ul className="space-y-3">
                     {component.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-center text-muted-foreground">
-                        <Check className="w-4 h-4 text-primary mr-3" />
+                        <CheckIcon className="w-4 h-4 text-primary mr-3" />
                         {feature}
                       </li>
                     ))}
@@ -217,7 +229,7 @@ export default function Technology() {
               <CardContent className="p-8">
                 <div className="text-center mb-8">
                   <div className="w-20 h-20 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Shield className="w-10 h-10 text-primary" />
+                    <ShieldCheckIcon className="w-10 h-10 text-primary" />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Security Layers</h3>
                   <p className="text-muted-foreground">Comprehensive protection through multiple validation points</p>
@@ -264,7 +276,7 @@ export default function Technology() {
               <CardContent className="p-8">
                 <div className="text-center mb-8">
                   <div className="w-20 h-20 bg-gradient-to-r from-accent/20 to-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Lock className="w-10 h-10 text-accent" />
+                    <LockClosedIcon className="w-10 h-10 text-accent" />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-4">Threat Protection</h3>
                   <p className="text-muted-foreground">Advanced defense against modern attack vectors</p>
@@ -321,7 +333,7 @@ export default function Technology() {
               <div className="text-center">
                 <div className="flex items-center justify-center mb-6">
                   <div className="w-24 h-24 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
-                    <Shield className="w-12 h-12 text-white" />
+                    <ShieldCheckIcon className="w-12 h-12 text-white" />
                   </div>
                 </div>
                 
@@ -410,7 +422,7 @@ export default function Technology() {
                   </div>
                 </div>
                 <div className="text-center">
-                  <Network className="w-32 h-32 text-primary mx-auto mb-6" />
+                  <GlobeAmericasIcon className="w-32 h-32 text-primary mx-auto mb-6" />
                   <h3 className="text-xl font-semibold text-foreground mb-4">Unified Experience</h3>
                   <p className="text-muted-foreground">
                     Users can perform transactions across different blockchains in a unified and simplified way, removing the complexity of managing multiple wallets and interfaces.
@@ -434,14 +446,14 @@ export default function Technology() {
             <CardContent className="p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="text-center">
-                  <Building2 className="w-16 h-16 text-accent mx-auto mb-4" />
+                  <BuildingOfficeIcon className="w-16 h-16 text-accent mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-foreground mb-4">Cost Reduction</h3>
                   <p className="text-muted-foreground">
                     Significantly reduces costs compared to traditional custodial services while maintaining enterprise-grade security.
                   </p>
                 </div>
                 <div className="text-center">
-                  <Settings className="w-16 h-16 text-primary mx-auto mb-4" />
+                  <CogIcon className="w-16 h-16 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-foreground mb-4">Enhanced Efficiency</h3>
                   <p className="text-muted-foreground">
                     Enhances operational efficiency and security through programmable smart contracts and transparent governance.
@@ -460,7 +472,7 @@ export default function Technology() {
           </p>
           
           <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
-            <Zap className="mr-2 h-5 w-5" />
+            <BoltIcon className="mr-2 h-5 w-5" />
             Explore OAuth 3 Demo
           </Button>
         </div>
