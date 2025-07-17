@@ -62,9 +62,7 @@ export default function Demo() {
       case "login":
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-              <ShieldCheckIcon className="w-8 h-8 text-primary" strokeWidth={1} />
-            </div>
+            <ShieldCheckIcon className="w-8 h-8 text-primary mb-6" strokeWidth={1} />
             <h2 className="text-2xl font-bold text-foreground mb-2">Connect your account</h2>
             <p className="text-muted-foreground text-center mb-8">
               Connect your account to continue with OAuth 3 authentication
