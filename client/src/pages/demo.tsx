@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,8 +27,8 @@ export default function Demo() {
   const [web3Option, setWeb3Option] = useState("new");
   const [privateKey, setPrivateKey] = useState("");
   const [zkpProgress, setZkpProgress] = useState(0);
-
   const [userEmail, setUserEmail] = useState("");
+  const [, setLocation] = useLocation();
 
   const handleGoogleLogin = () => {
     setUserEmail("demo.user@gmail.com");
@@ -58,8 +59,7 @@ export default function Demo() {
   };
 
   const handleGoToDashboard = () => {
-    // This would typically navigate to a dashboard
-    alert("Demo completed! In a real implementation, this would redirect to the OAuth 3 dashboard.");
+    setLocation("/dashboard");
   };
 
   const copyToClipboard = async (text: string, label: string) => {

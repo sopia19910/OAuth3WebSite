@@ -11,6 +11,7 @@ import Resources from "@/pages/resources";
 import Whitepaper from "@/pages/whitepaper";
 import Contact from "@/pages/contact";
 import Demo from "@/pages/demo";
+import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/whitepaper" component={Whitepaper} />
       <Route path="/contact" component={Contact} />
       <Route path="/demo" component={Demo} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>
   );
