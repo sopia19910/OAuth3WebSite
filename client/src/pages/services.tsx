@@ -275,24 +275,7 @@ export default function Services() {
 
 
 
-        {/* Call to Action */}
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-6 professional-heading">Ready to Transform Your Digital Experience?</h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body mb-8">
-            Whether you're an individual looking for seamless Web3 access or an enterprise seeking cost-efficient asset management, OAuth 3 has the perfect solution for you.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
-              <UsersIcon className="mr-2 h-5 w-5" strokeWidth={1} />
-              Get Started - Individual
-            </Button>
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 px-8 py-3 font-semibold">
-              <BuildingOfficeIcon className="mr-2 h-5 w-5" strokeWidth={1} />
-              Contact Sales - Enterprise
-            </Button>
-          </div>
-        </div>
+
       </div>
       <Footer />
     </div>
