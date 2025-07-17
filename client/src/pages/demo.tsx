@@ -13,7 +13,8 @@ import {
   DocumentIcon,
   CheckCircleIcon,
   ArrowRightIcon,
-  CurrencyDollarIcon
+  CurrencyDollarIcon,
+  ClipboardIcon
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
@@ -56,6 +57,16 @@ export default function Demo() {
   const handleGoToDashboard = () => {
     // This would typically navigate to a dashboard
     alert("Demo completed! In a real implementation, this would redirect to the OAuth 3 dashboard.");
+  };
+
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert(`${label} copied to clipboard!`);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      alert(`Failed to copy ${label}`);
+    }
   };
 
   const renderStep = () => {
@@ -136,19 +147,35 @@ export default function Demo() {
                 <div className="space-y-3">
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Public Address</Label>
-                    <div className="mt-1 p-3 bg-muted rounded-md">
-                      <p className="text-sm text-foreground font-mono break-all">
+                    <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
+                      <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
                         0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
                       </p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard('0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b', 'Public Address')}
+                        className="p-1 h-auto hover:bg-background"
+                      >
+                        <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                      </Button>
                     </div>
                   </div>
                   
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Private Address</Label>
-                    <div className="mt-1 p-3 bg-muted rounded-md">
-                      <p className="text-sm text-foreground font-mono break-all">
+                    <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
+                      <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
                         0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
                       </p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard('0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef', 'Private Address')}
+                        className="p-1 h-auto hover:bg-background"
+                      >
+                        <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                      </Button>
                     </div>
                   </div>
                 </div>
