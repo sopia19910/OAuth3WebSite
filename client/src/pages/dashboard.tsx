@@ -265,7 +265,32 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="pt-16 flex">
+      {/* Session Status Bar */}
+      <div className="fixed top-16 left-0 right-0 bg-muted/50 backdrop-blur-sm border-b border-border z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-12">
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium text-muted-foreground">Current Session:</span>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-sm font-semibold text-foreground">{userEmail}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Network:</span>
+                <span className="font-medium text-foreground">Ethereum Mainnet</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Wallet:</span>
+                <span className="font-mono text-xs text-foreground">{publicAddress.slice(0, 6)}...{publicAddress.slice(-4)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="pt-28 flex">
         {/* Left Sidebar */}
         <div className="w-56 bg-background border-r border-border/50 min-h-screen">
           <div className="p-6">
