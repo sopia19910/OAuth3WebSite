@@ -27,7 +27,10 @@ export default function Demo() {
   const [privateKey, setPrivateKey] = useState("");
   const [zkpProgress, setZkpProgress] = useState(0);
 
+  const [userEmail, setUserEmail] = useState("");
+
   const handleGoogleLogin = () => {
+    setUserEmail("demo.user@gmail.com");
     setCurrentStep("web3-setup");
   };
 
@@ -93,6 +96,24 @@ export default function Demo() {
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
             <h2 className="text-2xl font-bold text-foreground mb-6">Connect your Web3 account</h2>
+            
+            {/* Google Account Info */}
+            <div className="w-full bg-card rounded-lg p-4 mb-6">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Connected Google Account</h3>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                  {userEmail}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard(userEmail, 'Email')}
+                  className="p-1 h-auto hover:bg-muted"
+                >
+                  <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                </Button>
+              </div>
+            </div>
             
             <RadioGroup value={web3Option} onValueChange={setWeb3Option} className="w-full mb-6">
               <div className="flex items-center space-x-4 border rounded-lg p-4">
@@ -242,6 +263,24 @@ export default function Demo() {
               </p>
             </div>
             
+            {/* Email Information */}
+            <div className="mb-6 w-full bg-card rounded-lg p-4">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Connected Email Account</h3>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                  {userEmail}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard(userEmail, 'Email')}
+                  className="p-1 h-auto hover:bg-muted"
+                >
+                  <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                </Button>
+              </div>
+            </div>
+            
             <Card className="bg-card">
               <CardContent className="p-6">
                 <div className="space-y-4">
@@ -304,21 +343,41 @@ export default function Demo() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
                     <div className="space-y-1">
                       <span className="text-sm font-medium text-muted-foreground">Email Hash (Poseidon)</span>
-                      <p className="text-xs text-muted-foreground">Cryptographic hash of email address</p>
+                      <p className="text-xs text-muted-foreground">Cryptographic hash of {userEmail}</p>
                     </div>
-                    <span className="text-sm text-foreground md:col-span-2 font-mono break-all">
-                      0xabcdef1234567890abcdef1234567890
-                    </span>
+                    <div className="md:col-span-2 flex items-center justify-between">
+                      <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                        0xabcdef1234567890abcdef1234567890abcdef1234567890
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard('0xabcdef1234567890abcdef1234567890abcdef1234567890', 'Email Hash')}
+                        className="p-1 h-auto hover:bg-muted"
+                      >
+                        <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                      </Button>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
                     <div className="space-y-1">
                       <span className="text-sm font-medium text-muted-foreground">Domain Hash (Poseidon)</span>
-                      <p className="text-xs text-muted-foreground">Cryptographic hash of domain</p>
+                      <p className="text-xs text-muted-foreground">Cryptographic hash of gmail.com</p>
                     </div>
-                    <span className="text-sm text-foreground md:col-span-2 font-mono break-all">
-                      0x0987654321fedcba0987654321fedcba
-                    </span>
+                    <div className="md:col-span-2 flex items-center justify-between">
+                      <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                        0x0987654321fedcba0987654321fedcba0987654321fedcba
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard('0x0987654321fedcba0987654321fedcba0987654321fedcba', 'Domain Hash')}
+                        className="p-1 h-auto hover:bg-muted"
+                      >
+                        <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
