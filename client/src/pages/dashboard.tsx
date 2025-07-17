@@ -317,7 +317,6 @@ export default function Dashboard() {
         {/* Left Sidebar */}
         <div className="w-56 bg-background border-r border-border/50 min-h-screen">
           <div className="p-6">
-            <h2 className="text-sm font-medium text-muted-foreground mb-6 uppercase tracking-wide">Menu</h2>
             <nav className="space-y-1">
               <button
                 onClick={() => setActiveMenu("overview")}
