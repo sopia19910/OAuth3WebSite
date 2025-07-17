@@ -264,7 +264,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
       {/* Session Status Bar */}
       <div className="fixed top-16 left-0 right-0 bg-muted/50 backdrop-blur-sm border-b border-border z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -282,7 +281,7 @@ export default function Dashboard() {
                 <span className="font-medium text-foreground">Ethereum Mainnet</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">Wallet:</span>
+                <span className="text-muted-foreground">Owner:</span>
                 <span className="font-mono text-xs text-foreground">{publicAddress.slice(0, 6)}...{publicAddress.slice(-4)}</span>
               </div>
               <div className="flex items-center gap-2">
@@ -293,7 +292,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      
       <div className="pt-28 flex">
         {/* Left Sidebar */}
         <div className="w-56 bg-background border-r border-border/50 min-h-screen">
