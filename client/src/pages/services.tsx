@@ -200,6 +200,35 @@ export default function Services() {
           </div>
         </div>
 
+        {/* Service Comparison */}
+        <div className="mb-20">
+          <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Service Comparison</h2>
+          <Card className="bg-card border-border overflow-hidden">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-muted/20">
+                    <tr>
+                      <th className="text-left p-4 font-semibold text-foreground">Category</th>
+                      <th className="text-left p-4 font-semibold text-primary">Individual Services</th>
+                      <th className="text-left p-4 font-semibold text-accent">Enterprise Services</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {serviceComparison.map((row, index) => (
+                      <tr key={index} className="border-t border-border">
+                        <td className="p-4 font-medium text-foreground">{row.category}</td>
+                        <td className="p-4 text-muted-foreground">{row.individual}</td>
+                        <td className="p-4 text-muted-foreground">{row.enterprise}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Blockchain Ecosystem Support */}
         <div className="mb-20">
           <div className="text-center mb-12">
@@ -242,40 +271,7 @@ export default function Services() {
           </div>
         </div>
 
-        {/* Unified Service Architecture */}
-        <div className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">Unified Service Architecture</h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body">
-              A comprehensive comparison of OAuth 3's individual and enterprise service offerings.
-            </p>
-          </div>
 
-          <Card className="bg-card shadow-lg card-hover overflow-hidden">
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-muted/20">
-                    <tr>
-                      <th className="text-left p-4 font-semibold text-foreground">Category</th>
-                      <th className="text-left p-4 font-semibold text-primary">Individual Services</th>
-                      <th className="text-left p-4 font-semibold text-accent">Enterprise Services</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {serviceComparison.map((row, index) => (
-                      <tr key={index} className="border-t border-border">
-                        <td className="p-4 font-medium text-foreground">{row.category}</td>
-                        <td className="p-4 text-muted-foreground">{row.individual}</td>
-                        <td className="p-4 text-muted-foreground">{row.enterprise}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Technical Foundation */}
         <div className="mb-20">
