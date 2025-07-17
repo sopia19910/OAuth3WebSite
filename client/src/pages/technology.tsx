@@ -86,13 +86,13 @@ export default function Technology() {
           <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Core Components</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {coreComponents.map((component, index) => (
-              <Card key={index} className="bg-card border-border">
-                <CardContent className="p-6 text-center">
-                  <div className="mb-3 flex justify-center">
+              <Card key={index} className="bg-card border-border h-full">
+                <CardContent className="p-6 text-center flex flex-col h-full">
+                  <div className="mb-4 flex justify-center">
                     {component.icon}
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{component.title}</h3>
-                  <p className="text-sm text-muted-foreground">{component.description}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">{component.title}</h3>
+                  <p className="text-sm text-muted-foreground flex-1">{component.description}</p>
                 </CardContent>
               </Card>
             ))}
