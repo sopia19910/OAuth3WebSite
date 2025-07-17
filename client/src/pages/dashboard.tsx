@@ -282,11 +282,31 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">Owner:</span>
-                <span className="font-mono text-xs text-foreground">{publicAddress.slice(0, 6)}...{publicAddress.slice(-4)}</span>
+                <div className="flex items-center gap-1">
+                  <span className="font-mono text-xs text-foreground">{publicAddress.slice(0, 6)}...{publicAddress.slice(-4)}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(publicAddress, 'Owner Address')}
+                    className="p-0.5 h-auto hover:bg-muted/50"
+                  >
+                    <ClipboardIcon className="w-3 h-3 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                  </Button>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">ZKP Contract Account:</span>
-                <span className="font-mono text-xs text-foreground">{zkpContract.slice(0, 6)}...{zkpContract.slice(-4)}</span>
+                <div className="flex items-center gap-1">
+                  <span className="font-mono text-xs text-foreground">{zkpContract.slice(0, 6)}...{zkpContract.slice(-4)}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(zkpContract, 'ZKP Contract Address')}
+                    className="p-0.5 h-auto hover:bg-muted/50"
+                  >
+                    <ClipboardIcon className="w-3 h-3 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
