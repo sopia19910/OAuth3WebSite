@@ -149,52 +149,62 @@ export default function Services() {
           
           {/* Individual User Services - Left */}
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">Individual User Services</h2>
-            <p className="text-lg text-primary mb-4">"Web3 wallet that feels like Web2"</p>
-            <p className="text-sm text-muted-foreground mb-8">
-              Access blockchain accounts using familiar Web2 social logins. No seed phrases or complex key management required.
-            </p>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Individual User Services</h2>
+            <p className="text-lg text-primary mb-6">"Web3 wallet that feels like Web2"</p>
             
-            <div className="space-y-4">
-              {individualFeatures.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <CheckIcon className="w-4 h-4 text-primary" strokeWidth={2} />
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground mb-1">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-4 mb-6">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Familiar Web2 Login</h3>
+                <p className="text-sm text-muted-foreground">Access blockchain accounts via Google, Kakao, Facebook, or email—no seed phrases required.</p>
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Multi-Chain Support</h3>
+                <p className="text-sm text-muted-foreground">Manage assets seamlessly across Ethereum, Solana, BNB Chain, Avalanche, and Tron from a single interface.</p>
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Zero-Knowledge Privacy</h3>
+                <p className="text-sm text-muted-foreground">Protect your identity using advanced ZKP technology without exposing personal details.</p>
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Account Abstraction</h3>
+                <p className="text-sm text-muted-foreground">Automated gas payments and transaction bundling ensure a smooth user experience.</p>
+              </div>
             </div>
+            
+            <p className="text-sm text-muted-foreground font-semibold">Key Benefits: Ease of use, enhanced security, robust privacy.</p>
           </div>
 
           {/* Enterprise Services - Right */}
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">Enterprise Services</h2>
-            <p className="text-lg text-primary mb-4">"Secure asset management for organizations"</p>
-            <p className="text-sm text-muted-foreground mb-8">
-              All-in-one solution for token foundations to manage digital assets without expensive third-party custodians.
-            </p>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Enterprise Services</h2>
+            <p className="text-lg text-accent mb-6">"Secure asset management for organizations"</p>
             
-            <div className="space-y-4">
-              {enterpriseFeatures.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
-                      <CheckIcon className="w-4 h-4 text-accent" strokeWidth={2} />
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground mb-1">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-4 mb-6">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Smart Contract Automation</h3>
+                <p className="text-sm text-muted-foreground">Automate fund distribution through programmable multi-signature approval systems.</p>
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Multisig Governance</h3>
+                <p className="text-sm text-muted-foreground">Support complex internal decision-making processes with tailored approval workflows.</p>
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Cross-Chain Management</h3>
+                <p className="text-sm text-muted-foreground">Unified management of digital assets across multiple blockchain networks.</p>
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Cost Reduction</h3>
+                <p className="text-sm text-muted-foreground">Reduce custodial costs by over 90% compared to traditional third-party custodians.</p>
+              </div>
             </div>
+            
+            <p className="text-sm text-muted-foreground font-semibold">Key Benefits: Lower operational costs, improved transparency, enhanced decentralization.</p>
           </div>
         </div>
 
