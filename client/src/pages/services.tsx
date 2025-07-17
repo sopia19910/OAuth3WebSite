@@ -137,9 +137,7 @@ export default function Services() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">Services</h1>
-            <p className="text-xl text-muted-foreground max-w-4xl mx-auto tech-body leading-relaxed">
-              OAuth 3 is more than just a secure authentication protocol—it's a complete service ecosystem designed for both individuals and enterprises. By combining Web2-style convenience with Web3-level security and privacy, OAuth 3 delivers customized solutions that simplify blockchain access, improve digital asset management, and empower ecosystem participants through innovative incentive models.
-            </p>
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto tech-body leading-relaxed">OAuth 3 combines Web2 convenience with Web3 security, simplifying blockchain access, asset management, and incentivizing participation.</p>
           </div>
         </div>
       </section>
