@@ -1,6 +1,20 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Building2, Shield, Key, Globe, Check, ArrowRight, Zap, Network, Lock, Coins, Settings } from "lucide-react";
+import { 
+  UsersIcon, 
+  BuildingOfficeIcon, 
+  ShieldCheckIcon, 
+  KeyIcon, 
+  GlobeAltIcon, 
+  CheckIcon, 
+  ArrowRightIcon, 
+  BoltIcon, 
+  GlobeAmericasIcon, 
+  LockClosedIcon, 
+  CurrencyDollarIcon, 
+  CogIcon 
+} from "@heroicons/react/24/outline";
+import { Check } from "lucide-react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ethereumLogo from "@assets/image_1752123792166.png";
@@ -12,22 +26,22 @@ import tronLogo from "@assets/image_1752123864401.png";
 export default function Services() {
   const individualFeatures = [
     {
-      icon: <Globe className="w-12 h-12 text-primary mb-4" />,
+      icon: <GlobeAltIcon className="w-12 h-12 text-primary mb-4" strokeWidth={1} />,
       title: "Familiar Web2 Login",
       description: "Access blockchain accounts using Google, Kakao, Facebook, and email—no seed phrases required."
     },
     {
-      icon: <Network className="w-12 h-12 text-accent mb-4" />,
+      icon: <GlobeAmericasIcon className="w-12 h-12 text-accent mb-4" strokeWidth={1} />,
       title: "Multi-Chain Support",
       description: "Control assets across Ethereum, Solana, BNB Chain, Avalanche, and Tron with a single interface."
     },
     {
-      icon: <Shield className="w-12 h-12 text-primary mb-4" />,
+      icon: <ShieldCheckIcon className="w-12 h-12 text-primary mb-4" strokeWidth={1} />,
       title: "Zero-Knowledge Privacy",
       description: "Verify identity without exposing personal information using advanced ZKP technology."
     },
     {
-      icon: <Settings className="w-12 h-12 text-accent mb-4" />,
+      icon: <CogIcon className="w-12 h-12 text-accent mb-4" strokeWidth={1} />,
       title: "Account Abstraction",
       description: "Automated gas fee payments and transaction bundling for seamless user experience."
     }
@@ -35,22 +49,22 @@ export default function Services() {
 
   const enterpriseFeatures = [
     {
-      icon: <Building2 className="w-12 h-12 text-primary mb-4" />,
+      icon: <BuildingOfficeIcon className="w-12 h-12 text-primary mb-4" strokeWidth={1} />,
       title: "Smart Contract Automation",
       description: "Automate fund disbursement rules with programmable multi-signature approvals."
     },
     {
-      icon: <Users className="w-12 h-12 text-accent mb-4" />,
+      icon: <UsersIcon className="w-12 h-12 text-accent mb-4" strokeWidth={1} />,
       title: "Multisig Governance",
       description: "Support complex internal governance structures with customizable approval workflows."
     },
     {
-      icon: <Network className="w-12 h-12 text-primary mb-4" />,
+      icon: <GlobeAmericasIcon className="w-12 h-12 text-primary mb-4" strokeWidth={1} />,
       title: "Cross-Chain Management",
       description: "Unified asset management across multiple blockchain networks in one interface."
     },
     {
-      icon: <Coins className="w-12 h-12 text-accent mb-4" />,
+      icon: <CurrencyDollarIcon className="w-12 h-12 text-accent mb-4" strokeWidth={1} />,
       title: "Cost Reduction",
       description: "Over 90% reduction in custodial expenses compared to traditional third-party solutions."
     }
@@ -122,7 +136,7 @@ export default function Services() {
       <section className="pt-24 pb-16 gradient-bg tech-grid">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">Services</h1>
+            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">OAuth 3 Services</h1>
             <p className="text-xl text-muted-foreground max-w-4xl mx-auto tech-body leading-relaxed">
               OAuth 3 is more than just a secure authentication protocol—it's a complete service ecosystem designed for both individuals and enterprises. By combining Web2-style convenience with Web3-level security and privacy, OAuth 3 delivers customized solutions that simplify blockchain access, improve digital asset management, and empower ecosystem participants through innovative incentive models.
             </p>
@@ -304,7 +318,7 @@ export default function Services() {
             <Card className="bg-card shadow-lg card-hover">
               <CardContent className="p-8">
                 <div className="text-center">
-                  <Settings className="w-16 h-16 text-primary mx-auto mb-4" />
+                  <CogIcon className="w-16 h-16 text-primary mx-auto mb-4" strokeWidth={1} />
                   <h3 className="text-xl font-semibold text-foreground mb-4">Account Abstraction (ERC-4337)</h3>
                   <p className="text-muted-foreground">
                     Automates gas fee payments and bundles multi-step transactions into a single action for enhanced user experience.
@@ -316,7 +330,7 @@ export default function Services() {
             <Card className="bg-card shadow-lg card-hover">
               <CardContent className="p-8">
                 <div className="text-center">
-                  <Shield className="w-16 h-16 text-accent mx-auto mb-4" />
+                  <ShieldCheckIcon className="w-16 h-16 text-accent mx-auto mb-4" strokeWidth={1} />
                   <h3 className="text-xl font-semibold text-foreground mb-4">Zero-Knowledge Proof (ZKP)</h3>
                   <p className="text-muted-foreground">
                     Ensures privacy by verifying user identity without exposing personal information on the blockchain.
@@ -328,7 +342,7 @@ export default function Services() {
             <Card className="bg-card shadow-lg card-hover">
               <CardContent className="p-8">
                 <div className="text-center">
-                  <Lock className="w-16 h-16 text-primary mx-auto mb-4" />
+                  <LockClosedIcon className="w-16 h-16 text-primary mx-auto mb-4" strokeWidth={1} />
                   <h3 className="text-xl font-semibold text-foreground mb-4">Smart Contract 2FA</h3>
                   <p className="text-muted-foreground">
                     Dual-layer security using both Web2 login and Web3 key signature for maximum protection.
@@ -348,11 +362,11 @@ export default function Services() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
-              <Users className="mr-2 h-5 w-5" />
+              <UsersIcon className="mr-2 h-5 w-5" strokeWidth={1} />
               Get Started - Individual
             </Button>
             <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 px-8 py-3 font-semibold">
-              <Building2 className="mr-2 h-5 w-5" />
+              <BuildingOfficeIcon className="mr-2 h-5 w-5" strokeWidth={1} />
               Contact Sales - Enterprise
             </Button>
           </div>
