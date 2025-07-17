@@ -58,22 +58,6 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Email Address</Label>
-                    <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
-                      <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                        {userEmail}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(userEmail, 'Email')}
-                        className="p-1 h-auto hover:bg-background"
-                      >
-                        <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
                     <Label className="text-sm font-medium text-muted-foreground">Provider</Label>
                     <p className="text-sm text-foreground mt-1">Google OAuth 2.0</p>
                   </div>
@@ -94,22 +78,6 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Public Address</Label>
-                    <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
-                      <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                        {publicAddress}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(publicAddress, 'Public Address')}
-                        className="p-1 h-auto hover:bg-background"
-                      >
-                        <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
                     <Label className="text-sm font-medium text-muted-foreground">ETH Balance</Label>
                     <p className="text-sm text-foreground mt-1">1.23 ETH</p>
                   </div>
@@ -129,22 +97,6 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Contract Address</Label>
-                    <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
-                      <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                        {zkpContract}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(zkpContract, 'ZKP Contract')}
-                        className="p-1 h-auto hover:bg-background"
-                      >
-                        <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
-                      </Button>
-                    </div>
-                  </div>
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">ZKP Status</Label>
                     <p className="text-sm text-green-500 mt-1">✓ Active</p>
@@ -417,6 +369,61 @@ export default function Dashboard() {
                   {activeMenu === "send" && "Send"}
                   {activeMenu === "receive" && "Receive"}
                 </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Hero Section - Account Information */}
+          <div className="mb-8 p-6 bg-card rounded-lg border border-border">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Account Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Email Address</Label>
+                <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
+                  <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                    demo.user@gmail.com
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard('demo.user@gmail.com', 'Email')}
+                    className="p-1 h-auto hover:bg-background"
+                  >
+                    <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Public Address</Label>
+                <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
+                  <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                    0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard('0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b', 'Public Address')}
+                    className="p-1 h-auto hover:bg-background"
+                  >
+                    <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Contract Address</Label>
+                <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
+                  <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                    0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard('0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b', 'Contract Address')}
+                    className="p-1 h-auto hover:bg-background"
+                  >
+                    <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
