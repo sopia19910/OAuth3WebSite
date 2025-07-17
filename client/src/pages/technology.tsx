@@ -19,17 +19,17 @@ import Footer from "@/components/footer";
 export default function Technology() {
   const coreComponents = [
     {
-      icon: <UsersIcon className="w-12 h-12 text-primary" strokeWidth={1} />,
+      icon: <UsersIcon className="w-10 h-10 text-primary" strokeWidth={1} />,
       title: "EOA (Externally Owned Account)",
       description: "Standard Web3 account with full asset control via private key management."
     },
     {
-      icon: <CogIcon className="w-12 h-12 text-accent" strokeWidth={1} />,
+      icon: <CogIcon className="w-10 h-10 text-primary" strokeWidth={1} />,
       title: "CA (Contract Account)",
       description: "Smart contract wallet requiring both Web2 and Web3 authentication."
     },
     {
-      icon: <ShieldCheckIcon className="w-12 h-12 text-primary" strokeWidth={1} />,
+      icon: <ShieldCheckIcon className="w-10 h-10 text-primary" strokeWidth={1} />,
       title: "ZKP (Zero-Knowledge Proof)",
       description: "Verifies identity without exposing sensitive data on-chain."
     }
@@ -86,15 +86,13 @@ export default function Technology() {
           <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Core Components</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {coreComponents.map((component, index) => (
-              <Card key={index} className="bg-card border-border">
-                <CardContent className="p-6 text-center">
-                  <div className="mb-4 flex justify-center">
-                    {component.icon}
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">{component.title}</h3>
-                  <p className="text-sm text-muted-foreground">{component.description}</p>
-                </CardContent>
-              </Card>
+              <div key={index} className="text-center">
+                <div className="mb-3 flex justify-center">
+                  {component.icon}
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{component.title}</h3>
+                <p className="text-sm text-muted-foreground">{component.description}</p>
+              </div>
             ))}
           </div>
         </section>
