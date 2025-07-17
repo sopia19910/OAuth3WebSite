@@ -273,53 +273,7 @@ export default function Services() {
 
 
 
-        {/* Technical Foundation */}
-        <div className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">Technical Foundation</h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body">
-              OAuth 3 services are built on cutting-edge blockchain technologies that ensure security, privacy, and seamless user experience.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-card shadow-lg card-hover">
-              <CardContent className="p-8">
-                <div className="text-center">
-                  <CogIcon className="w-16 h-16 text-primary mx-auto mb-4" strokeWidth={1} />
-                  <h3 className="text-xl font-semibold text-foreground mb-4">Account Abstraction (ERC-4337)</h3>
-                  <p className="text-muted-foreground">
-                    Automates gas fee payments and bundles multi-step transactions into a single action for enhanced user experience.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card shadow-lg card-hover">
-              <CardContent className="p-8">
-                <div className="text-center">
-                  <ShieldCheckIcon className="w-16 h-16 text-accent mx-auto mb-4" strokeWidth={1} />
-                  <h3 className="text-xl font-semibold text-foreground mb-4">Zero-Knowledge Proof (ZKP)</h3>
-                  <p className="text-muted-foreground">
-                    Ensures privacy by verifying user identity without exposing personal information on the blockchain.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card shadow-lg card-hover">
-              <CardContent className="p-8">
-                <div className="text-center">
-                  <LockClosedIcon className="w-16 h-16 text-primary mx-auto mb-4" strokeWidth={1} />
-                  <h3 className="text-xl font-semibold text-foreground mb-4">Smart Contract 2FA</h3>
-                  <p className="text-muted-foreground">
-                    Dual-layer security using both Web2 login and Web3 key signature for maximum protection.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
 
         {/* Call to Action */}
         <div className="text-center">
