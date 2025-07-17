@@ -208,34 +208,7 @@ export default function Services() {
           </div>
         </div>
 
-        {/* Service Comparison */}
-        <div className="mb-20">
-          <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Service Comparison</h2>
-          <Card className="bg-card border-border overflow-hidden">
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-muted/20">
-                    <tr>
-                      <th className="text-left p-4 font-semibold text-foreground">Category</th>
-                      <th className="text-left p-4 font-semibold text-primary">Individual Services</th>
-                      <th className="text-left p-4 font-semibold text-accent">Enterprise Services</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {serviceComparison.map((row, index) => (
-                      <tr key={index} className="border-t border-border">
-                        <td className="p-4 font-medium text-foreground">{row.category}</td>
-                        <td className="p-4 text-muted-foreground">{row.individual}</td>
-                        <td className="p-4 text-muted-foreground">{row.enterprise}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        
 
         {/* Blockchain Ecosystem Support */}
         <div className="mb-20">
