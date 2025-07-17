@@ -125,13 +125,42 @@ export default function Demo() {
 
       case "balance":
         return (
-          <div className="flex flex-col items-center max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-foreground mb-8">Balance Display</h2>
+          <div className="flex flex-col items-center max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold text-foreground mb-8">Web3 Account & Balance Information</h2>
             
             <div className="w-full space-y-6">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-foreground mb-2">ETH Balance</h3>
-                <p className="text-muted-foreground">0.000000000000000000 ETH</p>
+              {/* Web3 Account Info */}
+              <div className="bg-card rounded-lg p-6 space-y-4">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Web3 Account Information</h3>
+                
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Public Address</Label>
+                    <div className="mt-1 p-3 bg-muted rounded-md">
+                      <p className="text-sm text-foreground font-mono break-all">
+                        0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Private Address</Label>
+                    <div className="mt-1 p-3 bg-muted rounded-md">
+                      <p className="text-sm text-foreground font-mono break-all">
+                        0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Balance Info */}
+              <div className="bg-card rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Balance Information</h3>
+                <div className="text-center">
+                  <h4 className="text-md font-medium text-foreground mb-2">ETH Balance</h4>
+                  <p className="text-muted-foreground">0.000000000000000000 ETH</p>
+                </div>
               </div>
               
               <div className="text-center py-4">
