@@ -319,6 +319,15 @@ export default function Dashboard() {
           <div className="p-6">
             <h2 className="text-sm font-medium text-muted-foreground mb-6 uppercase tracking-wide">Menu</h2>
             <div className="border-b border-border/30 mb-6"></div>
+            
+            {/* Additional Section */}
+            <div className="mb-6">
+              <div className="text-xs text-muted-foreground mb-2">Account Status</div>
+              <div className="px-3 py-2 bg-green-500/10 text-green-600 rounded-md text-sm">
+                ✓ Connected
+              </div>
+            </div>
+            
             <nav className="space-y-1">
               <button
                 onClick={() => setActiveMenu("overview")}
