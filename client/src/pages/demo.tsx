@@ -239,16 +239,36 @@ export default function Demo() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
                     <span className="text-sm font-medium text-muted-foreground">ZK Contract Account</span>
-                    <span className="text-sm text-foreground md:col-span-2 font-mono break-all">
-                      0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
-                    </span>
+                    <div className="md:col-span-2 flex items-center justify-between">
+                      <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                        0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard('0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b', 'ZK Contract Account')}
+                        className="p-1 h-auto hover:bg-muted"
+                      >
+                        <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                      </Button>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
                     <span className="text-sm font-medium text-muted-foreground">Owner (EOA)</span>
-                    <span className="text-sm text-foreground md:col-span-2 font-mono break-all">
-                      0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
-                    </span>
+                    <div className="md:col-span-2 flex items-center justify-between">
+                      <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                        0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard('0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b', 'Owner (EOA)')}
+                        className="p-1 h-auto hover:bg-muted"
+                      >
+                        <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                      </Button>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
