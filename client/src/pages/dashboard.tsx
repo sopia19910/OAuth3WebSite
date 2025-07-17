@@ -269,11 +269,7 @@ export default function Dashboard() {
         {/* Left Sidebar */}
         <div className="w-56 bg-background border-r border-border/50 min-h-screen">
           <div className="p-6">
-            <div className="border-b border-border/30 mb-6"></div>
-            
-            
-            
-            <nav className="space-y-1">
+            <nav className="space-y-1"></nav>
               <button
                 onClick={() => setActiveMenu("overview")}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
