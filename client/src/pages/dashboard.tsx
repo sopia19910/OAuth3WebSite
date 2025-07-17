@@ -316,13 +316,6 @@ export default function Dashboard() {
                 Receive
               </button>
             </nav>
-            
-            {/* Additional Section */}
-            <div className="mt-6 pt-6 border-t border-border/30">
-              <div className="text-sm text-foreground">
-                aaaa
-              </div>
-            </div>
           </div>
         </div>
 
