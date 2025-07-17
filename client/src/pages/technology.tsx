@@ -62,11 +62,7 @@ export default function Technology() {
   ];
 
   const supportedChains = [
-    { name: "Ethereum", status: "Supported" },
-    { name: "BNB Chain", status: "Supported" },
-    { name: "Solana", status: "Supported" },
-    { name: "Avalanche", status: "Supported" },
-    { name: "Tron", status: "Supported" }
+    "Ethereum", "BNB Chain", "Solana", "Avalanche", "Tron"
   ];
 
   const securitySteps = [
@@ -415,8 +411,8 @@ export default function Technology() {
                   <div className="space-y-4">
                     {supportedChains.map((chain, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
-                        <span className="text-foreground font-medium">{chain.name}</span>
-                        <span className="text-primary font-semibold">{chain.status}</span>
+                        <span className="text-foreground font-medium">{chain}</span>
+                        <span className="text-primary font-semibold">Supported</span>
                       </div>
                     ))}
                   </div>

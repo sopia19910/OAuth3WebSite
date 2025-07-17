@@ -20,21 +20,21 @@ export default function About() {
     }
   ];
 
-  const coreComponents = [
-    {
-      icon: <Users className="w-12 h-12 text-primary mb-4" />,
-      title: "EOA (Externally Owned Account)",
-      description: "A blockchain account managed by a user's private key—providing full asset ownership and control."
-    },
-    {
-      icon: <Settings className="w-12 h-12 text-accent mb-4" />,
-      title: "CA (Contract Account)",
-      description: "A smart contract wallet that only authorizes transactions if both Web2 login and Web3 private key signatures are validated."
-    },
+  const keyBenefits = [
     {
       icon: <Shield className="w-12 h-12 text-primary mb-4" />,
-      title: "ZKP (Zero-Knowledge Proof)",
-      description: "Ensures that login credentials are never exposed on-chain while still proving authentication occurred."
+      title: "Enhanced Security",
+      description: "Multi-layered authentication combining Web2 convenience with Web3 cryptographic security."
+    },
+    {
+      icon: <Users className="w-12 h-12 text-accent mb-4" />,
+      title: "User-Friendly Experience",
+      description: "Familiar login methods while maintaining full control over digital assets and identity."
+    },
+    {
+      icon: <Lock className="w-12 h-12 text-primary mb-4" />,
+      title: "Privacy Protection",
+      description: "Zero-knowledge proofs ensure personal data never leaves your control while proving authentication."
     }
   ];
 
@@ -132,14 +132,14 @@ export default function About() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {coreComponents.map((component, index) => (
+            {keyBenefits.map((benefit, index) => (
               <Card key={index} className="bg-card shadow-lg card-hover">
                 <CardContent className="p-8">
                   <div className="text-center mb-6">
-                    {component.icon}
-                    <h3 className="text-xl font-semibold text-foreground mb-4">{component.title}</h3>
+                    {benefit.icon}
+                    <h3 className="text-xl font-semibold text-foreground mb-4">{benefit.title}</h3>
                   </div>
-                  <p className="text-muted-foreground text-center">{component.description}</p>
+                  <p className="text-muted-foreground text-center">{benefit.description}</p>
                 </CardContent>
               </Card>
             ))}
