@@ -111,18 +111,7 @@ export default function Resources() {
           </div>
         </div>
 
-        {/* Get Started */}
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Need help getting started?</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Our team is here to help you implement OAuth 3 successfully.
-          </p>
-          <Link href="/contact">
-            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
-              Contact Support
-            </Button>
-          </Link>
-        </div>
+        
       </div>
       
       <Footer />
