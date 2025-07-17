@@ -233,12 +233,23 @@ export default function Demo() {
       case "zkp-display":
         return (
           <div className="flex flex-col max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Display Items</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">ZKP Account Information</h2>
+            
+            <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+              <p className="text-sm text-muted-foreground text-center">
+                Zero-Knowledge Proof has been successfully generated to link your Web2 OAuth account with your Web3 wallet. 
+                Below are the generated account details and cryptographic information.
+              </p>
+            </div>
+            
             <Card className="bg-card">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
-                    <span className="text-sm font-medium text-muted-foreground">ZK Contract Account</span>
+                    <div className="space-y-1">
+                      <span className="text-sm font-medium text-muted-foreground">ZK Contract Account</span>
+                      <p className="text-xs text-muted-foreground">Smart contract address for ZK operations</p>
+                    </div>
                     <div className="md:col-span-2 flex items-center justify-between">
                       <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
                         0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
@@ -255,7 +266,10 @@ export default function Demo() {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
-                    <span className="text-sm font-medium text-muted-foreground">Owner (EOA)</span>
+                    <div className="space-y-1">
+                      <span className="text-sm font-medium text-muted-foreground">Owner (EOA)</span>
+                      <p className="text-xs text-muted-foreground">Externally Owned Account address</p>
+                    </div>
                     <div className="md:col-span-2 flex items-center justify-between">
                       <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
                         0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
@@ -272,24 +286,36 @@ export default function Demo() {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
-                    <span className="text-sm font-medium text-muted-foreground">ETH Balance</span>
+                    <div className="space-y-1">
+                      <span className="text-sm font-medium text-muted-foreground">ETH Balance</span>
+                      <p className="text-xs text-muted-foreground">Current Ethereum balance</p>
+                    </div>
                     <span className="text-sm text-foreground md:col-span-2">1.23 ETH</span>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
-                    <span className="text-sm font-medium text-muted-foreground">Requires ZK Proof</span>
+                    <div className="space-y-1">
+                      <span className="text-sm font-medium text-muted-foreground">Requires ZK Proof</span>
+                      <p className="text-xs text-muted-foreground">Zero-Knowledge verification required</p>
+                    </div>
                     <span className="text-sm text-foreground md:col-span-2">Yes</span>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
-                    <span className="text-sm font-medium text-muted-foreground">Email Hash (Poseidon)</span>
+                    <div className="space-y-1">
+                      <span className="text-sm font-medium text-muted-foreground">Email Hash (Poseidon)</span>
+                      <p className="text-xs text-muted-foreground">Cryptographic hash of email address</p>
+                    </div>
                     <span className="text-sm text-foreground md:col-span-2 font-mono break-all">
                       0xabcdef1234567890abcdef1234567890
                     </span>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
-                    <span className="text-sm font-medium text-muted-foreground">Domain Hash (Poseidon)</span>
+                    <div className="space-y-1">
+                      <span className="text-sm font-medium text-muted-foreground">Domain Hash (Poseidon)</span>
+                      <p className="text-xs text-muted-foreground">Cryptographic hash of domain</p>
+                    </div>
                     <span className="text-sm text-foreground md:col-span-2 font-mono break-all">
                       0x0987654321fedcba0987654321fedcba
                     </span>
