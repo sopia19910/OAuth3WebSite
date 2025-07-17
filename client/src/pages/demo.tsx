@@ -15,6 +15,7 @@ import {
   ArrowRightIcon,
   CurrencyDollarIcon
 } from "@heroicons/react/24/outline";
+import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
 
 type DemoStep = "login" | "web3-setup" | "balance" | "zkp-generation" | "zkp-display" | "complete";
@@ -71,7 +72,7 @@ export default function Demo() {
               className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
               size="lg"
             >
-              <GlobeAltIcon className="w-5 h-5 mr-2" strokeWidth={1} />
+              <SiGoogle className="w-5 h-5 mr-2" />
               Login with Google
             </Button>
           </div>
