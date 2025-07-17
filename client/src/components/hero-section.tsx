@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Play } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Link } from "wouter";
 import logoImage from "@assets/image_1752117480535.png";
 import googleLogo from "@assets/image_1752137026323.png";
 import facebookLogo from "@assets/image_1752144869558.png";
@@ -120,14 +121,16 @@ export default function HeroSection() {
               >
                 Get Started
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 font-semibold"
-              >
-                <Play className="mr-2 h-4 w-4" />
-                View Demo
-              </Button>
+              <Link href="/demo">
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 font-semibold"
+                >
+                  <Play className="mr-2 h-4 w-4" />
+                  View Demo
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="flex justify-center relative">
