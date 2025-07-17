@@ -285,7 +285,7 @@ export default function Dashboard() {
                 <span className="font-mono text-xs text-foreground">{publicAddress.slice(0, 6)}...{publicAddress.slice(-4)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">Contract:</span>
+                <span className="text-muted-foreground">ZKP Contract Account:</span>
                 <span className="font-mono text-xs text-foreground">{zkpContract.slice(0, 6)}...{zkpContract.slice(-4)}</span>
               </div>
             </div>
