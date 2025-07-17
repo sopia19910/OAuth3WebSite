@@ -62,7 +62,6 @@ export default function Demo() {
       case "login":
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
-            <ShieldCheckIcon className="w-8 h-8 text-primary mb-6" strokeWidth={1} />
             <h2 className="text-2xl font-bold text-foreground mb-2">Connect your account</h2>
             <p className="text-muted-foreground text-center mb-8">
               Connect your account to continue with OAuth 3 authentication
@@ -81,9 +80,6 @@ export default function Demo() {
       case "web3-setup":
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
-            <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-6">
-              <WalletIcon className="w-8 h-8 text-accent" strokeWidth={1} />
-            </div>
             <h2 className="text-2xl font-bold text-foreground mb-6">Connect your Web3 account</h2>
             
             <RadioGroup value={web3Option} onValueChange={setWeb3Option} className="w-full mb-6">
@@ -129,9 +125,6 @@ export default function Demo() {
       case "balance":
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-              <CurrencyDollarIcon className="w-8 h-8 text-primary" strokeWidth={1} />
-            </div>
             <h2 className="text-2xl font-bold text-foreground mb-8">Balance Display</h2>
             
             <div className="w-full space-y-6">
@@ -169,9 +162,6 @@ export default function Demo() {
       case "zkp-generation":
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
-            <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-6">
-              <KeyIcon className="w-8 h-8 text-accent" strokeWidth={1} />
-            </div>
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
               Generating ZKP to link OAuth and Web3 accounts
             </h2>
@@ -196,11 +186,6 @@ export default function Demo() {
       case "zkp-display":
         return (
           <div className="flex flex-col max-w-2xl mx-auto">
-            <div className="flex items-center justify-center mb-8">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                <DocumentIcon className="w-8 h-8 text-primary" strokeWidth={1} />
-              </div>
-            </div>
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Display Items</h2>
             
             <Card className="bg-card">
@@ -271,9 +256,6 @@ export default function Demo() {
       case "complete":
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
-            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-6">
-              <CheckCircleIcon className="w-8 h-8 text-green-500" strokeWidth={1} />
-            </div>
             <h2 className="text-2xl font-bold text-foreground mb-8">Account Connections</h2>
             
             <div className="w-full space-y-4 mb-8">
