@@ -315,42 +315,50 @@ export default function Dashboard() {
       
       <div className="pt-16 flex">
         {/* Left Sidebar */}
-        <div className="w-64 bg-card border-r border-border min-h-screen">
-          <div className="p-4">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Dashboard</h2>
-            <nav className="space-y-2">
-              <Button
-                variant={activeMenu === "overview" ? "default" : "ghost"}
-                className="w-full justify-start"
+        <div className="w-56 bg-background border-r border-border/50 min-h-screen">
+          <div className="p-6">
+            <h2 className="text-sm font-medium text-muted-foreground mb-6 uppercase tracking-wide">Menu</h2>
+            <nav className="space-y-1">
+              <button
                 onClick={() => setActiveMenu("overview")}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeMenu === "overview" 
+                    ? "bg-primary/10 text-primary" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
               >
-                <CreditCardIcon className="w-4 h-4 mr-2" />
                 Overview
-              </Button>
-              <Button
-                variant={activeMenu === "add-token" ? "default" : "ghost"}
-                className="w-full justify-start"
+              </button>
+              <button
                 onClick={() => setActiveMenu("add-token")}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeMenu === "add-token" 
+                    ? "bg-primary/10 text-primary" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
               >
-                <PlusIcon className="w-4 h-4 mr-2" />
                 Add Token
-              </Button>
-              <Button
-                variant={activeMenu === "send" ? "default" : "ghost"}
-                className="w-full justify-start"
+              </button>
+              <button
                 onClick={() => setActiveMenu("send")}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeMenu === "send" 
+                    ? "bg-primary/10 text-primary" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
               >
-                <PaperAirplaneIcon className="w-4 h-4 mr-2" />
-                Send Coin/Token
-              </Button>
-              <Button
-                variant={activeMenu === "receive" ? "default" : "ghost"}
-                className="w-full justify-start"
+                Send
+              </button>
+              <button
                 onClick={() => setActiveMenu("receive")}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeMenu === "receive" 
+                    ? "bg-primary/10 text-primary" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
               >
-                <QrCodeIcon className="w-4 h-4 mr-2" />
-                Receive Coin/Token
-              </Button>
+                Receive
+              </button>
             </nav>
           </div>
         </div>
