@@ -36,11 +36,7 @@ export default function DemoSection() {
                     </div>
                   ))}
                 </div>
-                <Link href="/demo">
-                  <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold animate-pulse-glow">
-                    View Demo
-                  </Button>
-                </Link>
+                
               </div>
               <Card className="bg-background shadow-lg card-hover">
                 <CardContent className="p-8">
