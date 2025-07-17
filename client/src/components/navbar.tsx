@@ -15,7 +15,6 @@ export default function Navbar() {
     { label: "Services", href: "/services", isRoute: true },
     { label: "Resources", href: "/resources", isRoute: true },
     { label: "Contact Us", href: "/contact", isRoute: true },
-    { label: "View Demo", href: "/demo", isRoute: true },
   ];
 
   const handleNavClick = (href: string, isRoute: boolean) => {
