@@ -105,17 +105,9 @@ export default function Technology() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {securityFlow.map((step, index) => (
               <Card key={index} className="bg-card border-border">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-sm font-bold text-primary">{step.step}</span>
-                    </div>
-                    <h3 className="text-sm font-semibold text-foreground">{step.title}</h3>
-                  </div>
-                  <div className="flex justify-center mb-3">
-                    {step.icon}
-                  </div>
-                  <p className="text-sm text-muted-foreground text-center">{step.description}</p>
+                <CardContent className="p-6 text-center">
+                  <h3 className="text-lg font-semibold text-foreground mb-3">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
                 </CardContent>
               </Card>
             ))}
