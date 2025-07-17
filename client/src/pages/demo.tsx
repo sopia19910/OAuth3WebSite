@@ -234,12 +234,11 @@ export default function Demo() {
         return (
           <div className="flex flex-col max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Display Items</h2>
-            
             <Card className="bg-card">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
-                    <span className="text-sm font-medium text-muted-foreground">ZK Account Address</span>
+                    <span className="text-sm font-medium text-muted-foreground">ZK Contract Account</span>
                     <span className="text-sm text-foreground md:col-span-2 font-mono break-all">
                       0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
                     </span>
@@ -278,7 +277,6 @@ export default function Demo() {
                 </div>
               </CardContent>
             </Card>
-            
             <div className="flex justify-end mt-6">
               <Button 
                 onClick={handleViewZKP}
