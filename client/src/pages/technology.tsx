@@ -95,21 +95,17 @@ export default function Technology() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
       {/* Hero Section */}
       <section className="pt-24 pb-16 gradient-bg tech-grid">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
-              OAuth 3 Technology
-            </h1>
+            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">Technology</h1>
             <p className="text-xl text-muted-foreground max-w-4xl mx-auto tech-body leading-relaxed">
               OAuth 3 represents a new standard in digital authentication, merging the user-friendliness of Web2 with the security and decentralization of Web3. By leveraging smart contracts, blockchain-based identities, and Zero-Knowledge Proof (ZKP), OAuth 3 creates a hybrid system that delivers both strong protection and seamless user experience.
             </p>
           </div>
         </div>
       </section>
-
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         
@@ -473,7 +469,6 @@ export default function Technology() {
           </Button>
         </div>
       </div>
-      
       <Footer />
     </div>
   );
