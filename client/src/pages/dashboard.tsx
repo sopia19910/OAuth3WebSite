@@ -320,11 +320,28 @@ export default function Dashboard() {
             <h2 className="text-sm font-medium text-muted-foreground mb-6 uppercase tracking-wide">Menu</h2>
             <div className="border-b border-border/30 mb-6"></div>
             
-            {/* Additional Section */}
+            {/* Account Information Section */}
             <div className="mb-6">
-              <div className="text-xs text-muted-foreground mb-2">Account Status</div>
-              <div className="px-3 py-2 bg-green-500/10 text-green-600 rounded-md text-sm">
-                ✓ Connected
+              <div className="text-xs text-muted-foreground mb-3 uppercase tracking-wide">Account Info</div>
+              <div className="space-y-3">
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Email Address</div>
+                  <div className="text-xs text-foreground font-mono break-all">
+                    demo.user@gmail.com
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Public Address</div>
+                  <div className="text-xs text-foreground font-mono break-all">
+                    0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Contract Address</div>
+                  <div className="text-xs text-foreground font-mono break-all">
+                    0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
+                  </div>
+                </div>
               </div>
             </div>
             
