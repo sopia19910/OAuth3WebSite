@@ -78,8 +78,12 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">ETH Balance</Label>
-                    <p className="text-sm text-foreground mt-1">1.23 ETH</p>
+                    <Label className="text-sm font-medium text-muted-foreground">Owner ETH (수수료)</Label>
+                    <p className="text-sm text-foreground mt-1">0.05 ETH</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">CA ETH (자산)</Label>
+                    <p className="text-sm text-foreground mt-1">1.18 ETH</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Network</Label>
@@ -97,6 +101,10 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">CA Balance (자산)</Label>
+                    <p className="text-sm text-foreground mt-1 font-semibold">1.18 ETH</p>
+                  </div>
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">ZKP Status</Label>
                     <p className="text-sm text-green-500 mt-1">✓ Active</p>
