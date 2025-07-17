@@ -326,9 +326,7 @@ export default function Demo() {
       {/* Demo Content - Full Height */}
       <div className="pt-16 min-h-screen flex items-center justify-center gradient-bg">
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-background/95 backdrop-blur-sm rounded-xl p-8 shadow-2xl border border-border/50">
-            {renderStep()}
-          </div>
+          {renderStep()}
         </div>
       </div>
     </div>
