@@ -134,16 +134,6 @@ export default function Demo() {
                 <p className="text-muted-foreground">0.000000000000000000 ETH</p>
               </div>
               
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-foreground mb-2">OA3 Token Balance</h3>
-                <p className="text-muted-foreground">0.000000000000000000 OA3</p>
-              </div>
-              
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-foreground mb-2">TAIKO Token Balance</h3>
-                <p className="text-muted-foreground">0.000000000000000000 TAIKO</p>
-              </div>
-              
               <div className="text-center py-4">
                 <p className="text-destructive text-sm">
                   ETH balance is insufficient. Gas fee required.
@@ -209,16 +199,6 @@ export default function Demo() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
                     <span className="text-sm font-medium text-muted-foreground">ETH Balance</span>
                     <span className="text-sm text-foreground md:col-span-2">1.23 ETH</span>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
-                    <span className="text-sm font-medium text-muted-foreground">OA3 Token Balance</span>
-                    <span className="text-sm text-foreground md:col-span-2">456 OA3</span>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
-                    <span className="text-sm font-medium text-muted-foreground">TAIKO Token Balance</span>
-                    <span className="text-sm text-foreground md:col-span-2">789 TAIKO</span>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
