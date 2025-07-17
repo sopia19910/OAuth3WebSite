@@ -81,10 +81,7 @@ export default function Dashboard() {
                     <Label className="text-sm font-medium text-muted-foreground">Owner ETH (Gas Fee)</Label>
                     <p className="text-sm text-foreground mt-1">0.05 ETH</p>
                   </div>
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">CA ETH (Assets)</Label>
-                    <p className="text-sm text-foreground mt-1">1.18 ETH</p>
-                  </div>
+                  
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Network</Label>
                     <p className="text-sm text-foreground mt-1">Ethereum Mainnet</p>
