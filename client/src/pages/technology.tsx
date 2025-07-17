@@ -67,12 +67,14 @@ export default function Technology() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-24 pb-12 bg-background">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Technology</h1>
-          <p className="text-lg text-muted-foreground">
-            OAuth 3 combines Web2 convenience with Web3 security through smart contracts and Zero-Knowledge Proofs.
-          </p>
+      <section className="pt-24 pb-16 gradient-bg tech-grid">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">Technology</h1>
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto tech-body leading-relaxed">
+              OAuth 3 combines Web2 convenience with Web3 security through smart contracts and Zero-Knowledge Proofs, creating a revolutionary authentication system that delivers both ease of use and enterprise-grade protection.
+            </p>
+          </div>
         </div>
       </section>
 
