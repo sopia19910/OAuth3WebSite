@@ -78,11 +78,11 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Owner ETH (수수료)</Label>
+                    <Label className="text-sm font-medium text-muted-foreground">Owner ETH (Gas Fee)</Label>
                     <p className="text-sm text-foreground mt-1">0.05 ETH</p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">CA ETH (자산)</Label>
+                    <Label className="text-sm font-medium text-muted-foreground">CA ETH (Assets)</Label>
                     <p className="text-sm text-foreground mt-1">1.18 ETH</p>
                   </div>
                   <div>
@@ -102,7 +102,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">CA Balance (자산)</Label>
+                    <Label className="text-sm font-medium text-muted-foreground">CA Balance (Assets)</Label>
                     <p className="text-sm text-foreground mt-1 font-semibold">1.18 ETH</p>
                   </div>
                   <div>
