@@ -146,86 +146,58 @@ export default function Services() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         
-        {/* Individual User Services */}
-        <div className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">Individual User Services</h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body mb-6">
-              "Web3 wallet that feels like Web2"
+        {/* Services Overview - Left Right Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+          
+          {/* Individual User Services - Left */}
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Individual User Services</h2>
+            <p className="text-lg text-primary mb-4">"Web3 wallet that feels like Web2"</p>
+            <p className="text-sm text-muted-foreground mb-8">
+              Access blockchain accounts using familiar Web2 social logins. No seed phrases or complex key management required.
             </p>
-            <p className="text-base text-muted-foreground max-w-4xl mx-auto tech-body">
-              OAuth 3 enables users to access and manage multiple blockchain accounts using familiar Web2 social logins. It eliminates the need to memorize seed phrases or manage private keys manually, providing a single, intuitive interface to control assets across multiple networks.
-            </p>
+            
+            <div className="space-y-4">
+              {individualFeatures.map((feature, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <CheckIcon className="w-4 h-4 text-primary" strokeWidth={2} />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground mb-1">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {individualFeatures.map((feature, index) => (
-              <Card key={index} className="bg-card shadow-lg card-hover">
-                <CardContent className="p-6">
-                  <div className="text-center">
-                    {feature.icon}
-                    <h3 className="text-lg font-semibold text-foreground mb-3">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm">{feature.description}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <Card className="bg-card shadow-lg card-hover">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-semibold text-foreground mb-6 text-center">User Benefits</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {userBenefits.map((benefit, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <span className="text-muted-foreground">{benefit}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Enterprise Services */}
-        <div className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">Enterprise Services</h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body mb-6">
-              "Secure and cost-efficient asset management for token foundations"
+          {/* Enterprise Services - Right */}
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Enterprise Services</h2>
+            <p className="text-lg text-primary mb-4">"Secure asset management for organizations"</p>
+            <p className="text-sm text-muted-foreground mb-8">
+              All-in-one solution for token foundations to manage digital assets without expensive third-party custodians.
             </p>
-            <p className="text-base text-muted-foreground max-w-4xl mx-auto tech-body">
-              OAuth 3 provides an all-in-one solution for token-issuing companies and blockchain-based foundations to securely manage digital assets without relying on expensive third-party custodians.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {enterpriseFeatures.map((feature, index) => (
-              <Card key={index} className="bg-card shadow-lg card-hover">
-                <CardContent className="p-6">
-                  <div className="text-center">
-                    {feature.icon}
-                    <h3 className="text-lg font-semibold text-foreground mb-3">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm">{feature.description}</p>
+            
+            <div className="space-y-4">
+              {enterpriseFeatures.map((feature, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
+                      <CheckIcon className="w-4 h-4 text-accent" strokeWidth={2} />
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <Card className="bg-card shadow-lg card-hover">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-semibold text-foreground mb-6 text-center">Strategic Advantages</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {enterpriseAdvantages.map((advantage, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <Check className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
-                    <span className="text-muted-foreground">{advantage}</span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground mb-1">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground">{feature.description}</p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Blockchain Ecosystem Support */}
