@@ -16,7 +16,6 @@ import {
   CurrencyDollarIcon
 } from "@heroicons/react/24/outline";
 import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
 
 type DemoStep = "login" | "web3-setup" | "balance" | "zkp-generation" | "zkp-display" | "complete";
 
@@ -72,7 +71,7 @@ export default function Demo() {
             </p>
             <Button 
               onClick={handleGoogleLogin}
-              className="w-full bg-[#3d98f4] hover:bg-[#3d98f4]/90 text-white font-semibold"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
               size="lg"
             >
               <GlobeAltIcon className="w-5 h-5 mr-2" strokeWidth={1} />
@@ -122,7 +121,7 @@ export default function Demo() {
 
             <Button 
               onClick={handleWeb3Setup}
-              className="w-full bg-[#3d98f4] hover:bg-[#3d98f4]/90 text-white font-semibold"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
             >
               Next
             </Button>
@@ -162,7 +161,7 @@ export default function Demo() {
 
             <Button 
               onClick={handleRequestGasFee}
-              className="w-full bg-[#3d98f4] hover:bg-[#3d98f4]/90 text-white font-semibold"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
             >
               Request Gas Fee
             </Button>
@@ -189,7 +188,7 @@ export default function Demo() {
             <Button 
               onClick={handleViewZKP}
               disabled={zkpProgress < 100}
-              className="w-full bg-[#3d98f4] hover:bg-[#3d98f4]/90 text-white font-semibold disabled:opacity-50"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg disabled:opacity-50"
             >
               View Generated ZKP
             </Button>
@@ -263,7 +262,7 @@ export default function Demo() {
             <div className="flex justify-end mt-6">
               <Button 
                 onClick={handleViewZKP}
-                className="bg-[#3d98f4] hover:bg-[#3d98f4]/90 text-white font-semibold"
+                className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
               >
                 Confirm
               </Button>
@@ -308,7 +307,7 @@ export default function Demo() {
 
             <Button 
               onClick={handleGoToDashboard}
-              className="w-full bg-[#3d98f4] hover:bg-[#3d98f4]/90 text-white font-semibold"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
             >
               Go to Dashboard
             </Button>
@@ -323,67 +322,15 @@ export default function Demo() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      {/* Hero Section */}
-      <section className="pt-24 pb-16 gradient-bg tech-grid">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
-              OAuth 3 Interactive Demo
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-4xl mx-auto tech-body leading-relaxed">
-              Experience the OAuth 3 authentication flow firsthand. This interactive demo showcases the seamless integration of Web2 social login with Web3 wallet connection, powered by Zero-Knowledge Proof technology.
-            </p>
+      
+      {/* Demo Content - Full Height */}
+      <div className="pt-16 min-h-screen flex items-center justify-center gradient-bg">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-background/95 backdrop-blur-sm rounded-xl p-8 shadow-2xl border border-border/50">
+            {renderStep()}
           </div>
         </div>
-      </section>
-
-      {/* Demo Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="bg-slate-50 rounded-xl p-8 min-h-[600px] flex items-center justify-center">
-          {renderStep()}
-        </div>
-        
-        {/* Demo Information */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Card className="bg-card shadow-lg card-hover">
-            <CardContent className="p-6">
-              <div className="text-center">
-                <ShieldCheckIcon className="w-12 h-12 text-primary mx-auto mb-4" strokeWidth={1} />
-                <h3 className="text-xl font-semibold text-foreground mb-3">Web2 + Web3 Integration</h3>
-                <p className="text-muted-foreground text-sm">
-                  Seamlessly connect your Google account with Web3 wallets using OAuth 3's hybrid authentication system.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card shadow-lg card-hover">
-            <CardContent className="p-6">
-              <div className="text-center">
-                <KeyIcon className="w-12 h-12 text-accent mx-auto mb-4" strokeWidth={1} />
-                <h3 className="text-xl font-semibold text-foreground mb-3">Zero-Knowledge Proof</h3>
-                <p className="text-muted-foreground text-sm">
-                  Experience how ZKP technology protects your privacy while verifying your identity across platforms.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card shadow-lg card-hover">
-            <CardContent className="p-6">
-              <div className="text-center">
-                <WalletIcon className="w-12 h-12 text-primary mx-auto mb-4" strokeWidth={1} />
-                <h3 className="text-xl font-semibold text-foreground mb-3">Multi-Chain Support</h3>
-                <p className="text-muted-foreground text-sm">
-                  Manage assets across Ethereum, Solana, and other blockchain networks with a single authentication flow.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
-      
-      <Footer />
     </div>
   );
 }
