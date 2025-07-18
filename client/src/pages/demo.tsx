@@ -111,36 +111,41 @@ export default function Demo() {
 
   // Check for OAuth callback parameters
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const oauthSuccess = params.get('oauth');
-    const email = params.get('email');
-    
-    if (oauthSuccess === 'success' && email) {
-      setUserEmail(email);
-      setCurrentStep("web3-setup");
-      // Clear the URL parameters
-      window.history.replaceState({}, document.title, '/demo');
-    } else if (oauthSuccess === 'error') {
-      const message = params.get('message') || 'Authentication failed';
-      alert(message);
-      window.history.replaceState({}, document.title, '/demo');
-    }
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const oauthSuccess = params.get('oauth');
+      const email = params.get('email');
+      
+      if (oauthSuccess === 'success' && email) {
+        setUserEmail(email);
+        setCurrentStep("web3-setup");
+        // Clear the URL parameters
+        window.history.replaceState({}, document.title, '/demo');
+      } else if (oauthSuccess === 'error') {
+        const message = params.get('message') || 'Authentication failed';
+        alert(message);
+        window.history.replaceState({}, document.title, '/demo');
+      }
 
-    // Check for existing wallet in storage
-    const savedWallet = getWalletFromStorage();
-    if (savedWallet) {
-      setWallet(savedWallet);
-    }
+      // Check for existing wallet in storage
+      const savedWallet = getWalletFromStorage();
+      if (savedWallet) {
+        setWallet(savedWallet);
+      }
 
-    // Get network info
-    const info = getNetworkInfo();
-    setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
+      // Get network info
+      const info = getNetworkInfo();
+      setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
+    } catch (error) {
+      console.error('Error during initialization:', error);
+    }
   }, []);
 
   // Auto-refresh balance when wallet changes
   useEffect(() => {
     if (wallet) {
-      (async () => {
+      // Create promise and handle errors properly
+      const fetchBalance = async () => {
         setIsRefreshingBalance(true);
         setBalanceError("");
         try {
@@ -154,7 +159,12 @@ export default function Demo() {
         } finally {
           setIsRefreshingBalance(false);
         }
-      })();
+      };
+      
+      // Call with proper error handling
+      fetchBalance().catch(err => {
+        console.error('Balance fetch error:', err);
+      });
     }
   }, [wallet]);
 

@@ -21,6 +21,9 @@ async function getRpcUrl(): Promise<string> {
 
   try {
     const response = await fetch('/api/config');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch config: ${response.status}`);
+    }
     const data = await response.json();
     if (data.success && data.rpcUrl) {
       cachedRpcUrl = data.rpcUrl;
@@ -31,7 +34,9 @@ async function getRpcUrl(): Promise<string> {
   }
 
   // Fallback to Holesky testnet
-  return 'https://rpc-holesky.rockx.com';
+  const fallbackUrl = 'https://rpc-holesky.rockx.com';
+  console.log('Using fallback RPC URL:', fallbackUrl);
+  return fallbackUrl;
 }
 
 // Create a new random wallet
