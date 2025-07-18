@@ -278,6 +278,18 @@ export default function Dashboard() {
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-semibold text-foreground">{userEmail}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm('Are you sure you want to disconnect?')) {
+                      window.location.href = '/';
+                    }
+                  }}
+                  className="h-7 px-3 text-xs border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                >
+                  Disconnect
+                </Button>
               </div>
             </div>
             <div className="flex items-center gap-6 text-sm">
@@ -368,34 +380,7 @@ export default function Dashboard() {
 
         {/* Main Content */}
         <div className="flex-1 p-8">
-          {/* Current Selection Header */}
-          <div className="mb-6 pb-4 border-b border-border">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">
-                  {activeMenu === "overview" && "Dashboard Overview"}
-                  {activeMenu === "add-token" && "Add Token"}
-                  {activeMenu === "send" && "Send Coin/Token"}
-                  {activeMenu === "receive" && "Receive Coin/Token"}
-                </h1>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {activeMenu === "overview" && "Account information and status overview"}
-                  {activeMenu === "add-token" && "Add new tokens to your wallet"}
-                  {activeMenu === "send" && "Send coins or tokens to other addresses"}
-                  {activeMenu === "receive" && "Receive coins or tokens from others"}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Current Section:</span>
-                <span className="px-2 py-1 bg-primary/10 text-primary rounded-md font-medium">
-                  {activeMenu === "overview" && "Overview"}
-                  {activeMenu === "add-token" && "Add Token"}
-                  {activeMenu === "send" && "Send"}
-                  {activeMenu === "receive" && "Receive"}
-                </span>
-              </div>
-            </div>
-          </div>
+
 
           
 
