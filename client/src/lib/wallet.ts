@@ -3,157 +3,141 @@ import { ethers } from 'ethers';
 export interface WalletInfo {
   address: string;
   privateKey: string;
-  publicKey: string;
 }
 
-export interface NetworkInfo {
-  name: string;
-  chainId: number;
-  rpcUrl: string;
-  explorerUrl: string;
-}
-
-export interface BalanceInfo {
-  raw: string;
+export interface WalletBalance {
+  eth: string;
   formatted: string;
 }
 
-// Storage keys
-const WALLET_STORAGE_KEY = 'oauth3_wallet';
-const NETWORK_STORAGE_KEY = 'oauth3_network';
+// Cache for RPC URL
+let cachedRpcUrl: string | null = null;
 
-// Default network configuration (Holesky Testnet)
-const DEFAULT_NETWORK: NetworkInfo = {
-  name: 'Holesky Testnet',
-  chainId: 17000,
-  rpcUrl: 'https://ethereum-holesky.publicnode.com',
-  explorerUrl: 'https://holesky.etherscan.io'
-};
+// Get RPC URL from backend
+async function getRpcUrl(): Promise<string> {
+  if (cachedRpcUrl) {
+    return cachedRpcUrl;
+  }
 
-// Get RPC provider
-export function getRpcProvider(): ethers.JsonRpcProvider {
-  const network = getNetworkInfo();
-  return new ethers.JsonRpcProvider(network.rpcUrl);
+  try {
+    const response = await fetch('/api/config');
+    const data = await response.json();
+    if (data.success && data.rpcUrl) {
+      cachedRpcUrl = data.rpcUrl;
+      return data.rpcUrl;
+    }
+  } catch (error) {
+    console.error('Failed to fetch RPC URL:', error);
+  }
+
+  // Fallback to Holesky testnet
+  return 'https://rpc-holesky.rockx.com';
 }
 
-// Create a new wallet
+// Create a new random wallet
 export function createWallet(): WalletInfo {
-  const wallet = ethers.Wallet.createRandom();
-  return {
-    address: wallet.address,
-    privateKey: wallet.privateKey,
-    publicKey: wallet.publicKey
-  };
+  try {
+    const wallet = ethers.Wallet.createRandom();
+    return {
+      address: wallet.address,
+      privateKey: wallet.privateKey
+    };
+  } catch (error) {
+    console.error('Error creating wallet:', error);
+    throw new Error('Failed to create wallet');
+  }
 }
 
 // Import wallet from private key
 export function importWallet(privateKey: string): WalletInfo {
   try {
-    const wallet = new ethers.Wallet(privateKey);
+    // Remove 0x prefix if present
+    const cleanKey = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`;
+    const wallet = new ethers.Wallet(cleanKey);
     return {
       address: wallet.address,
-      privateKey: wallet.privateKey,
-      publicKey: wallet.publicKey
+      privateKey: wallet.privateKey
     };
   } catch (error) {
-    throw new Error('Invalid private key format');
+    console.error('Error importing wallet:', error);
+    throw new Error('Invalid private key');
   }
 }
 
-// Save wallet to local storage
-export function saveWalletToStorage(wallet: WalletInfo): void {
-  localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(wallet));
+// Get wallet balance (requires provider)
+export async function getWalletBalance(address: string, provider?: ethers.Provider): Promise<WalletBalance> {
+  try {
+    // Use provided provider or create one with RPC URL
+    let ethProvider = provider;
+    if (!ethProvider) {
+      const rpcUrl = await getRpcUrl();
+      console.log('🌐 Using RPC URL:', rpcUrl);
+      ethProvider = new ethers.JsonRpcProvider(rpcUrl);
+    }
+
+    const balance = await ethProvider.getBalance(address);
+    const formatted = ethers.formatEther(balance);
+
+    console.log(`💰 Balance for ${address}: ${formatted} ETH`);
+
+    return {
+      eth: balance.toString(),
+      formatted: formatted
+    };
+  } catch (error) {
+    console.error('Error getting balance:', error);
+    return {
+      eth: '0',
+      formatted: '0.0'
+    };
+  }
 }
 
-// Get wallet from local storage
+// Store wallet info in localStorage (encrypted in production)
+export function saveWalletToStorage(wallet: WalletInfo): void {
+  // In production, this should be encrypted
+  localStorage.setItem('oauth3_wallet', JSON.stringify(wallet));
+}
+
+// Retrieve wallet from localStorage
 export function getWalletFromStorage(): WalletInfo | null {
-  const stored = localStorage.getItem(WALLET_STORAGE_KEY);
-  if (!stored) return null;
-  
   try {
-    return JSON.parse(stored);
+    const stored = localStorage.getItem('oauth3_wallet');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    return null;
   } catch (error) {
-    console.error('Failed to parse stored wallet:', error);
+    console.error('Error retrieving wallet:', error);
     return null;
   }
 }
 
 // Clear wallet from storage
 export function clearWalletFromStorage(): void {
-  localStorage.removeItem(WALLET_STORAGE_KEY);
+  localStorage.removeItem('oauth3_wallet');
 }
 
-// Get wallet balance
-export async function getWalletBalance(address: string): Promise<BalanceInfo> {
+// Get an Ethereum provider instance
+export async function getProvider(): Promise<ethers.JsonRpcProvider> {
+  const rpcUrl = await getRpcUrl();
+  return new ethers.JsonRpcProvider(rpcUrl);
+}
+
+// Get network information
+export async function getNetworkInfo(): Promise<{ name: string; chainId: number }> {
   try {
-    const provider = getRpcProvider();
-    const balance = await provider.getBalance(address);
-    const formatted = ethers.formatEther(balance);
-    
+    const provider = await getProvider();
+    const network = await provider.getNetwork();
     return {
-      raw: balance.toString(),
-      formatted: parseFloat(formatted).toFixed(4)
+      name: network.name,
+      chainId: Number(network.chainId)
     };
   } catch (error) {
-    console.error('Failed to get wallet balance:', error);
+    console.error('Error getting network info:', error);
     return {
-      raw: '0',
-      formatted: '0.0000'
+      name: 'Unknown',
+      chainId: 0
     };
-  }
-}
-
-// Get network info
-export function getNetworkInfo(): NetworkInfo {
-  const stored = localStorage.getItem(NETWORK_STORAGE_KEY);
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch (error) {
-      console.error('Failed to parse stored network:', error);
-    }
-  }
-  return DEFAULT_NETWORK;
-}
-
-// Save network info
-export function saveNetworkInfo(network: NetworkInfo): void {
-  localStorage.setItem(NETWORK_STORAGE_KEY, JSON.stringify(network));
-}
-
-// Validate Ethereum address
-export function isValidAddress(address: string): boolean {
-  try {
-    return ethers.isAddress(address);
-  } catch (error) {
-    return false;
-  }
-}
-
-// Format address for display
-export function formatAddress(address: string): string {
-  if (!address) return '';
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
-// Get transaction by hash
-export async function getTransaction(hash: string) {
-  try {
-    const provider = getRpcProvider();
-    return await provider.getTransaction(hash);
-  } catch (error) {
-    console.error('Failed to get transaction:', error);
-    return null;
-  }
-}
-
-// Wait for transaction confirmation
-export async function waitForTransaction(hash: string, confirmations: number = 1) {
-  try {
-    const provider = getRpcProvider();
-    return await provider.waitForTransaction(hash, confirmations);
-  } catch (error) {
-    console.error('Failed to wait for transaction:', error);
-    return null;
   }
 }
