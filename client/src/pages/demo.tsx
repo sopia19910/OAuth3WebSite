@@ -133,9 +133,8 @@ export default function Demo() {
     }
 
     // Get network info
-    getNetworkInfo().then(info => {
-      setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
-    });
+    const info = getNetworkInfo();
+    setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
   }, []);
 
   // Auto-refresh balance when wallet changes
