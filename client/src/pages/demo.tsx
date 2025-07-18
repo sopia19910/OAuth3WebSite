@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,12 +15,79 @@ import {
   CheckCircleIcon,
   ArrowRightIcon,
   CurrencyDollarIcon,
-  ClipboardIcon
+  ClipboardIcon,
+  ArrowPathIcon,
+  UserIcon,
+  CogIcon,
+  BanknotesIcon,
+  LockClosedIcon
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
+import { 
+  createWallet, 
+  importWallet, 
+  getWalletBalance, 
+  saveWalletToStorage, 
+  getWalletFromStorage,
+  getNetworkInfo,
+  type WalletInfo 
+} from "@/lib/wallet";
+import { 
+  createZKAccount, 
+  checkZKAccount, 
+  waitForTransaction,
+  type ZKAccountInfo,
+  type ZKAccountCreationResult 
+} from "@/lib/zkAccount";
 
 type DemoStep = "login" | "web3-setup" | "balance" | "zkp-generation" | "zkp-display" | "complete";
+
+// Step configuration
+const stepConfig = [
+  {
+    id: "login",
+    title: "OAuth Login",
+    description: "Connect with Google",
+    icon: UserIcon,
+    color: "text-blue-500"
+  },
+  {
+    id: "web3-setup",
+    title: "Web3 Setup",
+    description: "Create or import wallet",
+    icon: WalletIcon,
+    color: "text-purple-500"
+  },
+  {
+    id: "balance",
+    title: "Balance Check",
+    description: "Verify ETH balance",
+    icon: BanknotesIcon,
+    color: "text-green-500"
+  },
+  {
+    id: "zkp-generation",
+    title: "ZK Account",
+    description: "Create ZK smart contract",
+    icon: CogIcon,
+    color: "text-cyan-500"
+  },
+  {
+    id: "zkp-display",
+    title: "ZK Information",
+    description: "Review account details",
+    icon: LockClosedIcon,
+    color: "text-indigo-500"
+  },
+  {
+    id: "complete",
+    title: "Complete",
+    description: "Ready to use dashboard",
+    icon: CheckCircleIcon,
+    color: "text-emerald-500"
+  }
+];
 
 export default function Demo() {
   const [currentStep, setCurrentStep] = useState<DemoStep>("login");
@@ -29,29 +96,258 @@ export default function Demo() {
   const [zkpProgress, setZkpProgress] = useState(0);
   const [userEmail, setUserEmail] = useState("");
   const [, setLocation] = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [wallet, setWallet] = useState<WalletInfo | null>(null);
+  const [walletBalance, setWalletBalance] = useState("0.0");
+  const [importError, setImportError] = useState("");
+  const [networkName, setNetworkName] = useState("Loading...");
+  const [isRefreshingBalance, setIsRefreshingBalance] = useState(false);
+  const [balanceError, setBalanceError] = useState("");
+  const [zkAccountInfo, setZkAccountInfo] = useState<ZKAccountInfo | null>(null);
+  const [zkCreationResult, setZkCreationResult] = useState<ZKAccountCreationResult | null>(null);
+  const [zkProgress, setZkProgress] = useState(0);
+  const [zkStatus, setZkStatus] = useState("");
+  const [isRefreshingZkAccount, setIsRefreshingZkAccount] = useState(false);
 
-  const handleGoogleLogin = () => {
-    setUserEmail("demo.user@gmail.com");
-    setCurrentStep("web3-setup");
-  };
+  // Check for OAuth callback parameters
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const oauthSuccess = params.get('oauth');
+    const email = params.get('email');
+    
+    if (oauthSuccess === 'success' && email) {
+      setUserEmail(email);
+      setCurrentStep("web3-setup");
+      // Clear the URL parameters
+      window.history.replaceState({}, document.title, '/demo');
+    } else if (oauthSuccess === 'error') {
+      const message = params.get('message') || 'Authentication failed';
+      alert(message);
+      window.history.replaceState({}, document.title, '/demo');
+    }
 
-  const handleWeb3Setup = () => {
-    setCurrentStep("balance");
-  };
+    // Check for existing wallet in storage
+    const savedWallet = getWalletFromStorage();
+    if (savedWallet) {
+      setWallet(savedWallet);
+    }
 
-  const handleRequestGasFee = () => {
-    setCurrentStep("zkp-generation");
-    // Simulate ZKP generation progress
-    const interval = setInterval(() => {
-      setZkpProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setCurrentStep("zkp-display"), 500);
-          return 100;
+    // Get network info
+    getNetworkInfo().then(info => {
+      setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
+    });
+  }, []);
+
+  // Auto-refresh balance when wallet changes
+  useEffect(() => {
+    if (wallet) {
+      (async () => {
+        setIsRefreshingBalance(true);
+        setBalanceError("");
+        try {
+          const balance = await getWalletBalance(wallet.address);
+          setWalletBalance(balance.formatted);
+          setBalanceError("");
+        } catch (error) {
+          console.error('Failed to fetch balance:', error);
+          setBalanceError('Failed to fetch balance. Please check your network connection.');
+          setWalletBalance("0.0");
+        } finally {
+          setIsRefreshingBalance(false);
         }
-        return prev + 25;
+      })();
+    }
+  }, [wallet]);
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/google');
+      const data = await response.json();
+      
+      if (data.success && data.authUrl) {
+        // Redirect to Google OAuth
+        window.location.href = data.authUrl;
+      } else {
+        alert('Failed to initiate Google login');
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      alert('Failed to initiate Google login');
+      setIsLoading(false);
+    }
+  };
+
+  const handleWeb3Setup = async () => {
+    try {
+      let walletInfo: WalletInfo;
+      
+      if (web3Option === "new") {
+        // Create new wallet
+        walletInfo = createWallet();
+        console.log('🔑 New wallet created:', walletInfo.address);
+      } else {
+        // Import existing wallet
+        if (!privateKey) {
+          setImportError("Private key is required");
+          return;
+        }
+        
+        try {
+          walletInfo = importWallet(privateKey);
+          console.log('🔑 Wallet imported:', walletInfo.address);
+        } catch (error) {
+          setImportError("Invalid private key format");
+          return;
+        }
+      }
+      
+      // Save wallet to storage
+      setWallet(walletInfo);
+      saveWalletToStorage(walletInfo);
+      
+      // Get wallet balance
+      try {
+        const balance = await getWalletBalance(walletInfo.address);
+        setWalletBalance(balance.formatted);
+        setBalanceError("");
+      } catch (error) {
+        console.error('Failed to fetch initial balance:', error);
+        setBalanceError('Failed to fetch balance. You can try refreshing later.');
+        setWalletBalance("0.0");
+      }
+
+      // Check for existing ZK Account
+      if (userEmail) {
+        try {
+          const existingAccount = await checkZKAccount(walletInfo.address);
+          if (existingAccount.hasZKAccount) {
+            setZkAccountInfo(existingAccount);
+            console.log('✅ Found existing ZK Account during wallet setup:', existingAccount.zkAccountAddress);
+          }
+        } catch (error) {
+          console.warn('Failed to check ZK account during wallet setup:', error);
+        }
+      }
+      
+      setCurrentStep("balance");
+    } catch (error) {
+      console.error('Wallet setup error:', error);
+      alert('Failed to setup wallet');
+    }
+  };
+
+  const refreshBalance = async () => {
+    if (!wallet) return;
+    
+    setIsRefreshingBalance(true);
+    setBalanceError("");
+    try {
+      const balance = await getWalletBalance(wallet.address);
+      setWalletBalance(balance.formatted);
+      setBalanceError("");
+      console.log('✅ Balance refreshed:', balance.formatted, 'ETH');
+    } catch (error) {
+      console.error('Failed to refresh balance:', error);
+      setBalanceError('Failed to fetch balance. Please check your network connection and try again.');
+      setWalletBalance("0.0");
+    } finally {
+      setIsRefreshingBalance(false);
+    }
+  };
+
+  const refreshZkAccountInfo = async () => {
+    if (!wallet) return;
+    
+    setIsRefreshingZkAccount(true);
+    try {
+      const refreshedInfo = await checkZKAccount(wallet.address);
+      setZkAccountInfo(refreshedInfo);
+      console.log('✅ ZK Account info refreshed:', {
+        ethBalance: refreshedInfo.balance,
+        oa3Balance: refreshedInfo.tokenBalance
       });
-    }, 800);
+    } catch (error) {
+      console.error('Failed to refresh ZK account info:', error);
+    } finally {
+      setIsRefreshingZkAccount(false);
+    }
+  };
+
+  const handleRequestGasFee = async () => {
+    if (!wallet || !userEmail) {
+      alert('Missing wallet or user email');
+      return;
+    }
+
+    setCurrentStep("zkp-generation");
+    setZkProgress(0);
+    setZkStatus("Initializing ZK Account creation...");
+
+    try {
+      // Step 1: Check if ZK account already exists (25%)
+      setZkProgress(25);
+      setZkStatus("Checking for existing ZK Account...");
+      
+      const existingAccount = await checkZKAccount(wallet.address);
+      if (existingAccount.hasZKAccount) {
+        setZkAccountInfo(existingAccount);
+        setZkProgress(100);
+        setZkStatus("ZK Account already exists! Loading account details...");
+        console.log('✅ Found existing ZK Account:', existingAccount.zkAccountAddress);
+        console.log('💰 ETH Balance:', existingAccount.balance);
+        console.log('🪙 OA3 Token Balance:', existingAccount.tokenBalance);
+        setTimeout(() => setCurrentStep("zkp-display"), 1000);
+        return;
+      }
+
+      // Step 2: Create ZK Account transaction (50%)
+      setZkProgress(50);
+      setZkStatus("Creating ZK Account transaction...");
+      
+      const result = await createZKAccount(wallet.privateKey, wallet.address, userEmail);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create ZK Account');
+      }
+
+      setZkCreationResult(result);
+      
+      // Step 3: Transaction sent (75%)
+      setZkProgress(75);
+      setZkStatus(`Transaction sent! Hash: ${result.transactionHash?.slice(0, 10)}...`);
+
+      // Step 4: Wait for confirmation (100%)
+      if (result.transactionHash) {
+        setZkStatus("Waiting for transaction confirmation...");
+        
+        // Wait for transaction with timeout
+        const receipt = await waitForTransaction(result.transactionHash);
+        
+        if (receipt) {
+          setZkProgress(100);
+          setZkStatus("ZK Account created successfully!");
+          
+          // Fetch the created account info
+          const accountInfo = await checkZKAccount(wallet.address);
+          setZkAccountInfo(accountInfo);
+        } else {
+          setZkProgress(100);
+          setZkStatus("Transaction sent but confirmation timed out. Check explorer for status.");
+        }
+      }
+      
+      setTimeout(() => setCurrentStep("zkp-display"), 1500);
+
+    } catch (error) {
+      console.error('ZK Account creation error:', error);
+      setZkStatus(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setTimeout(() => {
+        alert('Failed to create ZK Account: ' + (error instanceof Error ? error.message : 'Unknown error'));
+        setCurrentStep("balance");
+      }, 3000);
+    }
   };
 
   const handleViewZKP = () => {
@@ -72,6 +368,96 @@ export default function Demo() {
     }
   };
 
+  // Get current step index
+  const getCurrentStepIndex = () => {
+    return stepConfig.findIndex(step => step.id === currentStep);
+  };
+
+  // Check if step is completed
+  const isStepCompleted = (stepId: string) => {
+    const stepIndex = stepConfig.findIndex(step => step.id === stepId);
+    const currentIndex = getCurrentStepIndex();
+    return stepIndex < currentIndex;
+  };
+
+  // Check if step is current
+  const isCurrentStep = (stepId: string) => {
+    return stepId === currentStep;
+  };
+
+  // Render step progress indicator
+  const renderStepProgress = () => {
+    return (
+      <div className="w-full max-w-5xl mx-auto mb-8">
+        <div className="flex items-start justify-between relative">
+          {/* Background connection line */}
+          <div className="absolute top-6 left-6 right-6 h-0.5 bg-muted" />
+          
+          {/* Progress line */}
+          <div 
+            className="absolute top-6 left-6 h-0.5 bg-green-500 transition-all duration-1000 ease-in-out"
+            style={{ 
+              width: `${(getCurrentStepIndex() / (stepConfig.length - 1)) * 100}%`,
+              maxWidth: 'calc(100% - 3rem)'
+            }}
+          />
+          
+          {stepConfig.map((step, index) => {
+            const IconComponent = step.icon;
+            const isCompleted = isStepCompleted(step.id);
+            const isCurrent = isCurrentStep(step.id);
+            
+            return (
+              <div key={step.id} className="flex flex-col items-center relative z-10 flex-1">
+                {/* Step circle */}
+                <div className={`
+                  w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ease-in-out transform
+                  ${isCompleted 
+                    ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 scale-110' 
+                    : isCurrent 
+                      ? 'bg-primary text-white shadow-lg shadow-primary/30 animate-pulse scale-110' 
+                      : 'bg-muted text-muted-foreground border-2 border-muted scale-100'
+                  }
+                `}>
+                  {isCompleted ? (
+                    <CheckCircleIcon className="w-6 h-6" />
+                  ) : (
+                    <IconComponent className="w-6 h-6" />
+                  )}
+                </div>
+                
+                {/* Step number */}
+                <div className={`
+                  w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mt-1 transition-all duration-300
+                  ${isCompleted 
+                    ? 'bg-green-100 text-green-600' 
+                    : isCurrent 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'bg-muted text-muted-foreground'
+                  }
+                `}>
+                  {index + 1}
+                </div>
+                
+                {/* Step info */}
+                <div className="mt-2 text-center max-w-24">
+                  <h4 className={`text-sm font-medium transition-colors duration-300 ${
+                    isCurrent ? 'text-primary' : isCompleted ? 'text-green-600' : 'text-muted-foreground'
+                  }`}>
+                    {step.title}
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-1 leading-tight">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case "login":
@@ -83,11 +469,18 @@ export default function Demo() {
             </p>
             <Button 
               onClick={handleGoogleLogin}
-              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
+              disabled={isLoading}
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg disabled:opacity-50"
               size="lg"
             >
-              <SiGoogle className="w-5 h-5 mr-2" />
-              Login with Google
+              {isLoading ? (
+                <>Redirecting to Google...</>
+              ) : (
+                <>
+                  <SiGoogle className="w-5 h-5 mr-2" />
+                  Login with Google
+                </>
+              )}
             </Button>
           </div>
         );
@@ -138,11 +531,17 @@ export default function Demo() {
                 <Input
                   id="privateKey"
                   type="password"
-                  placeholder="Enter your private key"
+                  placeholder="Enter your private key (with or without 0x prefix)"
                   value={privateKey}
-                  onChange={(e) => setPrivateKey(e.target.value)}
-                  className="w-full"
+                  onChange={(e) => {
+                    setPrivateKey(e.target.value);
+                    setImportError(""); // Clear error on input change
+                  }}
+                  className={`w-full ${importError ? 'border-destructive' : ''}`}
                 />
+                {importError && (
+                  <p className="text-sm text-destructive mt-2">{importError}</p>
+                )}
               </div>
             )}
 
@@ -170,12 +569,12 @@ export default function Demo() {
                     <Label className="text-sm font-medium text-muted-foreground">Public Address</Label>
                     <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
                       <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                        0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+                        {wallet?.address || '0x...'}
                       </p>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => copyToClipboard('0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b', 'Public Address')}
+                        onClick={() => copyToClipboard(wallet?.address || '', 'Public Address')}
                         className="p-1 h-auto hover:bg-background"
                       >
                         <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
@@ -184,45 +583,116 @@ export default function Demo() {
                   </div>
                   
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Private Address</Label>
+                    <Label className="text-sm font-medium text-muted-foreground">Private Key</Label>
                     <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
                       <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                        0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+                        {wallet?.privateKey ? '••••••••••••••••••••••••••••••••' : 'No key available'}
                       </p>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => copyToClipboard('0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef', 'Private Address')}
+                        onClick={() => {
+                          if (wallet?.privateKey) {
+                            copyToClipboard(wallet.privateKey, 'Private Key');
+                            alert('⚠️ Private key copied! Keep it secure and never share it with anyone.');
+                          }
+                        }}
                         className="p-1 h-auto hover:bg-background"
+                        title="Copy private key (be careful!)"
                       >
                         <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
                       </Button>
                     </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      ⚠️ Never share your private key. Store it securely.
+                    </p>
                   </div>
                 </div>
               </div>
               
               {/* Balance Info */}
               <div className="bg-card rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Balance Information</h3>
-                <div className="text-center">
-                  <h4 className="text-md font-medium text-foreground mb-2">ETH Balance</h4>
-                  <p className="text-muted-foreground">0.000000000000000000 ETH</p>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-foreground">Balance Information</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={refreshBalance}
+                    disabled={isRefreshingBalance}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowPathIcon className={`w-4 h-4 ${isRefreshingBalance ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </Button>
+                </div>
+                <div className="text-center space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Network</h4>
+                    <p className="text-foreground">{networkName}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-md font-medium text-foreground mb-2">ETH Balance</h4>
+                    {balanceError ? (
+                      <div className="space-y-2">
+                        <p className="text-destructive text-sm">⚠️ {balanceError}</p>
+                        <p className="text-muted-foreground text-xs">Click refresh to try again</p>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-xl">{walletBalance} ETH</p>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              <div className="text-center py-4">
-                <p className="text-destructive text-sm">
-                  ETH balance is insufficient. Gas fee required.
-                </p>
+              <div className="text-center py-4 space-y-3">
+                {balanceError ? (
+                  <p className="text-destructive text-sm">
+                    ⚠️ Cannot check balance. Please fix the connection issue and refresh.
+                  </p>
+                ) : parseFloat(walletBalance) === 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-destructive text-sm">
+                      ETH balance is insufficient. Gas fee required.
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      Send some ETH to your wallet address and click refresh to continue.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-green-600 text-sm">
+                    ✅ Sufficient balance available for ZK Account operations.
+                  </p>
+                )}
+                
+                {zkAccountInfo?.hasZKAccount && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-700 text-sm font-medium">
+                      🎉 ZK Account Already Exists!
+                    </p>
+                    <p className="text-green-600 text-xs mt-1">
+                      Address: {zkAccountInfo.zkAccountAddress?.slice(0, 10)}...
+                    </p>
+                    <p className="text-green-600 text-xs">
+                      OA3 Balance: {zkAccountInfo.tokenBalance || '0'} OA3
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
             <Button 
               onClick={handleRequestGasFee}
-              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
+              disabled={!!balanceError || parseFloat(walletBalance) === 0}
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Request Gas Fee
+              {balanceError 
+                ? 'Connection Error - Cannot Create ZK Account' 
+                : parseFloat(walletBalance) === 0 
+                  ? 'Insufficient Balance - Cannot Create ZK Account' 
+                  : zkAccountInfo?.hasZKAccount
+                    ? 'View Existing ZK Account'
+                    : 'Create ZK Account Contract'
+              }
             </Button>
           </div>
         );
@@ -231,22 +701,58 @@ export default function Demo() {
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
-              Generating ZKP to link OAuth and Web3 accounts
+              Creating ZK Account Contract
             </h2>
             
-            <div className="w-full mb-8">
+            <div className="w-full mb-8 space-y-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-foreground">{zkpProgress}%</span>
+                <span className="text-sm font-medium text-foreground">{zkProgress}%</span>
               </div>
-              <Progress value={zkpProgress} className="w-full" />
+              <Progress value={zkProgress} className="w-full" />
+              
+              <div className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">{zkStatus}</p>
+                
+                {zkCreationResult?.transactionHash && (
+                  <div className="space-y-2">
+                    <div className="p-3 bg-muted rounded-lg">
+                      <p className="text-xs text-muted-foreground mb-1">Transaction Hash:</p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-mono text-foreground break-all flex-1 mr-2">
+                          {zkCreationResult.transactionHash}
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(zkCreationResult.transactionHash || '', 'Transaction Hash')}
+                          className="p-1 h-auto hover:bg-background"
+                        >
+                          <ClipboardIcon className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {zkCreationResult.explorerUrl && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(zkCreationResult.explorerUrl, '_blank')}
+                        className="w-full"
+                      >
+                        View on Explorer
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <Button 
               onClick={handleViewZKP}
-              disabled={zkpProgress < 100}
+              disabled={zkProgress < 100}
               className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg disabled:opacity-50"
             >
-              View Generated ZKP
+              {zkProgress < 100 ? 'Creating...' : 'View ZK Account'}
             </Button>
           </div>
         );
@@ -254,12 +760,26 @@ export default function Demo() {
       case "zkp-display":
         return (
           <div className="flex flex-col max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">ZKP Account Information</h2>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-foreground">ZK Account Information</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={refreshZkAccountInfo}
+                disabled={isRefreshingZkAccount}
+                className="flex items-center gap-2"
+              >
+                <ArrowPathIcon className={`w-4 h-4 ${isRefreshingZkAccount ? 'animate-spin' : ''}`} />
+                Refresh Balances
+              </Button>
+            </div>
             
             <div className="mb-6 p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground text-center">
-                Zero-Knowledge Proof has been successfully generated to link your Web2 OAuth account with your Web3 wallet. 
-                Below are the generated account details and cryptographic information.
+                {zkAccountInfo?.hasZKAccount 
+                  ? 'ZK Account contract has been successfully created to link your Web2 OAuth account with your Web3 wallet.'
+                  : 'ZK Account contract creation is in progress. Below are the generated account details and cryptographic information.'
+                }
               </p>
             </div>
             
@@ -291,12 +811,12 @@ export default function Demo() {
                     </div>
                     <div className="md:col-span-2 flex items-center justify-between">
                       <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                        0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
+                        {zkAccountInfo?.zkAccountAddress || zkCreationResult?.zkAccountAddress || '0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b'}
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => copyToClipboard('0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b', 'ZK Contract Account')}
+                        onClick={() => copyToClipboard(zkAccountInfo?.zkAccountAddress || zkCreationResult?.zkAccountAddress || '0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b', 'ZK Contract Account')}
                         className="p-1 h-auto hover:bg-muted"
                       >
                         <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
@@ -311,12 +831,12 @@ export default function Demo() {
                     </div>
                     <div className="md:col-span-2 flex items-center justify-between">
                       <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                        0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b
+                        {wallet?.address || '0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b'}
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => copyToClipboard('0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b', 'Owner (EOA)')}
+                        onClick={() => copyToClipboard(wallet?.address || '0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b', 'Owner (EOA)')}
                         className="p-1 h-auto hover:bg-muted"
                       >
                         <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
@@ -329,7 +849,15 @@ export default function Demo() {
                       <span className="text-sm font-medium text-muted-foreground">ETH Balance</span>
                       <p className="text-xs text-muted-foreground">Current Ethereum balance</p>
                     </div>
-                    <span className="text-sm text-foreground md:col-span-2">1.23 ETH</span>
+                    <span className="text-sm text-foreground md:col-span-2">{zkAccountInfo?.balance || '0'} ETH</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
+                    <div className="space-y-1">
+                      <span className="text-sm font-medium text-muted-foreground">OA3 Token Balance</span>
+                      <p className="text-xs text-muted-foreground">OAuth3 token balance in ZK Account</p>
+                    </div>
+                    <span className="text-sm text-foreground md:col-span-2">{zkAccountInfo?.tokenBalance || '0'} OA3</span>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
@@ -347,12 +875,12 @@ export default function Demo() {
                     </div>
                     <div className="md:col-span-2 flex items-center justify-between">
                       <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                        0xabcdef1234567890abcdef1234567890abcdef1234567890
+                        {zkAccountInfo?.emailHash || zkCreationResult?.emailHash || '0xabcdef1234567890abcdef1234567890abcdef1234567890'}
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => copyToClipboard('0xabcdef1234567890abcdef1234567890abcdef1234567890', 'Email Hash')}
+                        onClick={() => copyToClipboard(zkAccountInfo?.emailHash || zkCreationResult?.emailHash || '0xabcdef1234567890abcdef1234567890abcdef1234567890', 'Email Hash')}
                         className="p-1 h-auto hover:bg-muted"
                       >
                         <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
@@ -363,16 +891,16 @@ export default function Demo() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
                     <div className="space-y-1">
                       <span className="text-sm font-medium text-muted-foreground">Domain Hash (Poseidon)</span>
-                      <p className="text-xs text-muted-foreground">Cryptographic hash of gmail.com</p>
+                      <p className="text-xs text-muted-foreground">Cryptographic hash of {userEmail ? userEmail.split('@')[1] : 'gmail.com'}</p>
                     </div>
                     <div className="md:col-span-2 flex items-center justify-between">
                       <span className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                        0x0987654321fedcba0987654321fedcba0987654321fedcba
+                        {zkAccountInfo?.domainHash || zkCreationResult?.domainHash || '0x0987654321fedcba0987654321fedcba0987654321fedcba'}
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => copyToClipboard('0x0987654321fedcba0987654321fedcba0987654321fedcba', 'Domain Hash')}
+                        onClick={() => copyToClipboard(zkAccountInfo?.domainHash || zkCreationResult?.domainHash || '0x0987654321fedcba0987654321fedcba0987654321fedcba', 'Domain Hash')}
                         className="p-1 h-auto hover:bg-muted"
                       >
                         <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
@@ -444,9 +972,17 @@ export default function Demo() {
       <Navbar />
       
       {/* Demo Content - Full Height */}
-      <div className="pt-16 min-h-screen flex items-center justify-center gradient-bg">
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {renderStep()}
+      <div className="pt-16 min-h-screen flex flex-col items-center justify-center gradient-bg">
+        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Step Progress Indicator */}
+          <div className="mb-12">
+            {renderStepProgress()}
+          </div>
+          
+          {/* Current Step Content */}
+          <div className="w-full max-w-4xl mx-auto">
+            {renderStep()}
+          </div>
         </div>
       </div>
     </div>

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import { 
   CreditCardIcon, 
   PaperAirplaneIcon, 
@@ -14,12 +15,28 @@ import {
   WalletIcon,
   CogIcon,
   ArrowUpIcon,
-  ArrowDownIcon
+  ArrowDownIcon,
+  ArrowPathIcon
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
+import { 
+  getWalletFromStorage, 
+  getWalletBalance, 
+  getNetworkInfo,
+  type WalletInfo 
+} from "@/lib/wallet";
+import { 
+  checkZKAccount, 
+  waitForTransaction,
+  transferETHFromZKAccount,
+  transferOA3FromZKAccount,
+  type ZKAccountInfo,
+  type TransferResult 
+} from "@/lib/zkAccount";
 
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
   const [activeMenu, setActiveMenu] = useState<string>("overview");
   const [sendAmount, setSendAmount] = useState("");
   const [sendAddress, setSendAddress] = useState("");
@@ -27,10 +44,114 @@ export default function Dashboard() {
   const [tokenAddress, setTokenAddress] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenName, setTokenName] = useState("");
+  
+  // Wallet and account state
+  const [wallet, setWallet] = useState<WalletInfo | null>(null);
+  const [walletBalance, setWalletBalance] = useState("0.0");
+  const [zkAccountInfo, setZkAccountInfo] = useState<ZKAccountInfo | null>(null);
+  const [networkName, setNetworkName] = useState("Loading...");
+  const [userEmail, setUserEmail] = useState("");
+  
+  // Send transaction state
+  const [isSending, setIsSending] = useState(false);
+  const [sendProgress, setSendProgress] = useState(0);
+  const [sendStatus, setSendStatus] = useState("");
+  const [transactionHash, setTransactionHash] = useState("");
+  const [sendError, setSendError] = useState("");
+  
+  // Refresh state
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // Logout state
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  // Configuration state
+  const [config, setConfig] = useState<any>(null);
+  
 
-  const userEmail = "demo.user@gmail.com";
-  const publicAddress = "0x9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b";
-  const zkpContract = "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b";
+  // Load wallet and account data on component mount
+  useEffect(() => {
+    loadWalletData();
+  }, []);
+  
+  const loadWalletData = async () => {
+    try {
+      // First check if OAuth session is valid
+      console.log('🔍 Checking OAuth session validity...');
+      
+      try {
+        const userResponse = await fetch('/api/auth/me');
+        const userData = await userResponse.json();
+        
+        if (!userData.success || !userData.user?.email) {
+          console.log('❌ Invalid or expired OAuth session. Redirecting to demo...');
+          alert('Session expired or invalid. Please login again.');
+          setLocation('/demo');
+          return;
+        }
+        
+        // Valid session - continue with loading
+        console.log('✅ Valid OAuth session for:', userData.user.email);
+        setUserEmail(userData.user.email);
+        localStorage.setItem('oauth3_user_email', userData.user.email);
+        
+      } catch (error) {
+        console.error('Failed to validate OAuth session:', error);
+        alert('Failed to validate session. Please login again.');
+        setLocation('/demo');
+        return;
+      }
+      
+      // Get wallet from storage
+      const savedWallet = getWalletFromStorage();
+      if (savedWallet) {
+        setWallet(savedWallet);
+        
+        // Get wallet balance
+        const balance = await getWalletBalance(savedWallet.address);
+        setWalletBalance(balance.formatted);
+        
+        // Check for ZK Account
+        const zkInfo = await checkZKAccount(savedWallet.address);
+        setZkAccountInfo(zkInfo);
+      }
+      
+      // Get network info and config
+      const networkInfo = await getNetworkInfo();
+      setNetworkName(networkInfo.name === 'unknown' ? 'Holesky Testnet' : networkInfo.name);
+      
+      // Load configuration
+      const configResponse = await fetch('/api/config');
+      const configData = await configResponse.json();
+      if (configData.success) {
+        setConfig(configData);
+      }
+      
+    } catch (error) {
+      console.error('Failed to load wallet data:', error);
+    }
+  };
+  
+  const refreshAccountData = async () => {
+    if (!wallet) return;
+    
+    setIsRefreshing(true);
+    try {
+      // Refresh wallet balance
+      const balance = await getWalletBalance(wallet.address);
+      setWalletBalance(balance.formatted);
+      
+      // Refresh ZK Account info
+      const zkInfo = await checkZKAccount(wallet.address);
+      setZkAccountInfo(zkInfo);
+      
+      console.log('✅ Account data refreshed');
+    } catch (error) {
+      console.error('Failed to refresh account data:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const copyToClipboard = async (text: string, label: string) => {
     try {
@@ -41,12 +162,179 @@ export default function Dashboard() {
       alert(`Failed to copy ${label}`);
     }
   };
+  
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      console.log('🚪 Logging out...');
+      
+      // Call logout API
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('✅ Logout successful');
+        
+        // Clear local storage
+        localStorage.removeItem('oauth3_user_email');
+        localStorage.removeItem('oauth3_wallet');
+        
+        // Redirect to home page
+        setLocation('/');
+      } else {
+        console.error('❌ Logout failed:', data.error);
+        alert('Failed to logout. Please try again.');
+      }
+    } catch (error) {
+      console.error('❌ Logout error:', error);
+      alert('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+  
+  const handleSendTransaction = async () => {
+    if (!wallet || !zkAccountInfo?.hasZKAccount) {
+      setSendError('No wallet or ZK Account found');
+      return;
+    }
+    
+    if (!sendAddress || !sendAmount || parseFloat(sendAmount) <= 0) {
+      setSendError('Please fill in all required fields with valid values');
+      return;
+    }
+    
+    setIsSending(true);
+    setSendProgress(0);
+    setSendStatus('Initializing transaction...');
+    setSendError('');
+    setTransactionHash('');
+    
+    try {
+      // Step 1: Validate inputs (25%)
+      setSendProgress(25);
+      setSendStatus('Validating transaction details...');
+      
+      // Step 2: Prepare transfer (50%)
+      setSendProgress(50);
+      setSendStatus('Preparing transaction...');
+      
+      let result: TransferResult;
+      
+      if (selectedToken === 'ETH') {
+        result = await transferETHFromZKAccount(
+          wallet.privateKey,
+          wallet.address,
+          sendAddress,
+          sendAmount
+        );
+      } else {
+        result = await transferOA3FromZKAccount(
+          wallet.privateKey,
+          wallet.address,
+          sendAddress,
+          sendAmount
+        );
+      }
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Transfer failed');
+      }
+      
+      // Step 3: Transaction sent (75%) - Show hash immediately
+      setSendProgress(75);
+      if (result.transactionHash) {
+        setTransactionHash(result.transactionHash);
+        setSendStatus(`Transaction sent! Hash: ${result.transactionHash.slice(0, 10)}...`);
+        
+        // Step 4: Wait for confirmation (100%) - Run in background
+        setSendStatus('Waiting for transaction confirmation...');
+        
+        // Wait for confirmation without blocking the UI
+        waitForTransaction(result.transactionHash).then((receipt) => {
+          if (receipt) {
+            setSendProgress(100);
+            setSendStatus('Transaction confirmed successfully!');
+            
+            // Refresh account data
+            setTimeout(() => {
+              refreshAccountData();
+            }, 2000);
+            
+            // Clear form
+            setTimeout(() => {
+              setSendAmount('');
+              setSendAddress('');
+              setIsSending(false);
+              setSendProgress(0);
+              setSendStatus('');
+              setTransactionHash('');
+            }, 5000);
+          } else {
+            setSendProgress(100);
+            setSendStatus('Transaction sent but confirmation timed out. Check explorer for status.');
+            
+            // Still clear form after timeout
+            setTimeout(() => {
+              setSendAmount('');
+              setSendAddress('');
+              setIsSending(false);
+              setSendProgress(0);
+              setSendStatus('');
+              setTransactionHash('');
+            }, 5000);
+          }
+        }).catch((error) => {
+          console.error('Error waiting for transaction:', error);
+          setSendProgress(100);
+          setSendStatus('Transaction sent but confirmation failed. Check explorer for status.');
+        });
+        
+        // Set to 100% immediately so user sees the hash
+        setSendProgress(100);
+        
+      } else {
+        // No transaction hash (probably failed before sending)
+        throw new Error(result.error || 'Transaction failed to send');
+      }
+      
+    } catch (error) {
+      console.error('Send transaction error:', error);
+      setSendError(error instanceof Error ? error.message : 'Unknown error occurred');
+      setSendStatus('');
+      setTimeout(() => {
+        setIsSending(false);
+        setSendProgress(0);
+      }, 3000);
+    }
+  };
 
   const renderMainContent = () => {
     switch (activeMenu) {
       case "overview":
         return (
           <div className="space-y-6">
+            <div className="mb-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-foreground">Account Overview</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={refreshAccountData}
+                  disabled={isRefreshing}
+                  className="flex items-center gap-2"
+                >
+                  <ArrowPathIcon className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Web2 OAuth Account */}
               <Card className="bg-card border-border">
@@ -79,12 +367,31 @@ export default function Dashboard() {
                 <CardContent className="space-y-3">
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Owner ETH (Gas Fee)</Label>
-                    <p className="text-sm text-foreground mt-1">0.05 ETH</p>
+                    <p className="text-sm text-foreground mt-1">{walletBalance} ETH</p>
                   </div>
                   
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Network</Label>
-                    <p className="text-sm text-foreground mt-1">Ethereum Mainnet</p>
+                    <p className="text-sm text-foreground mt-1">{networkName}</p>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Address</Label>
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-xs font-mono text-foreground">
+                        {wallet?.address ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}` : 'No wallet'}
+                      </p>
+                      {wallet?.address && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(wallet.address, 'Owner Address')}
+                          className="p-0.5 h-auto hover:bg-muted/50"
+                        >
+                          <ClipboardIcon className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -99,16 +406,34 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">CA Balance (Assets)</Label>
-                    <p className="text-sm text-foreground mt-1 font-semibold">1.18 ETH</p>
+                    <Label className="text-sm font-medium text-muted-foreground">ETH Balance</Label>
+                    <p className="text-sm text-foreground mt-1 font-semibold">{zkAccountInfo?.balance || '0'} ETH</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">OA3 Token Balance</Label>
+                    <p className="text-sm text-foreground mt-1 font-semibold">{zkAccountInfo?.tokenBalance || '0'} OA3</p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">ZKP Status</Label>
-                    <p className="text-sm text-green-500 mt-1">✓ Active</p>
+                    <p className="text-sm text-green-500 mt-1">{zkAccountInfo?.hasZKAccount ? '✓ Active' : '⚠️ Not Created'}</p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">Link Status</Label>
-                    <p className="text-sm text-green-500 mt-1">✓ OAuth & Web3 Linked</p>
+                    <Label className="text-sm font-medium text-muted-foreground">Contract Address</Label>
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-xs font-mono text-foreground">
+                        {zkAccountInfo?.zkAccountAddress ? `${zkAccountInfo.zkAccountAddress.slice(0, 6)}...${zkAccountInfo.zkAccountAddress.slice(-4)}` : 'Not available'}
+                      </p>
+                      {zkAccountInfo?.zkAccountAddress && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(zkAccountInfo.zkAccountAddress!, 'ZK Contract Address')}
+                          className="p-0.5 h-auto hover:bg-muted/50"
+                        >
+                          <ClipboardIcon className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -194,8 +519,7 @@ export default function Dashboard() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ETH">ETH - Ethereum</SelectItem>
-                      <SelectItem value="USDC">USDC - USD Coin</SelectItem>
-                      <SelectItem value="USDT">USDT - Tether</SelectItem>
+                      <SelectItem value="OA3">OA3 - OAuth3 Token</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -210,8 +534,64 @@ export default function Dashboard() {
                     className="mt-1"
                   />
                 </div>
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  Send Transaction
+                {isSending && (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-foreground">{sendProgress}%</span>
+                    </div>
+                    <Progress value={sendProgress} className="w-full" />
+                    
+                    <div className="text-center space-y-2">
+                      <p className="text-sm text-muted-foreground">{sendStatus}</p>
+                      
+                      {transactionHash && (
+                        <div className="space-y-2">
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">Transaction Hash:</p>
+                            <div className="flex items-center justify-between">
+                              <p className="text-xs font-mono text-foreground break-all flex-1 mr-2">
+                                {transactionHash}
+                              </p>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(transactionHash, 'Transaction Hash')}
+                                className="p-1 h-auto hover:bg-background"
+                              >
+                                <ClipboardIcon className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const explorerUrl = config?.explorerUrl || 'https://holesky.etherscan.io';
+                              window.open(`${explorerUrl}/tx/${transactionHash}`, '_blank');
+                            }}
+                            className="w-full"
+                          >
+                            View on Explorer
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {sendError && (
+                  <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                    <p className="text-sm text-destructive">{sendError}</p>
+                  </div>
+                )}
+                
+                <Button 
+                  onClick={handleSendTransaction}
+                  disabled={isSending || !zkAccountInfo?.hasZKAccount}
+                  className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {isSending ? 'Sending...' : !zkAccountInfo?.hasZKAccount ? 'No ZK Account Found' : 'Send Transaction'}
                 </Button>
               </CardContent>
             </Card>
@@ -233,12 +613,12 @@ export default function Dashboard() {
                   <Label className="text-sm font-medium">Your Wallet Address</Label>
                   <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
                     <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                      {publicAddress}
+                      {zkAccountInfo?.zkAccountAddress || wallet?.address || 'No address available'}
                     </p>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => copyToClipboard(publicAddress, 'Wallet Address')}
+                      onClick={() => copyToClipboard(zkAccountInfo?.zkAccountAddress || wallet?.address || '', 'Wallet Address')}
                       className="p-1 h-auto hover:bg-background"
                     >
                       <ClipboardIcon className="w-4 h-4 text-muted-foreground hover:text-foreground" strokeWidth={1} />
@@ -283,35 +663,54 @@ export default function Dashboard() {
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">Network:</span>
-                <span className="font-medium text-foreground">Ethereum Mainnet</span>
+                <span className="font-medium text-foreground">{networkName}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">Owner:</span>
                 <div className="flex items-center gap-1">
-                  <span className="font-mono text-xs text-foreground">{publicAddress.slice(0, 6)}...{publicAddress.slice(-4)}</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyToClipboard(publicAddress, 'Owner Address')}
-                    className="p-0.5 h-auto hover:bg-muted/50"
-                  >
-                    <ClipboardIcon className="w-3 h-3 text-muted-foreground hover:text-foreground" strokeWidth={1} />
-                  </Button>
+                  <span className="font-mono text-xs text-foreground">
+                    {wallet?.address ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}` : 'No wallet'}
+                  </span>
+                  {wallet?.address && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(wallet.address, 'Owner Address')}
+                      className="p-0.5 h-auto hover:bg-muted/50"
+                    >
+                      <ClipboardIcon className="w-3 h-3 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                    </Button>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">ZKP Contract Account:</span>
                 <div className="flex items-center gap-1">
-                  <span className="font-mono text-xs text-foreground">{zkpContract.slice(0, 6)}...{zkpContract.slice(-4)}</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyToClipboard(zkpContract, 'ZKP Contract Address')}
-                    className="p-0.5 h-auto hover:bg-muted/50"
-                  >
-                    <ClipboardIcon className="w-3 h-3 text-muted-foreground hover:text-foreground" strokeWidth={1} />
-                  </Button>
+                  <span className="font-mono text-xs text-foreground">
+                    {zkAccountInfo?.zkAccountAddress ? `${zkAccountInfo.zkAccountAddress.slice(0, 6)}...${zkAccountInfo.zkAccountAddress.slice(-4)}` : 'Not created'}
+                  </span>
+                  {zkAccountInfo?.zkAccountAddress && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(zkAccountInfo.zkAccountAddress, 'ZKP Contract Address')}
+                      className="p-0.5 h-auto hover:bg-muted/50"
+                    >
+                      <ClipboardIcon className="w-3 h-3 text-muted-foreground hover:text-foreground" strokeWidth={1} />
+                    </Button>
+                  )}
                 </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20"
+                >
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </Button>
               </div>
             </div>
           </div>
