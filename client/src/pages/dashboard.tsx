@@ -400,7 +400,6 @@ export default function Dashboard() {
                       {walletBalance} ETH
                     </p>
                   </div>
-
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">
                       Network
