@@ -286,7 +286,7 @@ export default function Dashboard() {
                       window.location.href = '/';
                     }
                   }}
-                  className="h-7 px-3 text-xs"
+                  className="h-7 px-3 text-xs hover:bg-primary/10"
                 >
                   Disconnect
                 </Button>
