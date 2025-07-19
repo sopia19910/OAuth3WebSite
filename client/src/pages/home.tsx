@@ -146,7 +146,7 @@ export default function Home() {
                     <ShieldCheckIcon className="w-8 h-8 text-gray-600" strokeWidth={2} />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-2">ZKP</h3>
-                  <p className="text-sm font-medium mb-3 text-primary">Zero-Knowledge Proof</p>
+                  <p className="text-sm font-medium mb-3 text-[#fafafa]">Zero-Knowledge Proof</p>
                   <p className="text-muted-foreground">
                     Privacy-preserving identity verification without exposing data
                   </p>
