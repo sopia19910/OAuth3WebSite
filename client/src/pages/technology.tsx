@@ -15,6 +15,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import oauth3Architecture from "@assets/image_1752901094668.png";
 
 export default function Technology() {
   const coreComponents = [
@@ -98,6 +99,19 @@ export default function Technology() {
         {/* Core Components */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Core Components</h2>
+          
+          {/* OAuth 3 Architecture Diagram */}
+          <div className="mb-10 flex justify-center">
+            <div className="relative max-w-2xl w-full">
+              <img 
+                src={oauth3Architecture} 
+                alt="OAuth 3 Architecture" 
+                className="w-full h-auto rounded-lg opacity-90"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-lg pointer-events-none" />
+            </div>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {coreComponents.map((component, index) => (
               <Card key={index} className="bg-card border-border h-full">
