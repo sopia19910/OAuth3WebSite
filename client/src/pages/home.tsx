@@ -19,7 +19,6 @@ export default function Home() {
     <div className="min-h-screen">
       <Navbar />
       <HeroSection />
-      
       {/* About OAuth 3 Summary Section */}
       <section className="py-24 bg-gradient-to-b from-background to-muted/20 relative overflow-hidden">
         <div className="absolute inset-0 tech-grid opacity-20" />
@@ -95,7 +94,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
       {/* Technology Summary Section */}
       <section className="py-24 bg-gradient-to-b from-muted/20 to-background relative overflow-hidden">
         <div className="absolute inset-0">
@@ -124,7 +122,7 @@ export default function Home() {
                   <UsersIcon className="w-10 h-10 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2 text-center">EOA</h3>
-                <p className="text-xs text-accent font-medium text-center mb-3">Externally Owned Account</p>
+                <p className="text-xs font-medium text-center mb-3 text-[#fafafa]">Externally Owned Account</p>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
                   Standard Web3 account with full asset control through private key management
                 </p>
@@ -170,7 +168,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
       {/* Services Summary Section */}
       <section className="py-24 bg-gradient-to-b from-background via-muted/10 to-background relative overflow-hidden">
         <div className="absolute inset-0">
@@ -260,7 +257,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
       <Footer />
     </div>
   );
