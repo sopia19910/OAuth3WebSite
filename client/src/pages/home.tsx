@@ -21,36 +21,73 @@ export default function Home() {
       <HeroSection />
       
       {/* About OAuth 3 Summary Section */}
-      <section className="py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">About OAuth 3</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              OAuth 3 integrates traditional Web2 convenience with Web3 security through a sophisticated hybrid architecture.
+      <section className="py-24 bg-gradient-to-b from-background to-muted/20 relative overflow-hidden">
+        <div className="absolute inset-0 tech-grid opacity-20" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center justify-center mb-4">
+              <div className="h-px w-12 bg-primary mr-3" />
+              <span className="text-sm font-medium text-primary uppercase tracking-wider">About</span>
+              <div className="h-px w-12 bg-primary ml-3" />
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
+              The Future of Authentication
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              OAuth 3 seamlessly integrates traditional Web2 convenience with Web3 security through a sophisticated hybrid architecture
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div className="text-center">
-              <ShieldCheckIcon className="w-12 h-12 text-primary mx-auto mb-4" strokeWidth={1} />
-              <h3 className="text-lg font-semibold text-foreground mb-2">Enhanced Security</h3>
-              <p className="text-muted-foreground">Combining the best of Web2 and Web3 authentication methods</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
+              <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <ShieldCheckIcon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">Enhanced Security</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Combining the best of Web2 and Web3 authentication methods for maximum protection
+                  </p>
+                </CardContent>
+              </Card>
             </div>
-            <div className="text-center">
-              <KeyIcon className="w-12 h-12 text-primary mx-auto mb-4" strokeWidth={1} />
-              <h3 className="text-lg font-semibold text-foreground mb-2">Easy Access</h3>
-              <p className="text-muted-foreground">Login with familiar Web2 accounts, no complex key management</p>
+            
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
+              <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <KeyIcon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">Easy Access</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Login with familiar Web2 accounts, no complex key management required
+                  </p>
+                </CardContent>
+              </Card>
             </div>
-            <div className="text-center">
-              <GlobeAltIcon className="w-12 h-12 text-primary mx-auto mb-4" strokeWidth={1} />
-              <h3 className="text-lg font-semibold text-foreground mb-2">Web3 Benefits</h3>
-              <p className="text-muted-foreground">Full control over digital assets with decentralized security</p>
+            
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
+              <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <GlobeAltIcon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">Web3 Benefits</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Full control over digital assets with decentralized security features
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
           
           <div className="text-center">
             <Link href="/about">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl hover:shadow-primary/20 transition-all duration-300 px-8">
                 Learn More
                 <ArrowRightIcon className="ml-2 w-4 h-4" />
               </Button>
@@ -60,36 +97,72 @@ export default function Home() {
       </section>
       
       {/* Technology Summary Section */}
-      <section className="py-20 bg-muted/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">Technology</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+      <section className="py-24 bg-gradient-to-b from-muted/20 to-background relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-accent/5 via-transparent to-primary/5" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center justify-center mb-4">
+              <div className="h-px w-12 bg-accent mr-3" />
+              <span className="text-sm font-medium text-accent uppercase tracking-wider">Technology</span>
+              <div className="h-px w-12 bg-accent ml-3" />
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
+              Advanced Hybrid Architecture
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               OAuth 3 merges Web2 convenience with Web3 security via smart contracts and Zero-Knowledge Proofs
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div className="text-center">
-              <UsersIcon className="w-12 h-12 text-accent mx-auto mb-4" strokeWidth={1} />
-              <h3 className="text-lg font-semibold text-foreground mb-2">EOA</h3>
-              <p className="text-sm text-muted-foreground">Standard Web3 account with full asset control</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="group relative">
+              <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl transition-all duration-300">
+                <div className="w-20 h-20 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300">
+                  <UsersIcon className="w-10 h-10 text-accent" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2 text-center">EOA</h3>
+                <p className="text-xs text-accent font-medium text-center mb-3">Externally Owned Account</p>
+                <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                  Standard Web3 account with full asset control through private key management
+                </p>
+              </div>
             </div>
-            <div className="text-center">
-              <CogIcon className="w-12 h-12 text-accent mx-auto mb-4" strokeWidth={1} />
-              <h3 className="text-lg font-semibold text-foreground mb-2">CA</h3>
-              <p className="text-sm text-muted-foreground">Smart contract wallet requiring dual authentication</p>
+            
+            <div className="group relative">
+              <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl transition-all duration-300">
+                <div className="w-20 h-20 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300">
+                  <CogIcon className="w-10 h-10 text-accent" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2 text-center">CA</h3>
+                <p className="text-xs text-accent font-medium text-center mb-3">Contract Account</p>
+                <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                  Smart contract wallet requiring both Web2 and Web3 authentication
+                </p>
+              </div>
             </div>
-            <div className="text-center">
-              <ShieldCheckIcon className="w-12 h-12 text-accent mx-auto mb-4" strokeWidth={1} />
-              <h3 className="text-lg font-semibold text-foreground mb-2">ZKP</h3>
-              <p className="text-sm text-muted-foreground">Privacy-preserving identity verification</p>
+            
+            <div className="group relative">
+              <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl transition-all duration-300">
+                <div className="w-20 h-20 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300">
+                  <ShieldCheckIcon className="w-10 h-10 text-accent" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2 text-center">ZKP</h3>
+                <p className="text-xs text-accent font-medium text-center mb-3">Zero-Knowledge Proof</p>
+                <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                  Privacy-preserving identity verification without exposing data
+                </p>
+              </div>
             </div>
           </div>
           
           <div className="text-center">
             <Link href="/technology">
-              <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-xl hover:shadow-accent/20 transition-all duration-300 px-8">
                 Learn More
                 <ArrowRightIcon className="ml-2 w-4 h-4" />
               </Button>
@@ -99,42 +172,87 @@ export default function Home() {
       </section>
       
       {/* Services Summary Section */}
-      <section className="py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">Services</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              OAuth 3 provides tailored solutions for both individual users and enterprise organizations
+      <section className="py-24 bg-gradient-to-b from-background via-muted/10 to-background relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center justify-center mb-4">
+              <div className="h-px w-12 bg-primary mr-3" />
+              <span className="text-sm font-medium text-primary uppercase tracking-wider">Services</span>
+              <div className="h-px w-12 bg-primary ml-3" />
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
+              Tailored Solutions for Everyone
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              OAuth 3 provides customized authentication solutions for both individual users and enterprise organizations
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <Card className="bg-card/50 backdrop-blur border-primary/20">
-              <CardContent className="p-8">
-                <UsersIcon className="w-10 h-10 text-primary mb-4" strokeWidth={1} />
-                <h3 className="text-xl font-semibold text-foreground mb-2">Individual User Services</h3>
-                <p className="text-primary italic mb-4">"Web3 wallet that feels like Web2"</p>
-                <p className="text-sm text-muted-foreground">
-                  Access blockchain accounts via Google, Kakao, Facebook, or email with multi-chain support
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16 max-w-5xl mx-auto">
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-300" />
+              <Card className="relative bg-gradient-to-br from-card via-card/95 to-card/90 border-primary/20 overflow-hidden hover:border-primary/40 transition-all duration-300 h-full">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                <CardContent className="p-10 relative z-10">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <UsersIcon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-3">Individual User Services</h3>
+                  <p className="text-lg text-primary mb-6 italic font-medium">"Web3 wallet that feels like Web2"</p>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <div className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 flex-shrink-0" />
+                      <p>Access blockchain accounts via Google, Kakao, Facebook, or email</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 flex-shrink-0" />
+                      <p>Multi-chain support across major networks</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 flex-shrink-0" />
+                      <p>Zero-knowledge privacy protection</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
             
-            <Card className="bg-card/50 backdrop-blur border-accent/20">
-              <CardContent className="p-8">
-                <BuildingOfficeIcon className="w-10 h-10 text-accent mb-4" strokeWidth={1} />
-                <h3 className="text-xl font-semibold text-foreground mb-2">Enterprise Services</h3>
-                <p className="text-accent italic mb-4">"Secure asset management for organizations"</p>
-                <p className="text-sm text-muted-foreground">
-                  Smart contract automation with multi-signature approvals and cross-chain management
-                </p>
-              </CardContent>
-            </Card>
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-accent/20 via-accent/10 to-transparent rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-300" />
+              <Card className="relative bg-gradient-to-br from-card via-card/95 to-card/90 border-accent/20 overflow-hidden hover:border-accent/40 transition-all duration-300 h-full">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                <CardContent className="p-10 relative z-10">
+                  <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <BuildingOfficeIcon className="w-8 h-8 text-accent" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-3">Enterprise Services</h3>
+                  <p className="text-lg text-accent mb-6 italic font-medium">"Secure asset management for organizations"</p>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <div className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 bg-accent rounded-full mt-1.5 flex-shrink-0" />
+                      <p>Smart contract automation with programmable rules</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 bg-accent rounded-full mt-1.5 flex-shrink-0" />
+                      <p>Multi-signature approvals and governance</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 bg-accent rounded-full mt-1.5 flex-shrink-0" />
+                      <p>90%+ reduction in custodial expenses</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
           
           <div className="text-center">
             <Link href="/services">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-xl hover:shadow-primary/20 transition-all duration-300 px-8">
                 Learn More
                 <ArrowRightIcon className="ml-2 w-4 h-4" />
               </Button>
