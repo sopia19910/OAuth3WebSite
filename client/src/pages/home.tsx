@@ -207,14 +207,7 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <div className="mt-6 pt-6 border-t border-border/50">
-                  <Link href="/demo">
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-white">
-                      Try Demo
-                      <ArrowRightIcon className="ml-2 w-4 h-4" />
-                    </Button>
-                  </Link>
-                </div>
+                
               </div>
             </div>
             
