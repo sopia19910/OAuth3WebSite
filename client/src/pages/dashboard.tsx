@@ -24,6 +24,7 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   ArrowPathIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
@@ -677,9 +678,9 @@ export default function Dashboard() {
                             });
                           }
                         }}
-                        className="text-destructive hover:text-destructive/90"
+                        className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 text-xs py-1 h-7"
                       >
-                        Remove
+                        <XMarkIcon className="w-4 h-4" />
                       </Button>
                     </div>
                   ))}
