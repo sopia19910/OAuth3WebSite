@@ -153,6 +153,7 @@ The application is designed to be easily extensible for implementing the actual 
   - Removed card design from Send Coin/Token section for minimal appearance
   - Updated Remove button in Added Tokens to square icon button with X icon and disconnect button style
   - Changed Select dropdown hover/focus color from blue to white with transparency
+  - Fixed layout shift issue when opening Select dropdown by adjusting z-index values
 - **Home Page Restructure (2025-01-19)**: Replaced individual sections with summary overviews
   - Added About OAuth 3 summary section with key benefits
   - Added Technology summary section with core components (EOA, CA, ZKP)
