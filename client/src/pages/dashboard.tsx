@@ -343,8 +343,7 @@ export default function Dashboard() {
               {/* Web2 OAuth Account */}
               <Card className="bg-card border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <SiGoogle className="w-5 h-5 text-blue-500" />
+                  <CardTitle className="text-lg">
                     Web2 OAuth Account
                   </CardTitle>
                 </CardHeader>
@@ -369,8 +368,7 @@ export default function Dashboard() {
               {/* Web3 Account */}
               <Card className="bg-card border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <WalletIcon className="w-5 h-5 text-purple-500" />
+                  <CardTitle className="text-lg">
                     Web3 Account
                   </CardTitle>
                 </CardHeader>
@@ -422,8 +420,7 @@ export default function Dashboard() {
               {/* ZKP Smart Contract */}
               <Card className="bg-card border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <CogIcon className="w-5 h-5 text-cyan-500" />
+                  <CardTitle className="text-lg">
                     ZKP Smart Contract (CA)
                   </CardTitle>
                 </CardHeader>
