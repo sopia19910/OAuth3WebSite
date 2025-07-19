@@ -830,9 +830,9 @@ export default function Dashboard() {
                   size="sm"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20"
+                  className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500"
                 >
-                  {isLoggingOut ? "Logging out..." : "Logout"}
+                  {isLoggingOut ? "Disconnecting..." : "Disconnect"}
                 </Button>
               </div>
             </div>
