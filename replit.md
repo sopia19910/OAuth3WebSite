@@ -22,9 +22,12 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js framework
 - **Language**: TypeScript with ES modules
-- **Database**: PostgreSQL with Drizzle ORM
+- **Database**: PostgreSQL with Drizzle ORM (Neon Database)
 - **Session Management**: Connect-pg-simple for PostgreSQL session storage
 - **Development**: Hot reload with Vite integration in development mode
+- **Database Tables**:
+  - `users`: Stores user accounts (id, username, password)
+  - `contacts`: Stores contact form submissions (id, first_name, last_name, email, company, message, created_at)
 
 ### Key Components
 
@@ -115,6 +118,11 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Database Setup (2025-01-19)**:
+  - Configured PostgreSQL database with Neon Database integration
+  - Created database tables: users (for authentication) and contacts (for contact form submissions)
+  - DatabaseStorage class already implemented and active
+  - All database operations ready for production use
 - **Dashboard Functionality Enhancements (2025-01-19)**:
   - Added functional Add Token system with validation and storage
   - Tokens are saved in localStorage and persist between sessions  

@@ -41,6 +41,7 @@ export class MemStorage implements IStorage {
     const contact: Contact = { 
       ...insertContact, 
       id,
+      company: insertContact.company || null,
       createdAt: new Date()
     };
     // In memory storage for contacts (in real app, this would be persisted)
