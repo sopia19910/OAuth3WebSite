@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { Link } from "wouter";
 import logoImage from "@assets/image_1752117480535.png";
 import googleLogo from "@assets/image_1752137026323.png";
 import facebookLogo from "@assets/image_1752144869558.png";
@@ -113,12 +114,14 @@ export default function HeroSection() {
               Experience next-generation authentication that bridges traditional and blockchain ecosystems.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg" 
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold animate-pulse-glow"
-              >
-                Get Started
-              </Button>
+              <Link href="/demo">
+                <Button 
+                  size="lg" 
+                  className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold animate-pulse-glow"
+                >
+                  Get Started
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="flex justify-center relative">
