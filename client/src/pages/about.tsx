@@ -110,19 +110,16 @@ export default function About() {
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-center flex-1">
-                  <GlobeAltIcon className="w-12 h-12 text-primary mx-auto mb-3 [&>path]:stroke-[1.5]" />
                   <h4 className="font-semibold text-foreground">1. Web2 Login</h4>
                   <p className="text-sm text-muted-foreground">Sign in with Google</p>
                 </div>
                 
                 <div className="text-center flex-1">
-                  <KeyIcon className="w-12 h-12 text-primary mx-auto mb-3 [&>path]:stroke-[1.5]" />
                   <h4 className="font-semibold text-foreground">2. Web3 Signature</h4>
                   <p className="text-sm text-muted-foreground">Verify with private key</p>
                 </div>
                 
                 <div className="text-center flex-1">
-                  <ShieldCheckIcon className="w-12 h-12 text-primary mx-auto mb-3 [&>path]:stroke-[1.5]" />
                   <h4 className="font-semibold text-foreground">3. Secure Access</h4>
                   <p className="text-sm text-muted-foreground">Transaction authorized</p>
                 </div>
