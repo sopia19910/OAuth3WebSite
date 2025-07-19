@@ -15,6 +15,7 @@ import {
   CogIcon 
 } from "@heroicons/react/24/outline";
 import { Check } from "lucide-react";
+import { Link } from "wouter";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ethereumLogo from "@assets/image_1752123792166.png";
@@ -182,9 +183,11 @@ export default function Services() {
                     </span>
                   ))}
                 </div>
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                  Get Started
-                </Button>
+                <Link href="/demo">
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Get Started
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
