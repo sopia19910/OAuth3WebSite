@@ -872,58 +872,52 @@ export default function Dashboard() {
 
       case "receive":
         return (
-          <div className="max-w-2xl mx-auto">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowDownIcon className="w-5 h-5" />
-                  Receive Coin/Token
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label className="text-sm font-medium">
-                    Your Wallet Address
-                  </Label>
-                  <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
-                    <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                      {zkAccountInfo?.zkAccountAddress ||
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ArrowDownIcon className="w-5 h-5" />
+              <h2 className="text-lg font-semibold">Receive Coin/Token</h2>
+            </div>
+            <div>
+              <Label className="text-sm font-medium">
+                Your Wallet Address
+              </Label>
+              <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
+                <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                  {zkAccountInfo?.zkAccountAddress ||
+                    wallet?.address ||
+                    "No address available"}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    copyToClipboard(
+                      zkAccountInfo?.zkAccountAddress ||
                         wallet?.address ||
-                        "No address available"}
-                    </p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        copyToClipboard(
-                          zkAccountInfo?.zkAccountAddress ||
-                            wallet?.address ||
-                            "",
-                          "Wallet Address",
-                        )
-                      }
-                      className="p-1 h-auto hover:bg-background"
-                    >
-                      <ClipboardIcon
-                        className="w-4 h-4 text-muted-foreground hover:text-foreground"
-                        strokeWidth={1}
-                      />
-                    </Button>
-                  </div>
+                        "",
+                      "Wallet Address",
+                    )
+                  }
+                  className="p-1 h-auto hover:bg-background"
+                >
+                  <ClipboardIcon
+                    className="w-4 h-4 text-muted-foreground hover:text-foreground"
+                    strokeWidth={1}
+                  />
+                </Button>
+              </div>
+            </div>
+            <div className="text-center">
+              <Label className="text-sm font-medium">QR Code</Label>
+              <div className="mt-2 flex justify-center">
+                <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
+                  <QrCodeIcon className="w-24 h-24 text-muted-foreground" />
                 </div>
-                <div className="text-center">
-                  <Label className="text-sm font-medium">QR Code</Label>
-                  <div className="mt-2 flex justify-center">
-                    <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
-                      <QrCodeIcon className="w-24 h-24 text-muted-foreground" />
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Scan this QR code to send tokens to your wallet
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Scan this QR code to send tokens to your wallet
+              </p>
+            </div>
           </div>
         );
 

@@ -151,6 +151,7 @@ The application is designed to be easily extensible for implementing the actual 
   - Web3 Account card now shows full wallet address instead of truncated version
   - Removed card design from Add Token section for cleaner UI
   - Removed card design from Send Coin/Token section for minimal appearance
+  - Removed card design from Receive Coin/Token section for consistent minimal UI
   - Updated Remove button in Added Tokens to square icon button with X icon and disconnect button style
   - Changed Select dropdown hover/focus color from blue to white with transparency
   - Fixed layout shift issue when opening Select dropdown by adjusting z-index values
