@@ -62,10 +62,6 @@ export default function Resources() {
           <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
             <CardContent className="p-12">
               <div className="text-center">
-                <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body mb-8">
-                  The complete technical and strategic vision for OAuth 3's revolutionary authentication framework.
-                </p>
-                
                 <Link href="/whitepaper">
                   <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
                     <Download className="mr-2 h-5 w-5" />
