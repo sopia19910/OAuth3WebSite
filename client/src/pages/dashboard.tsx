@@ -331,12 +331,11 @@ export default function Dashboard() {
                   size="sm"
                   onClick={refreshAccountData}
                   disabled={isRefreshing}
-                  className="flex items-center gap-2"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/10 border border-gray-500 text-xs py-1 h-7"
                 >
                   <ArrowPathIcon
                     className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
                   />
-                  Refresh
                 </Button>
               </div>
             </div>
