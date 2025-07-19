@@ -341,7 +341,7 @@ export default function Dashboard() {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Web2 OAuth Account */}
-              <Card className="bg-card border-border">
+              <Card className="bg-card border-border rounded-none">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">
                     Web2 OAuth Account
@@ -366,7 +366,7 @@ export default function Dashboard() {
               </Card>
 
               {/* Web3 Account */}
-              <Card className="bg-card border-border">
+              <Card className="bg-card border-border rounded-none">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">
                     Web3 Account
@@ -395,10 +395,8 @@ export default function Dashboard() {
                       Address
                     </Label>
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs font-mono text-foreground">
-                        {wallet?.address
-                          ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
-                          : "No wallet"}
+                      <p className="text-xs font-mono text-foreground break-all">
+                        {wallet?.address || "No wallet"}
                       </p>
                       {wallet?.address && (
                         <Button
@@ -418,7 +416,7 @@ export default function Dashboard() {
               </Card>
 
               {/* ZKP Smart Contract */}
-              <Card className="bg-card border-border">
+              <Card className="bg-card border-border rounded-none">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">
                     ZKP Smart Contract (CA)
