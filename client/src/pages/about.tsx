@@ -64,21 +64,21 @@ export default function About() {
               </p>
               <div className="grid gap-4">
                 <div className="flex items-start gap-3">
-                  <GlobeAltIcon className="w-6 h-6 text-primary mt-1 flex-shrink-0 [&>path]:stroke-[1.5]" />
+                  <GlobeAltIcon className="w-6 h-6 text-muted-foreground mt-1 flex-shrink-0 [&>path]:stroke-[1.5]" />
                   <div>
                     <h4 className="font-semibold text-foreground">Web2 Login Methods</h4>
                     <p className="text-muted-foreground">Familiar social logins (Google, Facebook) that users already know</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <KeyIcon className="w-6 h-6 text-primary mt-1 flex-shrink-0 [&>path]:stroke-[1.5]" />
+                  <KeyIcon className="w-6 h-6 text-muted-foreground mt-1 flex-shrink-0 [&>path]:stroke-[1.5]" />
                   <div>
                     <h4 className="font-semibold text-foreground">Web3 Security</h4>
                     <p className="text-muted-foreground">Blockchain-based authentication and decentralized control</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <ShieldCheckIcon className="w-6 h-6 text-primary mt-1 flex-shrink-0 [&>path]:stroke-[1.5]" />
+                  <ShieldCheckIcon className="w-6 h-6 text-muted-foreground mt-1 flex-shrink-0 [&>path]:stroke-[1.5]" />
                   <div>
                     <h4 className="font-semibold text-foreground">Zero-Knowledge Proofs</h4>
                     <p className="text-muted-foreground">Privacy-preserving technology that protects user data</p>
