@@ -493,59 +493,53 @@ export default function Dashboard() {
 
       case "add-token":
         return (
-          <div className="max-w-2xl mx-auto">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <PlusIcon className="w-5 h-5" />
-                  Add Token
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label
-                    htmlFor="token-address"
-                    className="text-sm font-medium"
-                  >
-                    Token Contract Address
-                  </Label>
-                  <Input
-                    id="token-address"
-                    placeholder="0x..."
-                    value={tokenAddress}
-                    onChange={(e) => setTokenAddress(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="token-symbol" className="text-sm font-medium">
-                    Token Symbol
-                  </Label>
-                  <Input
-                    id="token-symbol"
-                    placeholder="e.g., USDC"
-                    value={tokenSymbol}
-                    onChange={(e) => setTokenSymbol(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="token-name" className="text-sm font-medium">
-                    Token Name
-                  </Label>
-                  <Input
-                    id="token-name"
-                    placeholder="e.g., USD Coin"
-                    value={tokenName}
-                    onChange={(e) => setTokenName(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  Add Token
-                </Button>
-              </CardContent>
-            </Card>
+          <div className="max-w-2xl mx-auto space-y-6">
+            <h2 className="text-base font-semibold flex items-center gap-2">
+              <PlusIcon className="w-5 h-5" />
+              Add Token
+            </h2>
+            <div>
+              <Label
+                htmlFor="token-address"
+                className="text-sm font-medium"
+              >
+                Token Contract Address
+              </Label>
+              <Input
+                id="token-address"
+                placeholder="0x..."
+                value={tokenAddress}
+                onChange={(e) => setTokenAddress(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="token-symbol" className="text-sm font-medium">
+                Token Symbol
+              </Label>
+              <Input
+                id="token-symbol"
+                placeholder="e.g., USDC"
+                value={tokenSymbol}
+                onChange={(e) => setTokenSymbol(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="token-name" className="text-sm font-medium">
+                Token Name
+              </Label>
+              <Input
+                id="token-name"
+                placeholder="e.g., USD Coin"
+                value={tokenName}
+                onChange={(e) => setTokenName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <Button className="w-full bg-primary hover:bg-primary/90">
+              Add Token
+            </Button>
           </div>
         );
 
