@@ -161,22 +161,7 @@ export default function About() {
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="text-center">
-          <Card className="bg-primary/10 border-primary/20">
-            <CardContent className="p-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Ready to Get Started?</h2>
-              <p className="text-muted-foreground mb-6">
-                Experience the future of authentication with OAuth 3
-              </p>
-              <Link href="/demo">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
-                  Try OAuth 3 Demo
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
+        
         
       </div>
       <Footer />
