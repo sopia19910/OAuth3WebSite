@@ -28,6 +28,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
+import QRCode from 'qrcode';
 import {
   getWalletFromStorage,
   getWalletBalance,
@@ -87,11 +88,34 @@ export default function Dashboard() {
 
   // Configuration state
   const [config, setConfig] = useState<any>(null);
+  
+  // QR Code state
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   // Load wallet and account data on component mount
   useEffect(() => {
     loadWalletData();
     loadTokensFromDB();
   }, []);
+
+  // Generate QR code when zkAccountInfo changes
+  useEffect(() => {
+    if (zkAccountInfo?.zkAccountAddress) {
+      QRCode.toDataURL(zkAccountInfo.zkAccountAddress, {
+        width: 192,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      })
+      .then((url) => {
+        setQrCodeDataUrl(url);
+      })
+      .catch((err) => {
+        console.error('Error generating QR code:', err);
+      });
+    }
+  }, [zkAccountInfo]);
 
   const loadTokensFromDB = async () => {
     try {
@@ -879,26 +903,23 @@ export default function Dashboard() {
             </div>
             <div>
               <Label className="text-sm font-medium">
-                Your Wallet Address
+                ZKP Contract Account Address
               </Label>
               <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
                 <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                  {zkAccountInfo?.zkAccountAddress ||
-                    wallet?.address ||
-                    "No address available"}
+                  {zkAccountInfo?.zkAccountAddress || "No ZKP account available"}
                 </p>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() =>
                     copyToClipboard(
-                      zkAccountInfo?.zkAccountAddress ||
-                        wallet?.address ||
-                        "",
-                      "Wallet Address",
+                      zkAccountInfo?.zkAccountAddress || "",
+                      "ZKP Contract Account Address",
                     )
                   }
                   className="p-1 h-auto hover:bg-background"
+                  disabled={!zkAccountInfo?.zkAccountAddress}
                 >
                   <ClipboardIcon
                     className="w-4 h-4 text-muted-foreground hover:text-foreground"
@@ -910,12 +931,20 @@ export default function Dashboard() {
             <div className="text-center">
               <Label className="text-sm font-medium">QR Code</Label>
               <div className="mt-2 flex justify-center">
-                <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
-                  <QrCodeIcon className="w-24 h-24 text-muted-foreground" />
-                </div>
+                {zkAccountInfo?.zkAccountAddress && qrCodeDataUrl ? (
+                  <img 
+                    src={qrCodeDataUrl} 
+                    alt="ZKP Account QR Code" 
+                    className="w-48 h-48 rounded-lg"
+                  />
+                ) : (
+                  <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
+                    <QrCodeIcon className="w-24 h-24 text-muted-foreground" />
+                  </div>
+                )}
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                Scan this QR code to send tokens to your wallet
+                Scan this QR code to send tokens to your ZKP Contract Account
               </p>
             </div>
           </div>

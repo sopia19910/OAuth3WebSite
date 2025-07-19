@@ -155,6 +155,10 @@ The application is designed to be easily extensible for implementing the actual 
   - Updated Remove button in Added Tokens to square icon button with X icon and disconnect button style
   - Changed Select dropdown hover/focus color from blue to white with transparency
   - Fixed layout shift issue when opening Select dropdown by adjusting z-index values
+- **ZKP Contract Account Display (2025-01-19)**:
+  - Updated Receive Coin/Token section to only display ZKP Contract Account address
+  - Added QR code generation for ZKP Contract Account address using qrcode library
+  - Removed fallback to regular wallet address for clearer user experience
 - **Home Page Restructure (2025-01-19)**: Replaced individual sections with summary overviews
   - Added About OAuth 3 summary section with key benefits
   - Added Technology summary section with core components (EOA, CA, ZKP)
