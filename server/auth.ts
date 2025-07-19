@@ -11,7 +11,11 @@
     if (!oauth2ClientInstance) {
       const CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
       const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET';
-      const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/api/auth/google/callback';
+      // Use Replit URL when available, otherwise use localhost
+      const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 
+        (process.env.REPL_SLUG && process.env.REPL_OWNER 
+          ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co/api/auth/google/callback`
+          : 'http://localhost:5000/api/auth/google/callback');
 
       console.log('🔧 OAuth2 Client Configuration:');
       console.log('CLIENT_ID:', CLIENT_ID);

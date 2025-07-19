@@ -108,39 +108,48 @@ export default function Demo() {
   const [zkProgress, setZkProgress] = useState(0);
   const [zkStatus, setZkStatus] = useState("");
   const [isRefreshingZkAccount, setIsRefreshingZkAccount] = useState(false);
+  
+  // Wallet creation/import loading state
+  const [isCreatingWallet, setIsCreatingWallet] = useState(false);
+  const [walletCreationStatus, setWalletCreationStatus] = useState("");
 
   // Check for OAuth callback parameters
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const oauthSuccess = params.get('oauth');
-    const email = params.get('email');
-    
-    if (oauthSuccess === 'success' && email) {
-      setUserEmail(email);
-      setCurrentStep("web3-setup");
-      // Clear the URL parameters
-      window.history.replaceState({}, document.title, '/demo');
-    } else if (oauthSuccess === 'error') {
-      const message = params.get('message') || 'Authentication failed';
-      alert(message);
-      window.history.replaceState({}, document.title, '/demo');
-    }
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const oauthSuccess = params.get('oauth');
+      const email = params.get('email');
+      
+      if (oauthSuccess === 'success' && email) {
+        setUserEmail(email);
+        setCurrentStep("web3-setup");
+        // Clear the URL parameters
+        window.history.replaceState({}, document.title, '/demo');
+      } else if (oauthSuccess === 'error') {
+        const message = params.get('message') || 'Authentication failed';
+        alert(message);
+        window.history.replaceState({}, document.title, '/demo');
+      }
 
-    // Check for existing wallet in storage
-    const savedWallet = getWalletFromStorage();
-    if (savedWallet) {
-      setWallet(savedWallet);
-    }
+      // Check for existing wallet in storage
+      const savedWallet = getWalletFromStorage();
+      if (savedWallet) {
+        setWallet(savedWallet);
+      }
 
-    // Get network info
-    const info = getNetworkInfo();
-    setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
+      // Get network info
+      const info = getNetworkInfo();
+      setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
+    } catch (error) {
+      console.error('Error during initialization:', error);
+    }
   }, []);
 
   // Auto-refresh balance when wallet changes
   useEffect(() => {
     if (wallet) {
-      (async () => {
+      // Create promise and handle errors properly
+      const fetchBalance = async () => {
         setIsRefreshingBalance(true);
         setBalanceError("");
         try {
@@ -154,7 +163,12 @@ export default function Demo() {
         } finally {
           setIsRefreshingBalance(false);
         }
-      })();
+      };
+      
+      // Call with proper error handling
+      fetchBalance().catch(err => {
+        console.error('Balance fetch error:', err);
+      });
     }
   }, [wallet]);
 
@@ -179,34 +193,43 @@ export default function Demo() {
   };
 
   const handleWeb3Setup = async () => {
+    setIsCreatingWallet(true);
+    setWalletCreationStatus("Initializing wallet...");
+    
     try {
       let walletInfo: WalletInfo;
       
       if (web3Option === "new") {
         // Create new wallet
+        setWalletCreationStatus("Creating new wallet...");
         walletInfo = createWallet();
         console.log('🔑 New wallet created:', walletInfo.address);
       } else {
         // Import existing wallet
         if (!privateKey) {
           setImportError("Private key is required");
+          setIsCreatingWallet(false);
           return;
         }
         
+        setWalletCreationStatus("Importing wallet...");
         try {
           walletInfo = importWallet(privateKey);
           console.log('🔑 Wallet imported:', walletInfo.address);
         } catch (error) {
           setImportError("Invalid private key format");
+          setIsCreatingWallet(false);
           return;
         }
       }
       
       // Save wallet to storage
+      setWalletCreationStatus("Saving wallet...");
       setWallet(walletInfo);
       saveWalletToStorage(walletInfo);
       
       // Get wallet balance
+      setWalletCreationStatus("Fetching balance...");
       try {
         const balance = await getWalletBalance(walletInfo.address);
         setWalletBalance(balance.formatted);
@@ -219,6 +242,7 @@ export default function Demo() {
 
       // Check for existing ZK Account
       if (userEmail) {
+        setWalletCreationStatus("Checking for existing ZK Account...");
         try {
           const existingAccount = await checkZKAccount(walletInfo.address);
           if (existingAccount.hasZKAccount) {
@@ -230,10 +254,16 @@ export default function Demo() {
         }
       }
       
+      setWalletCreationStatus("Setup complete!");
+      await new Promise(resolve => setTimeout(resolve, 500)); // Brief pause to show completion
+      
       setCurrentStep("balance");
     } catch (error) {
       console.error('Wallet setup error:', error);
       alert('Failed to setup wallet');
+    } finally {
+      setIsCreatingWallet(false);
+      setWalletCreationStatus("");
     }
   };
 
@@ -546,10 +576,24 @@ export default function Demo() {
 
             <Button 
               onClick={handleWeb3Setup}
-              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
+              disabled={isCreatingWallet}
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg disabled:opacity-50"
             >
-              Next
+              {isCreatingWallet ? 'Processing...' : 'Next'}
             </Button>
+            
+            {/* Loading overlay */}
+            {isCreatingWallet && (
+              <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-card rounded-lg p-8 max-w-sm w-full mx-4 shadow-lg">
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                    <h3 className="text-lg font-semibold text-foreground">Setting up your wallet</h3>
+                    <p className="text-sm text-muted-foreground text-center">{walletCreationStatus}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         );
 
