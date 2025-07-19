@@ -427,7 +427,7 @@ export default function Dashboard() {
                     <Label className="text-xs font-medium text-muted-foreground">
                       ETH Balance
                     </Label>
-                    <p className="text-sm text-foreground mt-1 font-semibold">
+                    <p className="text-sm text-foreground mt-1">
                       {zkAccountInfo?.balance || "0"} ETH
                     </p>
                   </div>
@@ -435,7 +435,7 @@ export default function Dashboard() {
                     <Label className="text-xs font-medium text-muted-foreground">
                       OA3 Token Balance
                     </Label>
-                    <p className="text-sm text-foreground mt-1 font-semibold">
+                    <p className="text-sm text-foreground mt-1">
                       {zkAccountInfo?.tokenBalance || "0"} OA3
                     </p>
                   </div>
