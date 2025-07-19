@@ -378,7 +378,7 @@ export default function Dashboard() {
                       Owner ETH (Gas Fee)
                     </Label>
                     <p className="text-sm text-foreground mt-1">
-                      {walletBalance} ETH
+                      {walletBalance} <span className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">ETH</span>
                     </p>
                   </div>
                   <div>
