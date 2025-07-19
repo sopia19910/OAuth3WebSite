@@ -50,9 +50,7 @@ export default function Resources() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">Whitepaper</h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto tech-body">
-              Everything you need to build, implement, and learn about OAuth 3
-            </p>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto tech-body">The complete technical and strategic vision for OAuth 3's revolutionary authentication framework.</p>
           </div>
         </div>
       </section>
