@@ -736,142 +736,136 @@ export default function Dashboard() {
 
       case "send":
         return (
-          <div className="max-w-2xl mx-auto">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowUpIcon className="w-5 h-5" />
-                  Send Coin/Token
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label htmlFor="recipient" className="text-sm font-medium">
-                    Recipient Address
-                  </Label>
-                  <Input
-                    id="recipient"
-                    placeholder="0x..."
-                    value={sendAddress}
-                    onChange={(e) => setSendAddress(e.target.value)}
-                    className="mt-1"
-                  />
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ArrowUpIcon className="w-5 h-5" />
+              <h2 className="text-lg font-semibold">Send Coin/Token</h2>
+            </div>
+            <div>
+              <Label htmlFor="recipient" className="text-sm font-medium">
+                Recipient Address
+              </Label>
+              <Input
+                id="recipient"
+                placeholder="0x..."
+                value={sendAddress}
+                onChange={(e) => setSendAddress(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="token-select" className="text-sm font-medium">
+                Select Token
+              </Label>
+              <Select
+                value={selectedToken}
+                onValueChange={setSelectedToken}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select a token" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ETH">ETH - Ethereum</SelectItem>
+                  <SelectItem value="OA3">OA3 - OAuth3 Token</SelectItem>
+                  {customTokens.map((token) => (
+                    <SelectItem key={token.id || token.address} value={token.address}>
+                      {token.symbol} - {token.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="amount" className="text-sm font-medium">
+                Amount
+              </Label>
+              <Input
+                id="amount"
+                type="number"
+                placeholder="0.00"
+                value={sendAmount}
+                onChange={(e) => setSendAmount(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            {isSending && (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-foreground">
+                    {sendProgress}%
+                  </span>
                 </div>
-                <div>
-                  <Label htmlFor="token-select" className="text-sm font-medium">
-                    Select Token
-                  </Label>
-                  <Select
-                    value={selectedToken}
-                    onValueChange={setSelectedToken}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select a token" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ETH">ETH - Ethereum</SelectItem>
-                      <SelectItem value="OA3">OA3 - OAuth3 Token</SelectItem>
-                      {customTokens.map((token) => (
-                        <SelectItem key={token.id || token.address} value={token.address}>
-                          {token.symbol} - {token.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="amount" className="text-sm font-medium">
-                    Amount
-                  </Label>
-                  <Input
-                    id="amount"
-                    type="number"
-                    placeholder="0.00"
-                    value={sendAmount}
-                    onChange={(e) => setSendAmount(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                {isSending && (
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-foreground">
-                        {sendProgress}%
-                      </span>
-                    </div>
-                    <Progress value={sendProgress} className="w-full" />
+                <Progress value={sendProgress} className="w-full" />
 
-                    <div className="text-center space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        {sendStatus}
-                      </p>
-                      {transactionHash && (
-                        <div className="space-y-2">
-                          <div className="p-3 bg-muted rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">
-                              Transaction Hash:
-                            </p>
-                            <div className="flex items-center justify-between">
-                              <p className="text-xs font-mono text-foreground break-all flex-1 mr-2">
-                                {transactionHash}
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  copyToClipboard(
-                                    transactionHash,
-                                    "Transaction Hash",
-                                  )
-                                }
-                                className="p-1 h-auto hover:bg-background"
-                              >
-                                <ClipboardIcon className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    {sendStatus}
+                  </p>
+                  {transactionHash && (
+                    <div className="space-y-2">
+                      <div className="p-3 bg-muted rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Transaction Hash:
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-mono text-foreground break-all flex-1 mr-2">
+                            {transactionHash}
+                          </p>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            onClick={() => {
-                              const explorerUrl =
-                                config?.explorerUrl ||
-                                "https://holesky.etherscan.io";
-                              window.open(
-                                `${explorerUrl}/tx/${transactionHash}`,
-                                "_blank",
-                              );
-                            }}
-                            className="w-full"
+                            onClick={() =>
+                              copyToClipboard(
+                                transactionHash,
+                                "Transaction Hash",
+                              )
+                            }
+                            className="p-1 h-auto hover:bg-background"
                           >
-                            View on Explorer
+                            <ClipboardIcon className="w-3 h-3" />
                           </Button>
                         </div>
-                      )}
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const explorerUrl =
+                            config?.explorerUrl ||
+                            "https://holesky.etherscan.io";
+                          window.open(
+                            `${explorerUrl}/tx/${transactionHash}`,
+                            "_blank",
+                          );
+                        }}
+                        className="w-full"
+                      >
+                        View on Explorer
+                      </Button>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              </div>
+            )}
 
-                {sendError && (
-                  <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                    <p className="text-sm text-destructive">{sendError}</p>
-                  </div>
-                )}
+            {sendError && (
+              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <p className="text-sm text-destructive">{sendError}</p>
+              </div>
+            )}
 
-                <Button
-                  onClick={handleSendTransaction}
-                  disabled={isSending || !zkAccountInfo?.hasZKAccount}
-                  className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50"
-                >
-                  {isSending
-                    ? "Sending..."
-                    : !zkAccountInfo?.hasZKAccount
-                      ? "No ZK Account Found"
-                      : "Send Transaction"}
-                </Button>
-              </CardContent>
-            </Card>
+            <Button
+              onClick={handleSendTransaction}
+              disabled={isSending || !zkAccountInfo?.hasZKAccount}
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50"
+            >
+              {isSending
+                ? "Sending..."
+                : !zkAccountInfo?.hasZKAccount
+                  ? "No ZK Account Found"
+                  : "Send Transaction"}
+            </Button>
           </div>
         );
 
