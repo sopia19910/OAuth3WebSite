@@ -38,10 +38,11 @@ import {
   transferETHFromZKAccount,
   transferOA3FromZKAccount,
   type ZKAccountInfo,
-  type TransferResult,
+  type TransferResult
 } from "@/lib/zkAccount";
 
 export default function Dashboard() {
+
   const [, setLocation] = useLocation();
   const [activeMenu, setActiveMenu] = useState<string>("overview");
   const [sendAmount, setSendAmount] = useState("");
@@ -75,7 +76,6 @@ export default function Dashboard() {
 
   // Configuration state
   const [config, setConfig] = useState<any>(null);
-
   // Load wallet and account data on component mount
   useEffect(() => {
     loadWalletData();
@@ -85,7 +85,6 @@ export default function Dashboard() {
     try {
       // First check if OAuth session is valid
       console.log("🔍 Checking OAuth session validity...");
-
       try {
         const userResponse = await fetch("/api/auth/me");
         const userData = await userResponse.json();
@@ -126,10 +125,7 @@ export default function Dashboard() {
 
       // Get network info and config
       const networkInfo = getNetworkInfo();
-      setNetworkName(
-        networkInfo.name === "unknown" ? "Holesky Testnet" : networkInfo.name,
-      );
-
+      setNetworkName(networkInfo.name === 'unknown' ? 'Holesky Testnet' : networkInfo.name);
       // Load configuration
       const configResponse = await fetch("/api/config");
       const configData = await configResponse.json();
@@ -153,8 +149,7 @@ export default function Dashboard() {
       // Refresh ZK Account info
       const zkInfo = await checkZKAccount(wallet.address);
       setZkAccountInfo(zkInfo);
-
-      console.log("✅ Account data refreshed");
+      console.log('✅ Account data refreshed');
     } catch (error) {
       console.error("Failed to refresh account data:", error);
     } finally {
@@ -175,8 +170,7 @@ export default function Dashboard() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      console.log("🚪 Logging out...");
-
+      console.log('🚪 Logging out...');
       // Call logout API
       const response = await fetch("/api/auth/logout", {
         method: "POST",
@@ -193,7 +187,6 @@ export default function Dashboard() {
         // Clear local storage
         localStorage.removeItem("oauth3_user_email");
         localStorage.removeItem("oauth3_wallet");
-
         // Redirect to home page
         setLocation("/");
       } else {
@@ -224,7 +217,6 @@ export default function Dashboard() {
     setSendStatus("Initializing transaction...");
     setSendError("");
     setTransactionHash("");
-
     try {
       // Step 1: Validate inputs (25%)
       setSendProgress(25);
@@ -260,58 +252,50 @@ export default function Dashboard() {
       setSendProgress(75);
       if (result.transactionHash) {
         setTransactionHash(result.transactionHash);
-        setSendStatus(
-          `Transaction sent! Hash: ${result.transactionHash.slice(0, 10)}...`,
-        );
+        setSendStatus(`Transaction sent! Hash: ${result.transactionHash.slice(0, 10)}...`);
 
         // Step 4: Wait for confirmation (100%) - Run in background
-        setSendStatus("Waiting for transaction confirmation...");
+        setSendStatus('Waiting for transaction confirmation...');
 
         // Wait for confirmation without blocking the UI
-        waitForTransaction(result.transactionHash)
-          .then((receipt) => {
-            if (receipt) {
-              setSendProgress(100);
-              setSendStatus("Transaction confirmed successfully!");
-
-              // Refresh account data
-              setTimeout(() => {
-                refreshAccountData();
-              }, 2000);
-
-              // Clear form
-              setTimeout(() => {
-                setSendAmount("");
-                setSendAddress("");
-                setIsSending(false);
-                setSendProgress(0);
-                setSendStatus("");
-                setTransactionHash("");
-              }, 5000);
-            } else {
-              setSendProgress(100);
-              setSendStatus(
-                "Transaction sent but confirmation timed out. Check explorer for status.",
-              );
-
-              // Still clear form after timeout
-              setTimeout(() => {
-                setSendAmount("");
-                setSendAddress("");
-                setIsSending(false);
-                setSendProgress(0);
-                setSendStatus("");
-                setTransactionHash("");
-              }, 5000);
-            }
-          })
-          .catch((error) => {
-            console.error("Error waiting for transaction:", error);
+        waitForTransaction(result.transactionHash).then((receipt) => {
+          if (receipt) {
             setSendProgress(100);
-            setSendStatus(
-              "Transaction sent but confirmation failed. Check explorer for status.",
-            );
-          });
+            setSendStatus('Transaction confirmed successfully!');
+
+            // Refresh account data
+            setTimeout(() => {
+              refreshAccountData();
+            }, 2000);
+
+            // Clear form
+            setTimeout(() => {
+              setSendAmount('');
+              setSendAddress('');
+              setIsSending(false);
+              setSendProgress(0);
+              setSendStatus('');
+              setTransactionHash('');
+            }, 5000);
+          } else {
+            setSendProgress(100);
+            setSendStatus('Transaction sent but confirmation timed out. Check explorer for status.');
+
+            // Still clear form after timeout
+            setTimeout(() => {
+              setSendAmount('');
+              setSendAddress('');
+              setIsSending(false);
+              setSendProgress(0);
+              setSendStatus('');
+              setTransactionHash('');
+            }, 5000);
+          }
+        }).catch((error) => {
+          console.error('Error waiting for transaction:', error);
+          setSendProgress(100);
+          setSendStatus('Transaction sent but confirmation failed. Check explorer for status.');
+        });
 
         // Set to 100% immediately so user sees the hash
         setSendProgress(100);
@@ -628,7 +612,6 @@ export default function Dashboard() {
                       <p className="text-sm text-muted-foreground">
                         {sendStatus}
                       </p>
-
                       {transactionHash && (
                         <div className="space-y-2">
                           <div className="p-3 bg-muted rounded-lg">
@@ -939,7 +922,6 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-
           {/* Selected Content */}
           {renderMainContent()}
         </div>
