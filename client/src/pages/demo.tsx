@@ -248,6 +248,14 @@ export default function Demo() {
           if (existingAccount.hasZKAccount) {
             setZkAccountInfo(existingAccount);
             console.log('✅ Found existing ZK Account during wallet setup:', existingAccount.zkAccountAddress);
+            
+            // If wallet has ZK Account, skip to dashboard
+            setWalletCreationStatus("ZK Account found! Redirecting to dashboard...");
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Brief pause to show message
+            
+            console.log('🚀 Wallet has existing ZK Account, redirecting to dashboard');
+            setLocation("/dashboard");
+            return;
           }
         } catch (error) {
           console.warn('Failed to check ZK account during wallet setup:', error);
