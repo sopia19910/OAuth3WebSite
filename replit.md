@@ -124,6 +124,7 @@ The application is designed to be easily extensible for implementing the actual 
   - Migrated from localStorage to database storage for custom tokens
   - Tokens now persist across browsers and devices for each user
   - User email linked to tokens for user-specific token lists
+  - Added OA3 token (0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea) to database
 - **Database Setup (2025-01-19)**:
   - Configured PostgreSQL database with Neon Database integration
   - Created database tables: users (for authentication), contacts (for contact form submissions), and tokens (for custom ERC20 tokens)
