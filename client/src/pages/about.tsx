@@ -5,10 +5,6 @@ import {
   KeyIcon,
   GlobeAltIcon,
   UserGroupIcon,
-  BuildingOfficeIcon,
-  BoltIcon,
-  CheckIcon,
-  ArrowRightIcon,
   LockClosedIcon
 } from "@heroicons/react/24/outline";
 import { Link } from "wouter";
@@ -127,15 +123,11 @@ export default function About() {
                   <p className="text-sm text-muted-foreground">Sign in with Google</p>
                 </div>
                 
-                <ArrowRightIcon className="w-6 h-6 text-muted-foreground hidden md:block" />
-                
                 <div className="text-center flex-1">
                   <KeyIcon className="w-12 h-12 text-primary mx-auto mb-3" />
                   <h4 className="font-semibold text-foreground">2. Web3 Signature</h4>
                   <p className="text-sm text-muted-foreground">Verify with private key</p>
                 </div>
-                
-                <ArrowRightIcon className="w-6 h-6 text-muted-foreground hidden md:block" />
                 
                 <div className="text-center flex-1">
                   <ShieldCheckIcon className="w-12 h-12 text-primary mx-auto mb-3" />
@@ -155,42 +147,22 @@ export default function About() {
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="bg-card shadow-lg card-hover">
               <CardContent className="p-6">
-                <UserGroupIcon className="w-10 h-10 text-primary mb-4" />
                 <h3 className="text-xl font-semibold text-foreground mb-3">Individuals</h3>
                 <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Easy multi-chain asset management</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Familiar login experience</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Full control over assets</span>
-                  </li>
+                  <li className="text-muted-foreground">• Easy multi-chain asset management</li>
+                  <li className="text-muted-foreground">• Familiar login experience</li>
+                  <li className="text-muted-foreground">• Full control over assets</li>
                 </ul>
               </CardContent>
             </Card>
             
             <Card className="bg-card shadow-lg card-hover">
               <CardContent className="p-6">
-                <BuildingOfficeIcon className="w-10 h-10 text-primary mb-4" />
                 <h3 className="text-xl font-semibold text-foreground mb-3">Enterprises</h3>
                 <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">90% cost reduction in custody</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Programmable multi-signature</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckIcon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-muted-foreground">Transparent governance</span>
-                  </li>
+                  <li className="text-muted-foreground">• 90% cost reduction in custody</li>
+                  <li className="text-muted-foreground">• Programmable multi-signature</li>
+                  <li className="text-muted-foreground">• Transparent governance</li>
                 </ul>
               </CardContent>
             </Card>
@@ -207,7 +179,6 @@ export default function About() {
               </p>
               <Link href="/demo">
                 <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
-                  <BoltIcon className="w-5 h-5 mr-2" />
                   Try OAuth 3 Demo
                 </Button>
               </Link>
