@@ -53,6 +53,11 @@ export default function Dashboard() {
   const [tokenAddress, setTokenAddress] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenName, setTokenName] = useState("");
+  const [customTokens, setCustomTokens] = useState<Array<{
+    address: string;
+    symbol: string;
+    name: string;
+  }>>([]);
 
   // Wallet and account state
   const [wallet, setWallet] = useState<WalletInfo | null>(null);
@@ -81,6 +86,15 @@ export default function Dashboard() {
   // Load wallet and account data on component mount
   useEffect(() => {
     loadWalletData();
+    // Load saved custom tokens from localStorage
+    const savedTokens = localStorage.getItem('oauth3_custom_tokens');
+    if (savedTokens) {
+      try {
+        setCustomTokens(JSON.parse(savedTokens));
+      } catch (e) {
+        console.error('Failed to load custom tokens:', e);
+      }
+    }
   }, []);
 
   const loadWalletData = async () => {
@@ -176,6 +190,69 @@ export default function Dashboard() {
         duration: 2000,
       });
     }
+  };
+
+  const handleAddToken = () => {
+    // Validate inputs
+    if (!tokenAddress || !tokenSymbol || !tokenName) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all token details",
+        variant: "destructive",
+        duration: 2000,
+      });
+      return;
+    }
+
+    // Validate Ethereum address format
+    if (!/^0x[a-fA-F0-9]{40}$/.test(tokenAddress)) {
+      toast({
+        title: "Invalid Address",
+        description: "Please enter a valid Ethereum address",
+        variant: "destructive",
+        duration: 2000,
+      });
+      return;
+    }
+
+    // Check if token already exists
+    const tokenExists = customTokens.some(token => 
+      token.address.toLowerCase() === tokenAddress.toLowerCase()
+    );
+    
+    if (tokenExists) {
+      toast({
+        title: "Token Already Added",
+        description: `${tokenSymbol} is already in your token list`,
+        variant: "destructive",
+        duration: 2000,
+      });
+      return;
+    }
+
+    // Add token to list
+    const newToken = {
+      address: tokenAddress,
+      symbol: tokenSymbol.toUpperCase(),
+      name: tokenName
+    };
+    
+    const updatedTokens = [...customTokens, newToken];
+    setCustomTokens(updatedTokens);
+    
+    // Save to localStorage
+    localStorage.setItem('oauth3_custom_tokens', JSON.stringify(updatedTokens));
+
+    // Clear form
+    setTokenAddress("");
+    setTokenSymbol("");
+    setTokenName("");
+
+    toast({
+      title: "Token Added",
+      description: `${tokenSymbol.toUpperCase()} has been added to your token list`,
+      duration: 2000,
+    });
   };
 
   const handleLogout = async () => {
@@ -498,6 +575,48 @@ export default function Dashboard() {
               <PlusIcon className="w-5 h-5" />
               Add Token
             </h2>
+            
+            {/* Custom Tokens List */}
+            {customTokens.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-muted-foreground">Added Tokens</h3>
+                <div className="space-y-2">
+                  {customTokens.map((token) => (
+                    <div 
+                      key={token.address} 
+                      className="flex items-center justify-between p-3 border border-border rounded bg-card/50"
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{token.symbol}</p>
+                        <p className="text-xs text-muted-foreground">{token.name}</p>
+                        <p className="text-xs text-muted-foreground font-mono mt-1">
+                          {token.address}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const updatedTokens = customTokens.filter(
+                            t => t.address !== token.address
+                          );
+                          setCustomTokens(updatedTokens);
+                          localStorage.setItem('oauth3_custom_tokens', JSON.stringify(updatedTokens));
+                          toast({
+                            title: "Token Removed",
+                            description: `${token.symbol} has been removed`,
+                            duration: 2000,
+                          });
+                        }}
+                        className="text-destructive hover:text-destructive/90"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div>
               <Label
                 htmlFor="token-address"
@@ -537,7 +656,10 @@ export default function Dashboard() {
                 className="mt-1"
               />
             </div>
-            <Button className="w-full bg-primary hover:bg-primary/90">
+            <Button 
+              className="w-full bg-primary hover:bg-primary/90"
+              onClick={handleAddToken}
+            >
               Add Token
             </Button>
           </div>
@@ -580,6 +702,11 @@ export default function Dashboard() {
                     <SelectContent>
                       <SelectItem value="ETH">ETH - Ethereum</SelectItem>
                       <SelectItem value="OA3">OA3 - OAuth3 Token</SelectItem>
+                      {customTokens.map((token) => (
+                        <SelectItem key={token.address} value={token.address}>
+                          {token.symbol} - {token.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

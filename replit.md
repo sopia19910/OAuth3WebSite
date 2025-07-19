@@ -115,6 +115,17 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Dashboard Functionality Enhancements (2025-01-19)**:
+  - Added functional Add Token system with validation and storage
+  - Tokens are saved in localStorage and persist between sessions  
+  - Added tokens appear in Send section dropdown for selection
+  - Token list shows all added custom tokens with remove functionality
+  - Toast notifications for all token operations (add/remove/errors)
+  - Ethereum address validation for token contracts
+- **Toast Notification System (2025-01-19)**:
+  - Replaced alert messages with toast popups on Dashboard page
+  - Extended toast system to Demo page for copy operations
+  - 2-second auto-dismiss with error variants for failures
 - **Dashboard UI Updates (2025-01-19)**: Made multiple refinements to the dashboard interface
   - Changed "Logout" button to "Disconnect" with gray border styling
   - Removed Dashboard Overview header card
@@ -123,6 +134,7 @@ The application is designed to be easily extensible for implementing the actual 
   - Reduced font sizes: card titles from text-lg to text-base, labels from text-sm to text-xs
   - Changed all cards to right-angled corners (removed rounded corners)
   - Web3 Account card now shows full wallet address instead of truncated version
+  - Removed card design from Add Token section for cleaner UI
 - **Home Page Restructure (2025-01-19)**: Replaced individual sections with summary overviews
   - Added About OAuth 3 summary section with key benefits
   - Added Technology summary section with core components (EOA, CA, ZKP)
