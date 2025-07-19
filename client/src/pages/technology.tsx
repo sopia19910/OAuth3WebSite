@@ -46,7 +46,7 @@ export default function Technology() {
         <>
           ZKP
           <br />
-          <span className="text-sm font-normal">(Zero-Knowledge Proof)</span>
+          <span className="text-sm font-normal">( Zero-Knowledge Proof )</span>
         </>
       ),
       description: "Verifies identity without exposing sensitive data on-chain."
