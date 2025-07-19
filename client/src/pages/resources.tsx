@@ -62,7 +62,6 @@ export default function Resources() {
           <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
             <CardContent className="p-12">
               <div className="text-center">
-                <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">OAuth 3 Whitepaper</h2>
                 <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body mb-8">
                   The complete technical and strategic vision for OAuth 3's revolutionary authentication framework.
                 </p>
