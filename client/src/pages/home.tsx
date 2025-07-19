@@ -24,11 +24,6 @@ export default function Home() {
         <div className="absolute inset-0 tech-grid opacity-20" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center mb-4">
-              <div className="h-px w-12 bg-primary mr-3" />
-              <span className="text-sm font-medium text-primary uppercase tracking-wider">About</span>
-              <div className="h-px w-12 bg-primary ml-3" />
-            </div>
             <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
               The Future of Authentication
             </h2>
@@ -101,11 +96,6 @@ export default function Home() {
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center mb-4">
-              <div className="h-px w-12 bg-accent mr-3" />
-              <span className="text-sm font-medium text-accent uppercase tracking-wider">Technology</span>
-              <div className="h-px w-12 bg-accent ml-3" />
-            </div>
             <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
               Advanced Hybrid Architecture
             </h2>
@@ -176,11 +166,6 @@ export default function Home() {
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center mb-4">
-              <div className="h-px w-12 bg-primary mr-3" />
-              <span className="text-sm font-medium text-primary uppercase tracking-wider">Services</span>
-              <div className="h-px w-12 bg-primary ml-3" />
-            </div>
             <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
               Tailored Solutions for Everyone
             </h2>
