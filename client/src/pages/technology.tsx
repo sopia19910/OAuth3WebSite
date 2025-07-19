@@ -24,7 +24,7 @@ export default function Technology() {
         <>
           EOA
           <br />
-          <span className="text-sm font-normal">(Externally Owned Account)</span>
+          <span className="text-sm font-normal">( Externally Owned Account )</span>
         </>
       ),
       description: "Standard Web3 account with full asset control via private key management."
