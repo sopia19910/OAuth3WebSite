@@ -250,14 +250,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="text-center mt-10">
-            <Link href="/services">
-              <Button size="lg" variant="ghost" className="text-muted-foreground hover:text-foreground">
-                View All Services
-                <ArrowRightIcon className="ml-2 w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
+          
         </div>
       </section>
       <Footer />
