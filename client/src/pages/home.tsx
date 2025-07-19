@@ -87,7 +87,7 @@ export default function Home() {
           
           <div className="text-center">
             <Link href="/about">
-              <Button size="lg" variant="outline" className="border-gray-500 text-gray-500 hover:bg-white/10 hover:text-white shadow-xl hover:shadow-white/20 transition-all duration-300 px-8">
+              <Button size="lg" variant="outline" className="border-gray-500 text-gray-500 hover:bg-white/10 hover:text-white transition-all duration-300 px-8">
                 Learn More
                 <ArrowRightIcon className="ml-2 w-4 h-4" />
               </Button>
@@ -162,7 +162,7 @@ export default function Home() {
           
           <div className="text-center">
             <Link href="/technology">
-              <Button size="lg" variant="outline" className="border-gray-500 text-gray-500 hover:bg-white/10 hover:text-white shadow-xl hover:shadow-white/20 transition-all duration-300 px-8">
+              <Button size="lg" variant="outline" className="border-gray-500 text-gray-500 hover:bg-white/10 hover:text-white transition-all duration-300 px-8">
                 Learn More
                 <ArrowRightIcon className="ml-2 w-4 h-4" />
               </Button>
@@ -252,7 +252,7 @@ export default function Home() {
           
           <div className="text-center">
             <Link href="/services">
-              <Button size="lg" variant="outline" className="border-gray-500 text-gray-500 hover:bg-white/10 hover:text-white shadow-xl hover:shadow-white/20 transition-all duration-300 px-8">
+              <Button size="lg" variant="outline" className="border-gray-500 text-gray-500 hover:bg-white/10 hover:text-white transition-all duration-300 px-8">
                 Learn More
                 <ArrowRightIcon className="ml-2 w-4 h-4" />
               </Button>
