@@ -38,7 +38,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
               <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
@@ -116,7 +116,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             <div className="group relative">
               <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl transition-all duration-300">
@@ -192,7 +192,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-16 max-w-5xl mx-auto">
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-300" />
               <Card className="relative bg-gradient-to-br from-card via-card/95 to-card/90 border-primary/20 overflow-hidden hover:border-primary/40 transition-all duration-300 h-full">
