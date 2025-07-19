@@ -54,9 +54,12 @@ export default function Dashboard() {
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenName, setTokenName] = useState("");
   const [customTokens, setCustomTokens] = useState<Array<{
+    id?: number;
     address: string;
     symbol: string;
     name: string;
+    userEmail?: string;
+    createdAt?: Date | string;
   }>>([]);
 
   // Wallet and account state
@@ -86,16 +89,28 @@ export default function Dashboard() {
   // Load wallet and account data on component mount
   useEffect(() => {
     loadWalletData();
-    // Load saved custom tokens from localStorage
-    const savedTokens = localStorage.getItem('oauth3_custom_tokens');
-    if (savedTokens) {
-      try {
-        setCustomTokens(JSON.parse(savedTokens));
-      } catch (e) {
-        console.error('Failed to load custom tokens:', e);
-      }
-    }
+    loadTokensFromDB();
   }, []);
+
+  const loadTokensFromDB = async () => {
+    try {
+      const response = await fetch('/api/tokens', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setCustomTokens(data.tokens);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load tokens from DB:', error);
+    }
+  };
 
   const loadWalletData = async () => {
     try {
@@ -192,7 +207,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleAddToken = () => {
+  const handleAddToken = async () => {
     // Validate inputs
     if (!tokenAddress || !tokenSymbol || !tokenName) {
       toast({
@@ -230,29 +245,54 @@ export default function Dashboard() {
       return;
     }
 
-    // Add token to list
-    const newToken = {
-      address: tokenAddress,
-      symbol: tokenSymbol.toUpperCase(),
-      name: tokenName
-    };
-    
-    const updatedTokens = [...customTokens, newToken];
-    setCustomTokens(updatedTokens);
-    
-    // Save to localStorage
-    localStorage.setItem('oauth3_custom_tokens', JSON.stringify(updatedTokens));
+    try {
+      // Save to database
+      const response = await fetch('/api/tokens', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          address: tokenAddress,
+          symbol: tokenSymbol.toUpperCase(),
+          name: tokenName
+        })
+      });
 
-    // Clear form
-    setTokenAddress("");
-    setTokenSymbol("");
-    setTokenName("");
+      const data = await response.json();
 
-    toast({
-      title: "Token Added",
-      description: `${tokenSymbol.toUpperCase()} has been added to your token list`,
-      duration: 2000,
-    });
+      if (!response.ok || !data.success) {
+        toast({
+          title: "Failed to Add Token",
+          description: data.error || "Unable to save token",
+          variant: "destructive",
+          duration: 2000,
+        });
+        return;
+      }
+
+      // Update local state
+      setCustomTokens([...customTokens, data.token]);
+
+      // Clear form
+      setTokenAddress("");
+      setTokenSymbol("");
+      setTokenName("");
+
+      toast({
+        title: "Token Added",
+        description: `${tokenSymbol.toUpperCase()} has been added to your token list`,
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error("Failed to add token:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add token. Please try again.",
+        variant: "destructive",
+        duration: 2000,
+      });
+    }
   };
 
   const handleLogout = async () => {
@@ -583,7 +623,7 @@ export default function Dashboard() {
                 <div className="space-y-2">
                   {customTokens.map((token) => (
                     <div 
-                      key={token.address} 
+                      key={token.id || token.address} 
                       className="flex items-center justify-between p-3 border border-border rounded bg-card/50"
                     >
                       <div className="flex-1">
@@ -596,17 +636,46 @@ export default function Dashboard() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          const updatedTokens = customTokens.filter(
-                            t => t.address !== token.address
-                          );
-                          setCustomTokens(updatedTokens);
-                          localStorage.setItem('oauth3_custom_tokens', JSON.stringify(updatedTokens));
-                          toast({
-                            title: "Token Removed",
-                            description: `${token.symbol} has been removed`,
-                            duration: 2000,
-                          });
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`/api/tokens/${token.id}`, {
+                              method: 'DELETE',
+                              headers: {
+                                'Content-Type': 'application/json'
+                              }
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok && data.success) {
+                              // Update local state
+                              const updatedTokens = customTokens.filter(
+                                t => t.id !== token.id
+                              );
+                              setCustomTokens(updatedTokens);
+                              
+                              toast({
+                                title: "Token Removed",
+                                description: `${token.symbol} has been removed`,
+                                duration: 2000,
+                              });
+                            } else {
+                              toast({
+                                title: "Failed to Remove Token",
+                                description: data.error || "Unable to remove token",
+                                variant: "destructive",
+                                duration: 2000,
+                              });
+                            }
+                          } catch (error) {
+                            console.error("Failed to remove token:", error);
+                            toast({
+                              title: "Error",
+                              description: "Failed to remove token. Please try again.",
+                              variant: "destructive",
+                              duration: 2000,
+                            });
+                          }
                         }}
                         className="text-destructive hover:text-destructive/90"
                       >
@@ -703,7 +772,7 @@ export default function Dashboard() {
                       <SelectItem value="ETH">ETH - Ethereum</SelectItem>
                       <SelectItem value="OA3">OA3 - OAuth3 Token</SelectItem>
                       {customTokens.map((token) => (
-                        <SelectItem key={token.address} value={token.address}>
+                        <SelectItem key={token.id || token.address} value={token.address}>
                           {token.symbol} - {token.name}
                         </SelectItem>
                       ))}

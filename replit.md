@@ -118,9 +118,15 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Token Storage Migration to Database (2025-01-19)**:
+  - Created `tokens` table in PostgreSQL for persistent token storage
+  - Added API endpoints: GET /api/tokens, POST /api/tokens, DELETE /api/tokens/:id
+  - Migrated from localStorage to database storage for custom tokens
+  - Tokens now persist across browsers and devices for each user
+  - User email linked to tokens for user-specific token lists
 - **Database Setup (2025-01-19)**:
   - Configured PostgreSQL database with Neon Database integration
-  - Created database tables: users (for authentication) and contacts (for contact form submissions)
+  - Created database tables: users (for authentication), contacts (for contact form submissions), and tokens (for custom ERC20 tokens)
   - DatabaseStorage class already implemented and active
   - All database operations ready for production use
 - **Dashboard Functionality Enhancements (2025-01-19)**:

@@ -1,4 +1,4 @@
-import { users, contacts, type User, type InsertUser, type Contact, type InsertContact } from "@shared/schema";
+import { users, contacts, tokens, type User, type InsertUser, type Contact, type InsertContact, type Token, type InsertToken } from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -8,14 +8,19 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   createContact(contact: InsertContact): Promise<Contact>;
+  getTokensByEmail(userEmail: string): Promise<Token[]>;
+  createToken(token: InsertToken): Promise<Token>;
+  deleteToken(id: number, userEmail: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
+  private tokens: Map<number, Token>;
   currentId: number;
 
   constructor() {
     this.users = new Map();
+    this.tokens = new Map();
     this.currentId = 1;
   }
 
@@ -47,6 +52,32 @@ export class MemStorage implements IStorage {
     // In memory storage for contacts (in real app, this would be persisted)
     console.log("Contact submitted:", contact);
     return contact;
+  }
+
+  async getTokensByEmail(userEmail: string): Promise<Token[]> {
+    return Array.from(this.tokens.values()).filter(
+      (token) => token.userEmail === userEmail
+    );
+  }
+
+  async createToken(insertToken: InsertToken): Promise<Token> {
+    const id = this.currentId++;
+    const token: Token = {
+      ...insertToken,
+      id,
+      createdAt: new Date()
+    };
+    this.tokens.set(id, token);
+    return token;
+  }
+
+  async deleteToken(id: number, userEmail: string): Promise<boolean> {
+    const token = this.tokens.get(id);
+    if (token && token.userEmail === userEmail) {
+      this.tokens.delete(id);
+      return true;
+    }
+    return false;
   }
 }
 
@@ -89,6 +120,37 @@ export class DatabaseStorage implements IStorage {
       .values(insertContact)
       .returning();
     return contact;
+  }
+
+  async getTokensByEmail(userEmail: string): Promise<Token[]> {
+    const { db } = await import("./db");
+    const { tokens } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    return await db.select().from(tokens).where(eq(tokens.userEmail, userEmail));
+  }
+
+  async createToken(insertToken: InsertToken): Promise<Token> {
+    const { db } = await import("./db");
+    const { tokens } = await import("@shared/schema");
+    
+    const [token] = await db
+      .insert(tokens)
+      .values(insertToken)
+      .returning();
+    return token;
+  }
+
+  async deleteToken(id: number, userEmail: string): Promise<boolean> {
+    const { db } = await import("./db");
+    const { tokens } = await import("@shared/schema");
+    const { eq, and } = await import("drizzle-orm");
+    
+    const result = await db
+      .delete(tokens)
+      .where(and(eq(tokens.id, id), eq(tokens.userEmail, userEmail)));
+    
+    return !!result;
   }
 }
 
