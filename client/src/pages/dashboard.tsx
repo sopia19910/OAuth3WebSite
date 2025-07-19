@@ -454,10 +454,8 @@ export default function Dashboard() {
                       Contract Address
                     </Label>
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs font-mono text-foreground">
-                        {zkAccountInfo?.zkAccountAddress
-                          ? `${zkAccountInfo.zkAccountAddress.slice(0, 6)}...${zkAccountInfo.zkAccountAddress.slice(-4)}`
-                          : "Not available"}
+                      <p className="text-xs font-mono text-foreground break-all">
+                        {zkAccountInfo?.zkAccountAddress || "Not available"}
                       </p>
                       {zkAccountInfo?.zkAccountAddress && (
                         <Button
