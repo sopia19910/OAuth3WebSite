@@ -493,7 +493,7 @@ export default function Dashboard() {
 
       case "add-token":
         return (
-          <div className="w-full">
+          <div className="max-w-2xl mx-auto">
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
