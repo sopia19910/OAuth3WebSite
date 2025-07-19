@@ -115,6 +115,17 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Home Page Restructure (2025-01-19)**: Replaced individual sections with summary overviews
+  - Added About OAuth 3 summary section with key benefits
+  - Added Technology summary section with core components (EOA, CA, ZKP)
+  - Added Services summary section with Individual and Enterprise services
+  - Each section includes "Learn More" button linking to respective pages
+  - Removed separate Demo and Contact sections from home page
+- **Navigation Update (2025-01-19)**: Changed "Resources" to "Docs" in main menu
+- **Services Page Enhancement (2025-01-19)**: 
+  - Added professional card designs with gradients and icons
+  - Individual Services: Added "Get Started" button linking to /demo
+  - Enterprise Services: Added "Coming Soon" label
 - **View Demo Page (2025-01-17)**: Added comprehensive interactive demo
   - 6-step authentication flow simulation
   - Google OAuth login, Web3 account connection, ZKP generation
