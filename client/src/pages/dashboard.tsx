@@ -678,9 +678,9 @@ export default function Dashboard() {
                             });
                           }
                         }}
-                        className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 text-xs py-1 h-7"
+                        className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 text-xs py-1 px-2 h-7"
                       >
-                        <XMarkIcon className="w-4 h-4" />
+                        Remove
                       </Button>
                     </div>
                   ))}
