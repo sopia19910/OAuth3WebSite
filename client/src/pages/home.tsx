@@ -182,7 +182,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-foreground">Individual Users</h3>
-                    <p className="text-primary font-medium">Web3 wallet that feels like Web2</p>
+                    <p className="font-medium text-[#fafafa]">Web3 wallet that feels like Web2</p>
                   </div>
                 </div>
                 
