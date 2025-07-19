@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { 
-  CreditCardIcon, 
-  PaperAirplaneIcon, 
+import {
+  CreditCardIcon,
+  PaperAirplaneIcon,
   QrCodeIcon,
   PlusIcon,
   ClipboardIcon,
@@ -20,22 +20,23 @@ import {
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
-import { 
-  getWalletFromStorage, 
-  getWalletBalance, 
+import {
+  getWalletFromStorage,
+  getWalletBalance,
   getNetworkInfo,
-  type WalletInfo 
+  type WalletInfo
 } from "@/lib/wallet";
-import { 
-  checkZKAccount, 
+import {
+  checkZKAccount,
   waitForTransaction,
   transferETHFromZKAccount,
   transferOA3FromZKAccount,
   type ZKAccountInfo,
-  type TransferResult 
+  type TransferResult
 } from "@/lib/zkAccount";
 
 export default function Dashboard() {
+
   const [, setLocation] = useLocation();
   const [activeMenu, setActiveMenu] = useState<string>("overview");
   const [sendAmount, setSendAmount] = useState("");
@@ -44,107 +45,107 @@ export default function Dashboard() {
   const [tokenAddress, setTokenAddress] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenName, setTokenName] = useState("");
-  
+
   // Wallet and account state
   const [wallet, setWallet] = useState<WalletInfo | null>(null);
   const [walletBalance, setWalletBalance] = useState("0.0");
   const [zkAccountInfo, setZkAccountInfo] = useState<ZKAccountInfo | null>(null);
   const [networkName, setNetworkName] = useState("Loading...");
   const [userEmail, setUserEmail] = useState("");
-  
+
   // Send transaction state
   const [isSending, setIsSending] = useState(false);
   const [sendProgress, setSendProgress] = useState(0);
   const [sendStatus, setSendStatus] = useState("");
   const [transactionHash, setTransactionHash] = useState("");
   const [sendError, setSendError] = useState("");
-  
+
   // Refresh state
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   // Logout state
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  
+
   // Configuration state
   const [config, setConfig] = useState<any>(null);
-  
+
 
   // Load wallet and account data on component mount
   useEffect(() => {
     loadWalletData();
   }, []);
-  
+
   const loadWalletData = async () => {
     try {
       // First check if OAuth session is valid
       console.log('🔍 Checking OAuth session validity...');
-      
+
       try {
         const userResponse = await fetch('/api/auth/me');
         const userData = await userResponse.json();
-        
+
         if (!userData.success || !userData.user?.email) {
           console.log('❌ Invalid or expired OAuth session. Redirecting to demo...');
           alert('Session expired or invalid. Please login again.');
           setLocation('/demo');
           return;
         }
-        
+
         // Valid session - continue with loading
         console.log('✅ Valid OAuth session for:', userData.user.email);
         setUserEmail(userData.user.email);
         localStorage.setItem('oauth3_user_email', userData.user.email);
-        
+
       } catch (error) {
         console.error('Failed to validate OAuth session:', error);
         alert('Failed to validate session. Please login again.');
         setLocation('/demo');
         return;
       }
-      
+
       // Get wallet from storage
       const savedWallet = getWalletFromStorage();
       if (savedWallet) {
         setWallet(savedWallet);
-        
+
         // Get wallet balance
         const balance = await getWalletBalance(savedWallet.address);
         setWalletBalance(balance.formatted);
-        
+
         // Check for ZK Account
         const zkInfo = await checkZKAccount(savedWallet.address);
         setZkAccountInfo(zkInfo);
       }
-      
+
       // Get network info and config
       const networkInfo = getNetworkInfo();
       setNetworkName(networkInfo.name === 'unknown' ? 'Holesky Testnet' : networkInfo.name);
-      
+
       // Load configuration
       const configResponse = await fetch('/api/config');
       const configData = await configResponse.json();
       if (configData.success) {
         setConfig(configData);
       }
-      
+
     } catch (error) {
       console.error('Failed to load wallet data:', error);
     }
   };
-  
+
   const refreshAccountData = async () => {
     if (!wallet) return;
-    
+
     setIsRefreshing(true);
     try {
       // Refresh wallet balance
       const balance = await getWalletBalance(wallet.address);
       setWalletBalance(balance.formatted);
-      
+
       // Refresh ZK Account info
       const zkInfo = await checkZKAccount(wallet.address);
       setZkAccountInfo(zkInfo);
-      
+
       console.log('✅ Account data refreshed');
     } catch (error) {
       console.error('Failed to refresh account data:', error);
@@ -162,12 +163,12 @@ export default function Dashboard() {
       alert(`Failed to copy ${label}`);
     }
   };
-  
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
       console.log('🚪 Logging out...');
-      
+
       // Call logout API
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
@@ -175,16 +176,16 @@ export default function Dashboard() {
           'Content-Type': 'application/json'
         }
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         console.log('✅ Logout successful');
-        
+
         // Clear local storage
         localStorage.removeItem('oauth3_user_email');
         localStorage.removeItem('oauth3_wallet');
-        
+
         // Redirect to home page
         setLocation('/');
       } else {
@@ -198,35 +199,35 @@ export default function Dashboard() {
       setIsLoggingOut(false);
     }
   };
-  
+
   const handleSendTransaction = async () => {
     if (!wallet || !zkAccountInfo?.hasZKAccount) {
       setSendError('No wallet or ZK Account found');
       return;
     }
-    
+
     if (!sendAddress || !sendAmount || parseFloat(sendAmount) <= 0) {
       setSendError('Please fill in all required fields with valid values');
       return;
     }
-    
+
     setIsSending(true);
     setSendProgress(0);
     setSendStatus('Initializing transaction...');
     setSendError('');
     setTransactionHash('');
-    
+
     try {
       // Step 1: Validate inputs (25%)
       setSendProgress(25);
       setSendStatus('Validating transaction details...');
-      
+
       // Step 2: Prepare transfer (50%)
       setSendProgress(50);
       setSendStatus('Preparing transaction...');
-      
+
       let result: TransferResult;
-      
+
       if (selectedToken === 'ETH') {
         result = await transferETHFromZKAccount(
           wallet.privateKey,
@@ -242,31 +243,31 @@ export default function Dashboard() {
           sendAmount
         );
       }
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Transfer failed');
       }
-      
+
       // Step 3: Transaction sent (75%) - Show hash immediately
       setSendProgress(75);
       if (result.transactionHash) {
         setTransactionHash(result.transactionHash);
         setSendStatus(`Transaction sent! Hash: ${result.transactionHash.slice(0, 10)}...`);
-        
+
         // Step 4: Wait for confirmation (100%) - Run in background
         setSendStatus('Waiting for transaction confirmation...');
-        
+
         // Wait for confirmation without blocking the UI
         waitForTransaction(result.transactionHash).then((receipt) => {
           if (receipt) {
             setSendProgress(100);
             setSendStatus('Transaction confirmed successfully!');
-            
+
             // Refresh account data
             setTimeout(() => {
               refreshAccountData();
             }, 2000);
-            
+
             // Clear form
             setTimeout(() => {
               setSendAmount('');
@@ -279,7 +280,7 @@ export default function Dashboard() {
           } else {
             setSendProgress(100);
             setSendStatus('Transaction sent but confirmation timed out. Check explorer for status.');
-            
+
             // Still clear form after timeout
             setTimeout(() => {
               setSendAmount('');
@@ -295,15 +296,15 @@ export default function Dashboard() {
           setSendProgress(100);
           setSendStatus('Transaction sent but confirmation failed. Check explorer for status.');
         });
-        
+
         // Set to 100% immediately so user sees the hash
         setSendProgress(100);
-        
+
       } else {
         // No transaction hash (probably failed before sending)
         throw new Error(result.error || 'Transaction failed to send');
       }
-      
+
     } catch (error) {
       console.error('Send transaction error:', error);
       setSendError(error instanceof Error ? error.message : 'Unknown error occurred');
@@ -369,12 +370,12 @@ export default function Dashboard() {
                     <Label className="text-sm font-medium text-muted-foreground">Owner ETH (Gas Fee)</Label>
                     <p className="text-sm text-foreground mt-1">{walletBalance} ETH</p>
                   </div>
-                  
+
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Network</Label>
                     <p className="text-sm text-foreground mt-1">{networkName}</p>
                   </div>
-                  
+
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Address</Label>
                     <div className="flex items-center justify-between mt-1">
@@ -540,10 +541,10 @@ export default function Dashboard() {
                       <span className="text-sm font-medium text-foreground">{sendProgress}%</span>
                     </div>
                     <Progress value={sendProgress} className="w-full" />
-                    
+
                     <div className="text-center space-y-2">
                       <p className="text-sm text-muted-foreground">{sendStatus}</p>
-                      
+
                       {transactionHash && (
                         <div className="space-y-2">
                           <div className="p-3 bg-muted rounded-lg">
@@ -562,7 +563,7 @@ export default function Dashboard() {
                               </Button>
                             </div>
                           </div>
-                          
+
                           <Button
                             variant="outline"
                             size="sm"
@@ -579,14 +580,14 @@ export default function Dashboard() {
                     </div>
                   </div>
                 )}
-                
+
                 {sendError && (
                   <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                     <p className="text-sm text-destructive">{sendError}</p>
                   </div>
                 )}
-                
-                <Button 
+
+                <Button
                   onClick={handleSendTransaction}
                   disabled={isSending || !zkAccountInfo?.hasZKAccount}
                   className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50"
@@ -796,7 +797,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          
+
 
           {/* Selected Content */}
           {renderMainContent()}
