@@ -20,7 +20,7 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       {/* What is OAuth 3 */}
-      <section className="py-16 bg-gradient-to-b from-background to-muted/10 relative overflow-hidden">
+      <section className="py-16 relative overflow-hidden">
         <div className="absolute inset-0 tech-grid opacity-10" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
@@ -70,8 +70,8 @@ export default function Home() {
               
               <div className="pt-4">
                 <Link href="/about">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white">
-                    Learn More About OAuth 3
+                  <Button size="lg" variant="outline" className="border-gray-400 text-gray-600 hover:bg-gray-100 hover:border-gray-500 hover:text-gray-700">
+                    Learn More
                     <ArrowRightIcon className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>
@@ -100,7 +100,7 @@ export default function Home() {
         </div>
       </section>
       {/* Core Technology */}
-      <section className="py-16 bg-gradient-to-b from-muted/10 to-background relative overflow-hidden">
+      <section className="py-16 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-r from-accent/5 via-transparent to-primary/5" />
         </div>
@@ -164,8 +164,8 @@ export default function Home() {
           
           <div className="text-center mt-10">
             <Link href="/technology">
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300">
-                Explore Technology
+              <Button size="lg" variant="outline" className="border-gray-400 text-gray-600 hover:bg-gray-100 hover:border-gray-500 hover:text-gray-700 transition-all duration-300">
+                Learn More
                 <ArrowRightIcon className="ml-2 w-4 h-4" />
               </Button>
             </Link>
@@ -173,7 +173,7 @@ export default function Home() {
         </div>
       </section>
       {/* Services & Solutions */}
-      <section className="py-16 bg-gradient-to-b from-background to-muted/10 relative overflow-hidden">
+      <section className="py-16 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
