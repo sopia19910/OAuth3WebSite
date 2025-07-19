@@ -18,7 +18,7 @@ async function getRpcUrl(): Promise<string> {
   if (cachedRpcUrl) {
     return cachedRpcUrl;
   }
-  
+
   try {
     const response = await fetch('/api/config');
     const data = await response.json();
@@ -29,7 +29,7 @@ async function getRpcUrl(): Promise<string> {
   } catch (error) {
     console.error('Failed to fetch RPC URL:', error);
   }
-  
+
   // Fallback to Holesky testnet
   return 'https://rpc-holesky.rockx.com';
 }
@@ -74,12 +74,12 @@ export async function getWalletBalance(address: string, provider?: ethers.Provid
       console.log('🌐 Using RPC URL:', rpcUrl);
       ethProvider = new ethers.JsonRpcProvider(rpcUrl);
     }
-    
+
     const balance = await ethProvider.getBalance(address);
     const formatted = ethers.formatEther(balance);
-    
+
     console.log(`💰 Balance for ${address}: ${formatted} ETH`);
-    
+
     return {
       eth: balance.toString(),
       formatted: formatted

@@ -117,7 +117,7 @@ export default function Dashboard() {
       }
       
       // Get network info and config
-      const networkInfo = await getNetworkInfo();
+      const networkInfo = getNetworkInfo();
       setNetworkName(networkInfo.name === 'unknown' ? 'Holesky Testnet' : networkInfo.name);
       
       // Load configuration

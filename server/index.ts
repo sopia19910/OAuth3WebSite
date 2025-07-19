@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 // Load environment variables FIRST, before any other imports
-dotenv.config();
+dotenv.config({ override: true });
 
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
@@ -60,8 +60,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Use port 3000 instead of 5000 (which is reserved by macOS for AirPlay)
-  const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+  // Use port 5000 to match workflow configuration
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
   server.listen(port, () => {
     log(`serving on port ${port}`);
   });
