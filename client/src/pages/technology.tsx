@@ -19,17 +19,17 @@ import Footer from "@/components/footer";
 export default function Technology() {
   const coreComponents = [
     {
-      icon: <UsersIcon className="w-10 h-10 text-primary" strokeWidth={1} />,
+      icon: <UsersIcon className="w-10 h-10 text-muted-foreground" strokeWidth={1} />,
       title: "EOA (Externally Owned Account)",
       description: "Standard Web3 account with full asset control via private key management."
     },
     {
-      icon: <CogIcon className="w-10 h-10 text-primary" strokeWidth={1} />,
+      icon: <CogIcon className="w-10 h-10 text-muted-foreground" strokeWidth={1} />,
       title: "CA (Contract Account)",
       description: "Smart contract wallet requiring both Web2 and Web3 authentication."
     },
     {
-      icon: <ShieldCheckIcon className="w-10 h-10 text-primary" strokeWidth={1} />,
+      icon: <ShieldCheckIcon className="w-10 h-10 text-muted-foreground" strokeWidth={1} />,
       title: "ZKP (Zero-Knowledge Proof)",
       description: "Verifies identity without exposing sensitive data on-chain."
     }
