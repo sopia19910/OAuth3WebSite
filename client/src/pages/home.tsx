@@ -136,7 +136,7 @@ export default function Home() {
                   <CogIcon className="w-10 h-10 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2 text-center">CA</h3>
-                <p className="text-xs text-accent font-medium text-center mb-3">Contract Account</p>
+                <p className="text-xs font-medium text-center mb-3 text-[#fafafa]">Contract Account</p>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
                   Smart contract wallet requiring both Web2 and Web3 authentication
                 </p>
