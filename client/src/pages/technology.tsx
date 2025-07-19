@@ -35,7 +35,7 @@ export default function Technology() {
         <>
           CA
           <br />
-          <span className="text-sm font-normal">(Contract Account)</span>
+          <span className="text-sm font-normal">( Contract Account )</span>
         </>
       ),
       description: "Smart contract wallet requiring both Web2 and Web3 authentication."
