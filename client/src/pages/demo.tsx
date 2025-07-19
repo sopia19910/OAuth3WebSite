@@ -973,10 +973,10 @@ export default function Demo() {
       {/* Demo Content - Full Height */}
       <div className="pt-16 min-h-screen flex flex-col items-center justify-center gradient-bg">
         <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Step Progress Indicator */}
-          <div className="mb-12">
+          {/* Step Progress Indicator - Hidden */}
+          {/* <div className="mb-12">
             {renderStepProgress()}
-          </div>
+          </div> */}
           
           {/* Current Step Content */}
           <div className="w-full max-w-4xl mx-auto">
