@@ -245,11 +245,7 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <div className="mt-6 pt-6 border-t border-border/50">
-                  <Button className="w-full" variant="outline" disabled>
-                    Coming Soon
-                  </Button>
-                </div>
+                
               </div>
             </div>
           </div>
