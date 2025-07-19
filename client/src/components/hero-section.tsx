@@ -108,7 +108,7 @@ export default function HeroSection() {
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight clean-title">
               <span className="clean-logo">OAuth 3</span><br />
               The Future of{" "}
-              <span className="text-primary">Hybrid Authentication</span>
+              <span className="text-primary">Integrated Authentication</span>
             </h1>
             <p className="text-lg text-foreground/80 tech-body">
               Combining the intuitive convenience of Web2 with the robust security of Web3. 
