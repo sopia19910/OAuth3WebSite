@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -44,6 +45,7 @@ import {
 export default function Dashboard() {
 
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [activeMenu, setActiveMenu] = useState<string>("overview");
   const [sendAmount, setSendAmount] = useState("");
   const [sendAddress, setSendAddress] = useState("");
@@ -160,10 +162,19 @@ export default function Dashboard() {
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert(`${label} copied to clipboard!`);
+      toast({
+        title: "Copied!",
+        description: `${label} copied to clipboard`,
+        duration: 2000,
+      });
     } catch (err) {
       console.error("Failed to copy: ", err);
-      alert(`Failed to copy ${label}`);
+      toast({
+        title: "Failed to copy",
+        description: `Could not copy ${label}`,
+        variant: "destructive",
+        duration: 2000,
+      });
     }
   };
 
