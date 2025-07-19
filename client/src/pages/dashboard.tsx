@@ -349,7 +349,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Provider
                     </Label>
                     <p className="text-sm text-foreground mt-1">
@@ -357,7 +357,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Authentication Status
                     </Label>
                     <p className="text-sm text-green-500 mt-1">✓ Verified</p>
@@ -374,7 +374,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Owner ETH (Gas Fee)
                     </Label>
                     <p className="text-sm text-foreground mt-1">
@@ -382,7 +382,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Network
                     </Label>
                     <p className="text-sm text-foreground mt-1">
@@ -391,7 +391,7 @@ export default function Dashboard() {
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Address
                     </Label>
                     <div className="flex items-center justify-between mt-1">
@@ -426,7 +426,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       ETH Balance
                     </Label>
                     <p className="text-sm text-foreground mt-1 font-semibold">
@@ -434,7 +434,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       OA3 Token Balance
                     </Label>
                     <p className="text-sm text-foreground mt-1 font-semibold">
@@ -442,7 +442,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       ZKP Status
                     </Label>
                     <p className="text-sm text-green-500 mt-1">
@@ -452,7 +452,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Contract Address
                     </Label>
                     <div className="flex items-center justify-between mt-1">
