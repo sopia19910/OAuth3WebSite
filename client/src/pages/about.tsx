@@ -3,9 +3,7 @@ import { Button } from "@/components/ui/button";
 import { 
   ShieldCheckIcon,
   KeyIcon,
-  GlobeAltIcon,
-  UserGroupIcon,
-  LockClosedIcon
+  GlobeAltIcon
 } from "@heroicons/react/24/outline";
 import { Link } from "wouter";
 import Navbar from "@/components/navbar";
@@ -14,17 +12,14 @@ import Footer from "@/components/footer";
 export default function About() {
   const keyBenefits = [
     {
-      icon: <ShieldCheckIcon className="w-12 h-12 text-primary [&>path]:stroke-[1.5]" />,
       title: "Enhanced Security",
       description: "Multi-layered authentication combining Web2 convenience with Web3 cryptographic security."
     },
     {
-      icon: <UserGroupIcon className="w-12 h-12 text-primary [&>path]:stroke-[1.5]" />,
       title: "User Experience",
       description: "Familiar login methods while maintaining full control over digital assets."
     },
     {
-      icon: <LockClosedIcon className="w-12 h-12 text-primary [&>path]:stroke-[1.5]" />,
       title: "Privacy First",
       description: "Zero-knowledge proofs ensure personal data never leaves your control."
     }
@@ -98,9 +93,6 @@ export default function About() {
             {keyBenefits.map((benefit, index) => (
               <Card key={index} className="bg-card shadow-lg card-hover">
                 <CardContent className="p-6 text-center">
-                  <div className="flex justify-center mb-4">
-                    {benefit.icon}
-                  </div>
                   <h3 className="text-xl font-semibold text-foreground mb-3">{benefit.title}</h3>
                   <p className="text-muted-foreground">{benefit.description}</p>
                 </CardContent>
