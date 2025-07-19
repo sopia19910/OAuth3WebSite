@@ -343,7 +343,7 @@ export default function Dashboard() {
               {/* Web2 OAuth Account */}
               <Card className="bg-card border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">
+                  <CardTitle className="text-base">
                     Web2 OAuth Account
                   </CardTitle>
                 </CardHeader>
@@ -368,7 +368,7 @@ export default function Dashboard() {
               {/* Web3 Account */}
               <Card className="bg-card border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">
+                  <CardTitle className="text-base">
                     Web3 Account
                   </CardTitle>
                 </CardHeader>
@@ -420,7 +420,7 @@ export default function Dashboard() {
               {/* ZKP Smart Contract */}
               <Card className="bg-card border-border">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">
+                  <CardTitle className="text-base">
                     ZKP Smart Contract (CA)
                   </CardTitle>
                 </CardHeader>
