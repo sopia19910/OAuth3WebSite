@@ -39,7 +39,7 @@ import {
   checkZKAccount,
   waitForTransaction,
   transferETHFromZKAccount,
-  transferOA3FromZKAccount,
+  transferTokenFromZKAccount,
   type ZKAccountInfo,
   type TransferResult
 } from "@/lib/zkAccount";
@@ -389,11 +389,13 @@ export default function Dashboard() {
           sendAmount,
         );
       } else {
-        result = await transferOA3FromZKAccount(
+        // For all other tokens, use the generic token transfer function
+        result = await transferTokenFromZKAccount(
           wallet.privateKey,
           wallet.address,
           sendAddress,
           sendAmount,
+          selectedToken // This is the token address for custom tokens
         );
       }
 
@@ -791,7 +793,6 @@ export default function Dashboard() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ETH">ETH - Ethereum</SelectItem>
-                  <SelectItem value="OA3">OA3 - OAuth3 Token</SelectItem>
                   {customTokens.map((token) => (
                     <SelectItem key={token.id || token.address} value={token.address}>
                       {token.symbol} - {token.name}

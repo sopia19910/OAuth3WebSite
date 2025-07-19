@@ -519,7 +519,270 @@
     }
   }
 
-  // Transfer OA3 tokens from ZK Account (frontend-only)
+  // Transfer ERC20 tokens from ZK Account (frontend-only, generic)
+  export async function transferTokenFromZKAccount(
+    privateKey: string,
+    walletAddress: string,
+    toAddress: string,
+    amount: string,
+    tokenAddress: string
+  ): Promise<TransferResult> {
+    try {
+      // Ensure contract addresses are loaded
+      if (!ZK_ACCOUNT_FACTORY_V3_ADDRESS) {
+        await loadContractAddresses();
+      }
+
+      // Input validation
+      if (!privateKey || privateKey.trim() === '') {
+        throw new Error('Private key is required');
+      }
+
+      if (!walletAddress || !ethers.isAddress(walletAddress)) {
+        throw new Error('Valid wallet address is required');
+      }
+
+      if (!toAddress || toAddress.trim() === '') {
+        throw new Error('Recipient address is required');
+      }
+
+      if (!ethers.isAddress(toAddress)) {
+        throw new Error('Invalid recipient address format');
+      }
+
+      if (!tokenAddress || !ethers.isAddress(tokenAddress)) {
+        throw new Error('Valid token address is required');
+      }
+
+      if (!amount || amount.trim() === '' || parseFloat(amount) <= 0) {
+        throw new Error('Valid amount greater than 0 is required');
+      }
+
+      // Check if sending to same address
+      if (walletAddress.toLowerCase() === toAddress.toLowerCase()) {
+        throw new Error('Cannot send to the same address');
+      }
+
+      const provider = await getProvider();
+      const signer = new ethers.Wallet(privateKey, provider);
+
+      // Verify signer address matches wallet address
+      if (signer.address.toLowerCase() !== walletAddress.toLowerCase()) {
+        throw new Error('Private key does not match wallet address');
+      }
+
+      const factory = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, ZK_ACCOUNT_FACTORY_V3_ABI, provider);
+
+      // Get user's ZK accounts
+      const userAccounts = await factory.getUserAccounts(walletAddress);
+      if (userAccounts.length === 0) {
+        throw new Error('No ZK Account found for this wallet');
+      }
+
+      const zkAccountAddress = userAccounts[0];
+      console.log('🏦 Using ZK Account:', zkAccountAddress);
+
+      // Setup token contract with proper ABI
+      const erc20Interface = new ethers.Interface([
+        "function transfer(address to, uint256 amount) external returns (bool)",
+        "function balanceOf(address account) external view returns (uint256)",
+        "function decimals() external view returns (uint8)"
+      ]);
+
+      const tokenContract = new ethers.Contract(tokenAddress, erc20Interface, provider);
+
+      // Check token balance in ZK Account
+      const tokenBalance = await tokenContract.balanceOf(zkAccountAddress);
+      const decimals = await tokenContract.decimals();
+      const amountWei = ethers.parseUnits(amount, decimals);
+      const tokenBalanceFormatted = ethers.formatUnits(tokenBalance, decimals);
+
+      console.log('🪙 ZK Account Token Balance:', tokenBalanceFormatted);
+      console.log('💸 Requested Amount:', amount);
+
+      if (tokenBalance < amountWei) {
+        throw new Error(`Insufficient token balance in ZK Account. Available: ${tokenBalanceFormatted}, Requested: ${amount}`);
+      }
+
+      // Check if owner wallet has enough ETH for gas fees
+      const ownerBalance = await provider.getBalance(walletAddress);
+      const ownerBalanceFormatted = ethers.formatEther(ownerBalance);
+      const minGasBalance = ethers.parseEther('0.001'); // Minimum 0.001 ETH for gas
+
+      if (ownerBalance < minGasBalance) {
+        throw new Error(`Insufficient ETH for gas fees in owner wallet. Available: ${ownerBalanceFormatted} ETH, Need at least: 0.001 ETH`);
+      }
+
+      // Prepare transfer data using interface
+      const transferData = erc20Interface.encodeFunctionData('transfer', [toAddress, amountWei]);
+
+      // ZK Account V3 ABI for execution
+      const zkAccountV3ABI = [
+        "function execute(tuple(uint256[2] a, uint256[2][2] b, uint256[2] c, uint256[3] publicSignals) proof, address target, uint256 value, bytes data) external",
+        "function getAccountInfo() external view returns (address, address, bool, uint256, uint256, uint256)",
+        "function requiresZKProof() external view returns (bool)"
+      ];
+
+      const zkAccount = new ethers.Contract(zkAccountAddress, zkAccountV3ABI, signer);
+
+      // Check if ZK proof is required
+      const requiresZKProof = await zkAccount.requiresZKProof();
+      console.log('🔒 Requires ZK Proof:', requiresZKProof);
+
+      console.log('🚀 Attempting token transfer...');
+      console.log('📍 From ZK Account:', zkAccountAddress);
+      console.log('📍 To Address:', toAddress);
+      console.log('💰 Amount:', amount);
+      console.log('🪙 Token Address:', tokenAddress);
+
+      let tx;
+
+      if (requiresZKProof) {
+        // Generate ZK proof for transfer
+        console.log('🔒 Generating ZK proof for token transfer...');
+
+        const response = await fetch('/api/zkp/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate ZK proof. Please ensure you are logged in with OAuth.');
+        }
+
+        const proofData = await response.json();
+
+        console.log('🔍 Raw proof data received:', JSON.stringify(proofData, null, 2));
+
+        if (!proofData.success) {
+          throw new Error(proofData.error || 'Failed to generate ZK proof');
+        }
+
+        // Format proof for ZK Account V3 with proper structure validation
+        const zkProof = {
+          a: proofData.proof?.pi_a ? proofData.proof.pi_a.slice(0, 2) : [0, 0],
+          b: proofData.proof?.pi_b ? [
+            proofData.proof.pi_b[0].slice(0).reverse(),
+            proofData.proof.pi_b[1].slice(0).reverse()
+          ] : [[0, 0], [0, 0]],
+          c: proofData.proof?.pi_c ? proofData.proof.pi_c.slice(0, 2) : [0, 0],
+          publicSignals: proofData.publicSignals ? proofData.publicSignals.slice(0, 3) : [0, 0, 0]
+        };
+
+        console.log('✅ ZK proof generated successfully');
+        console.log('🔍 Proof structure:', {
+          a: zkProof.a,
+          b: zkProof.b,
+          c: zkProof.c,
+          publicSignals: zkProof.publicSignals
+        });
+
+        // Get the ZK account info to compare email hashes
+        const zkAccountCheckABI = [
+          "function getAccountInfo() external view returns (address, address, bool, uint256, uint256, uint256)"
+        ];
+        const zkAccountForCheck = new ethers.Contract(zkAccountAddress, zkAccountCheckABI, provider);
+        const accountInfo = await zkAccountForCheck.getAccountInfo();
+
+        console.log('🔍 Contract authorized email hash:', accountInfo[3].toString());
+        console.log('🔍 Proof email hash:', zkProof.publicSignals[0].toString());
+        console.log('🔍 Contract authorized domain hash:', accountInfo[4].toString());
+        console.log('🔍 Proof domain hash:', zkProof.publicSignals[1].toString());
+
+        // Check if hashes match
+        if (accountInfo[3].toString() !== zkProof.publicSignals[0].toString()) {
+          console.error('❌ Email hash mismatch! Contract expects:', accountInfo[3].toString(), 'but proof has:', zkProof.publicSignals[0].toString());
+          throw new Error(`Email hash mismatch: ZK Account was created with a different email. Contract expects hash ${accountInfo[3].toString()} but current OAuth session provides ${zkProof.publicSignals[0].toString()}. Please create a new ZK Account with the current email or use the original email session.`);
+        }
+        if (accountInfo[4].toString() !== zkProof.publicSignals[1].toString()) {
+          console.error('❌ Domain hash mismatch! Contract expects:', accountInfo[4].toString(), 'but proof has:', zkProof.publicSignals[1].toString());
+          throw new Error(`Domain hash mismatch: ZK Account was created with a different domain. Contract expects hash ${accountInfo[4].toString()} but current OAuth session provides ${zkProof.publicSignals[1].toString()}. Please create a new ZK Account with the current email or use the original email session.`);
+        }
+
+        // Execute with ZK proof
+        try {
+          const gasEstimate = await zkAccount.execute.estimateGas(zkProof, tokenAddress, 0, transferData);
+          console.log('⛽ Gas estimate:', gasEstimate.toString());
+
+          tx = await zkAccount.execute(zkProof, tokenAddress, 0, transferData, {
+            gasLimit: gasEstimate * BigInt(2)
+          });
+        } catch (estimateError) {
+          console.error('❌ Gas estimation failed:', estimateError);
+
+          // Check if error is due to proof already used or other contract revert
+          if (estimateError instanceof Error && estimateError.message.includes('proof already used')) {
+            throw new Error('ZK proof has already been used. Please refresh the page and try again.');
+          } else if (estimateError instanceof Error && estimateError.message.includes('execution reverted')) {
+            throw new Error('Transaction would fail: ' + estimateError.message);
+          } else {
+            // Only fallback to default gas limit for gas estimation issues, not contract errors
+            throw estimateError;
+          }
+        }
+      } else {
+        // Execute without proof (if not required)
+        const emptyProof = {
+          a: [0, 0],
+          b: [[0, 0], [0, 0]],
+          c: [0, 0],
+          publicSignals: [0, 0, 0]
+        };
+
+        try {
+          const gasEstimate = await zkAccount.execute.estimateGas(emptyProof, tokenAddress, 0, transferData);
+          tx = await zkAccount.execute(emptyProof, tokenAddress, 0, transferData, {
+            gasLimit: gasEstimate * BigInt(2)
+          });
+        } catch (estimateError) {
+          if (estimateError instanceof Error && estimateError.message.includes('execution reverted')) {
+            throw new Error('Transaction would fail: ' + estimateError.message);
+          }
+          tx = await zkAccount.execute(emptyProof, tokenAddress, 0, transferData, {
+            gasLimit: 500000
+          });
+        }
+      }
+
+      // 🚀 IMMEDIATELY return transaction hash
+      console.log('✅ Token transfer transaction sent!');
+      console.log('🔗 Transaction hash:', tx.hash);
+
+      return {
+        success: true,
+        transactionHash: tx.hash,
+        newBalance: undefined // Will be updated after confirmation
+      };
+
+    } catch (error) {
+      console.error('Token transfer error:', error);
+
+      let errorMessage = 'Failed to transfer tokens: ';
+
+      if (error instanceof Error) {
+        if (error.message.includes('insufficient funds')) {
+          errorMessage = 'Insufficient funds for gas fees. Please ensure your wallet has enough ETH for gas.';
+        } else if (error.message.includes('user rejected') || error.message.includes('denied')) {
+          errorMessage = 'Transaction was rejected by user.';
+        } else if (error.message.includes('unauthorized email hash')) {
+          errorMessage = 'ZK proof required. Please ensure you are logged in with OAuth and try again.';
+        } else if (error.message.includes('proof already used')) {
+          errorMessage = 'ZK proof has already been used. Please refresh the page and try again.';
+        } else {
+          errorMessage += error.message;
+        }
+      }
+
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
+  }
+
+  // Transfer OA3 tokens from ZK Account (frontend-only) - DEPRECATED: Use transferTokenFromZKAccount instead
   export async function transferOA3FromZKAccount(
     privateKey: string,
     walletAddress: string,
