@@ -44,7 +44,7 @@ export default function Home() {
               <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
                 <CardContent className="p-8 text-center">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <ShieldCheckIcon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                    <ShieldCheckIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-3">Enhanced Security</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
@@ -59,7 +59,7 @@ export default function Home() {
               <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
                 <CardContent className="p-8 text-center">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <KeyIcon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                    <KeyIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-3">Easy Access</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
@@ -74,7 +74,7 @@ export default function Home() {
               <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
                 <CardContent className="p-8 text-center">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <GlobeAltIcon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                    <GlobeAltIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-3">Web3 Benefits</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
@@ -121,7 +121,7 @@ export default function Home() {
               <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl transition-all duration-300">
                 <div className="w-20 h-20 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300">
-                  <UsersIcon className="w-10 h-10 text-accent" strokeWidth={1.5} />
+                  <UsersIcon className="w-10 h-10 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2 text-center">EOA</h3>
                 <p className="text-xs text-accent font-medium text-center mb-3">Externally Owned Account</p>
@@ -135,7 +135,7 @@ export default function Home() {
               <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl transition-all duration-300">
                 <div className="w-20 h-20 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300">
-                  <CogIcon className="w-10 h-10 text-accent" strokeWidth={1.5} />
+                  <CogIcon className="w-10 h-10 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2 text-center">CA</h3>
                 <p className="text-xs text-accent font-medium text-center mb-3">Contract Account</p>
@@ -149,7 +149,7 @@ export default function Home() {
               <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl transition-all duration-300">
                 <div className="w-20 h-20 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300">
-                  <ShieldCheckIcon className="w-10 h-10 text-accent" strokeWidth={1.5} />
+                  <ShieldCheckIcon className="w-10 h-10 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2 text-center">ZKP</h3>
                 <p className="text-xs text-accent font-medium text-center mb-3">Zero-Knowledge Proof</p>
@@ -199,7 +199,7 @@ export default function Home() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2" />
                 <CardContent className="p-10 relative z-10">
                   <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <UsersIcon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                    <UsersIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-3">Individual User Services</h3>
                   <p className="text-lg text-primary mb-6 italic font-medium">"Web3 wallet that feels like Web2"</p>
@@ -227,7 +227,7 @@ export default function Home() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -translate-y-1/2 translate-x-1/2" />
                 <CardContent className="p-10 relative z-10">
                   <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <BuildingOfficeIcon className="w-8 h-8 text-accent" strokeWidth={1.5} />
+                    <BuildingOfficeIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-3">Enterprise Services</h3>
                   <p className="text-lg text-accent mb-6 italic font-medium">"Secure asset management for organizations"</p>
