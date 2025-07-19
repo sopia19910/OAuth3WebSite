@@ -114,7 +114,7 @@ export default function Home() {
                     <UsersIcon className="w-8 h-8 text-gray-600" strokeWidth={2} />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-2">EOA</h3>
-                  <p className="text-sm font-medium mb-3 text-primary">Externally Owned Account</p>
+                  <p className="text-sm font-medium mb-3 text-[#fafafa]">Externally Owned Account</p>
                   <p className="text-muted-foreground">
                     Standard Web3 account with full asset control through private key management
                   </p>
