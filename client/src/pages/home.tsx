@@ -20,21 +20,21 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       {/* About OAuth 3 Summary Section */}
-      <section className="py-24 bg-gradient-to-b from-background to-muted/20 relative overflow-hidden">
+      <section className="py-12 bg-gradient-to-b from-background to-muted/20 relative overflow-hidden">
         <div className="absolute inset-0 tech-grid opacity-20" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
               <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
                 <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <ShieldCheckIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
+                  <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <ShieldCheckIcon className="w-7 h-7 text-gray-500" strokeWidth={1.5} />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Enhanced Security</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Enhanced Security</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Combining the best of Web2 and Web3 authentication methods for maximum protection
                   </p>
@@ -46,10 +46,10 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
               <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
                 <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <KeyIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
+                  <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <KeyIcon className="w-7 h-7 text-gray-500" strokeWidth={1.5} />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Easy Access</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Easy Access</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Login with familiar Web2 accounts, no complex key management required
                   </p>
@@ -61,10 +61,10 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
               <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden hover:border-primary/50 transition-all duration-300">
                 <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <GlobeAltIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
+                  <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <GlobeAltIcon className="w-7 h-7 text-gray-500" strokeWidth={1.5} />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Web3 Benefits</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Web3 Benefits</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Full control over digital assets with decentralized security features
                   </p>
@@ -84,23 +84,23 @@ export default function Home() {
         </div>
       </section>
       {/* Technology Summary Section */}
-      <section className="py-24 bg-gradient-to-b from-muted/20 to-background relative overflow-hidden">
+      <section className="py-12 bg-gradient-to-b from-muted/20 to-background relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-r from-accent/5 via-transparent to-primary/5" />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div className="group relative">
               <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-6 hover:shadow-2xl transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300">
-                  <UsersIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
+                <div className="w-14 h-14 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300">
+                  <UsersIcon className="w-7 h-7 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg font-bold text-foreground mb-2 text-center">EOA</h3>
-                <p className="text-xs font-medium text-center mb-3 text-[#fafafa]">Externally Owned Account</p>
+                <p className="text-xs font-medium text-center mb-2 text-[#fafafa]">Externally Owned Account</p>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
                   Standard Web3 account with full asset control through private key management
                 </p>
@@ -110,11 +110,11 @@ export default function Home() {
             <div className="group relative">
               <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-6 hover:shadow-2xl transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300">
-                  <CogIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
+                <div className="w-14 h-14 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300">
+                  <CogIcon className="w-7 h-7 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg font-bold text-foreground mb-2 text-center">CA</h3>
-                <p className="text-xs font-medium text-center mb-3 text-[#fafafa]">Contract Account</p>
+                <p className="text-xs font-medium text-center mb-2 text-[#fafafa]">Contract Account</p>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
                   Smart contract wallet requiring both Web2 and Web3 authentication
                 </p>
@@ -124,11 +124,11 @@ export default function Home() {
             <div className="group relative">
               <div className="absolute -inset-px bg-gradient-to-r from-accent/50 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur border border-border/50 rounded-2xl p-6 hover:shadow-2xl transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300">
-                  <ShieldCheckIcon className="w-8 h-8 text-gray-500" strokeWidth={1.5} />
+                <div className="w-14 h-14 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300">
+                  <ShieldCheckIcon className="w-7 h-7 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg font-bold text-foreground mb-2 text-center">ZKP</h3>
-                <p className="text-xs font-medium text-center mb-3 text-[#fafafa]">Zero-Knowledge Proof</p>
+                <p className="text-xs font-medium text-center mb-2 text-[#fafafa]">Zero-Knowledge Proof</p>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
                   Privacy-preserving identity verification without exposing data
                 </p>
@@ -147,16 +147,16 @@ export default function Home() {
         </div>
       </section>
       {/* Services Summary Section */}
-      <section className="py-24 bg-gradient-to-b from-background via-muted/10 to-background relative overflow-hidden">
+      <section className="py-12 bg-gradient-to-b from-background via-muted/10 to-background relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-16 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8 max-w-5xl mx-auto">
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent rounded-2xl blur-2xl group-hover:blur-3xl transition-all duration-300" />
               <Card className="relative bg-gradient-to-br from-card via-card/95 to-card/90 border-primary/20 overflow-hidden hover:border-primary/40 transition-all duration-300 h-full">
