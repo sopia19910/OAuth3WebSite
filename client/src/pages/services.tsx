@@ -175,13 +175,16 @@ export default function Services() {
               
               <div className="pt-6 border-t border-border/50">
                 <p className="text-sm font-semibold text-foreground mb-3">Key Benefits</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mb-6">
                   {["Ease of use", "Enhanced security", "Robust privacy"].map((benefit, index) => (
                     <span key={index} className="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full">
                       {benefit}
                     </span>
                   ))}
                 </div>
+                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                  Get Started
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -214,12 +217,15 @@ export default function Services() {
               
               <div className="pt-6 border-t border-border/50">
                 <p className="text-sm font-semibold text-foreground mb-3">Key Benefits</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mb-6">
                   {["Lower costs", "Transparency", "Decentralization"].map((benefit, index) => (
                     <span key={index} className="px-3 py-1 bg-accent/10 text-accent text-xs rounded-full">
                       {benefit}
                     </span>
                   ))}
+                </div>
+                <div className="w-full py-3 bg-accent/10 text-accent text-center rounded-lg font-semibold">
+                  Coming Soon
                 </div>
               </div>
             </CardContent>
