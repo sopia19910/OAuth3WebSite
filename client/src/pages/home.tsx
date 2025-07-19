@@ -150,7 +150,7 @@ export default function Home() {
                   <ShieldCheckIcon className="w-10 h-10 text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2 text-center">ZKP</h3>
-                <p className="text-xs text-accent font-medium text-center mb-3">Zero-Knowledge Proof</p>
+                <p className="text-xs font-medium text-center mb-3 text-[#fafafa]">Zero-Knowledge Proof</p>
                 <p className="text-sm text-muted-foreground text-center leading-relaxed">
                   Privacy-preserving identity verification without exposing data
                 </p>
