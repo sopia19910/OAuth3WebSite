@@ -58,19 +58,13 @@ export default function Resources() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         
         {/* OAuth 3 Whitepaper Section */}
-        <div className="mb-20">
-          <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
-            <CardContent className="p-12">
-              <div className="text-center">
-                <Link href="/whitepaper">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
-                    <Download className="mr-2 h-5 w-5" />
-                    Download Whitepaper
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="mb-20 text-center">
+          <Link href="/whitepaper">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
+              <Download className="mr-2 h-5 w-5" />
+              Download Whitepaper
+            </Button>
+          </Link>
         </div>
 
         {/* Resource Categories */}
