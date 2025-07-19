@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Play } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import logoImage from "@assets/image_1752117480535.png";
@@ -108,27 +107,19 @@ export default function HeroSection() {
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight clean-title">
               <span className="clean-logo">OAuth 3</span><br />
               The Future of{" "}
-              <span className="text-primary">Hybrid Authentication</span>
+              <span className="text-primary">Integrated Authentication</span>
             </h1>
             <p className="text-lg text-foreground/80 tech-body">
               Combining the intuitive convenience of Web2 with the robust security of Web3. 
               Experience next-generation authentication that bridges traditional and blockchain ecosystems.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg" 
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold animate-pulse-glow"
-              >
-                Get Started
-              </Button>
               <Link href="/demo">
                 <Button 
                   size="lg" 
-                  variant="outline"
-                  className="border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 font-semibold"
+                  className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold animate-pulse-glow"
                 >
-                  <Play className="mr-2 h-4 w-4" />
-                  View Demo
+                  Get Started
                 </Button>
               </Link>
             </div>

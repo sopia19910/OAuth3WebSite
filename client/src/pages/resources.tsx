@@ -45,43 +45,26 @@ export default function Resources() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
       {/* Hero Section */}
       <section className="pt-24 pb-16 gradient-bg tech-grid">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">
-              Resources
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto tech-body">
-              Everything you need to build, implement, and learn about OAuth 3
-            </p>
+            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6 professional-heading">Whitepaper</h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto tech-body">The complete technical and strategic vision for OAuth 3's revolutionary authentication framework.</p>
           </div>
         </div>
       </section>
-
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         
         {/* OAuth 3 Whitepaper Section */}
-        <div className="mb-20">
-          <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
-            <CardContent className="p-12">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold text-foreground mb-4 professional-heading">OAuth 3 Whitepaper</h2>
-                <p className="text-lg text-muted-foreground max-w-3xl mx-auto tech-body mb-8">
-                  The complete technical and strategic vision for OAuth 3's revolutionary authentication framework.
-                </p>
-                
-                <Link href="/whitepaper">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
-                    <Download className="mr-2 h-5 w-5" />
-                    Download Whitepaper
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="mb-20 text-center">
+          <Link href="/whitepaper">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold">
+              <Download className="mr-2 h-5 w-5" />
+              Download Whitepaper
+            </Button>
+          </Link>
         </div>
 
         {/* Resource Categories */}
@@ -113,7 +96,6 @@ export default function Resources() {
 
         
       </div>
-      
       <Footer />
     </div>
   );
