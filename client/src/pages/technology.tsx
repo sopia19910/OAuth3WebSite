@@ -20,17 +20,35 @@ export default function Technology() {
   const coreComponents = [
     {
       icon: <UsersIcon className="w-10 h-10 text-muted-foreground" strokeWidth={1} />,
-      title: "EOA (Externally Owned Account)",
+      title: (
+        <>
+          EOA
+          <br />
+          <span className="text-sm font-normal">(Externally Owned Account)</span>
+        </>
+      ),
       description: "Standard Web3 account with full asset control via private key management."
     },
     {
       icon: <CogIcon className="w-10 h-10 text-muted-foreground" strokeWidth={1} />,
-      title: "CA (Contract Account)",
+      title: (
+        <>
+          CA
+          <br />
+          <span className="text-sm font-normal">(Contract Account)</span>
+        </>
+      ),
       description: "Smart contract wallet requiring both Web2 and Web3 authentication."
     },
     {
       icon: <ShieldCheckIcon className="w-10 h-10 text-muted-foreground" strokeWidth={1} />,
-      title: "ZKP (Zero-Knowledge Proof)",
+      title: (
+        <>
+          ZKP
+          <br />
+          <span className="text-sm font-normal">(Zero-Knowledge Proof)</span>
+        </>
+      ),
       description: "Verifies identity without exposing sensitive data on-chain."
     }
   ];
