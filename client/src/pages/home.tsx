@@ -155,14 +155,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="text-center mt-10">
-            <Link href="/technology">
-              <Button size="sm" variant="outline" className="border-gray-400 text-gray-600 text-xs hover:bg-gray-100 hover:border-gray-500 hover:text-gray-700 hover:opacity-20 transition-all duration-300">
-                Learn More
-                <ArrowRightIcon className="ml-2 w-3 h-3" />
-              </Button>
-            </Link>
-          </div>
+          
         </div>
       </section>
       {/* Services & Solutions */}
