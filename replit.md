@@ -22,9 +22,12 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js framework
 - **Language**: TypeScript with ES modules
-- **Database**: PostgreSQL with Drizzle ORM
+- **Database**: PostgreSQL with Drizzle ORM (Neon Database)
 - **Session Management**: Connect-pg-simple for PostgreSQL session storage
 - **Development**: Hot reload with Vite integration in development mode
+- **Database Tables**:
+  - `users`: Stores user accounts (id, username, password)
+  - `contacts`: Stores contact form submissions (id, first_name, last_name, email, company, message, created_at)
 
 ### Key Components
 
@@ -115,6 +118,48 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Token Storage Migration to Database (2025-01-19)**:
+  - Created `tokens` table in PostgreSQL for persistent token storage
+  - Added API endpoints: GET /api/tokens, POST /api/tokens, DELETE /api/tokens/:id
+  - Migrated from localStorage to database storage for custom tokens
+  - Tokens now persist across browsers and devices for each user
+  - User email linked to tokens for user-specific token lists
+  - Added OA3 token (0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea) to database
+- **Database Setup (2025-01-19)**:
+  - Configured PostgreSQL database with Neon Database integration
+  - Created database tables: users (for authentication), contacts (for contact form submissions), and tokens (for custom ERC20 tokens)
+  - DatabaseStorage class already implemented and active
+  - All database operations ready for production use
+- **Dashboard Functionality Enhancements (2025-01-19)**:
+  - Added functional Add Token system with validation and storage
+  - Tokens are saved in localStorage and persist between sessions  
+  - Added tokens appear in Send section dropdown for selection
+  - Token list shows all added custom tokens with remove functionality
+  - Toast notifications for all token operations (add/remove/errors)
+  - Ethereum address validation for token contracts
+- **Toast Notification System (2025-01-19)**:
+  - Replaced alert messages with toast popups on Dashboard page
+  - Extended toast system to Demo page for copy operations
+  - 2-second auto-dismiss with error variants for failures
+- **Dashboard UI Updates (2025-01-19)**: Made multiple refinements to the dashboard interface
+  - Changed "Logout" button to "Disconnect" with gray border styling
+  - Removed Dashboard Overview header card
+  - Made Refresh button icon-only design
+  - Removed icons from all Account Overview cards
+  - Reduced font sizes: card titles from text-lg to text-base, labels from text-sm to text-xs
+  - Changed all cards to right-angled corners (removed rounded corners)
+  - Web3 Account card now shows full wallet address instead of truncated version
+  - Removed card design from Add Token section for cleaner UI
+  - Removed card design from Send Coin/Token section for minimal appearance
+  - Removed card design from Receive Coin/Token section for consistent minimal UI
+  - Updated Remove button in Added Tokens to square icon button with X icon and disconnect button style
+  - Changed Select dropdown hover/focus color from blue to white with transparency
+  - Fixed layout shift issue when opening Select dropdown by adjusting z-index values
+- **ZKP Contract Account Display (2025-01-19)**:
+  - Updated Receive Coin/Token section to only display ZKP Contract Account address
+  - Added QR code generation for ZKP Contract Account address using qrcode library
+  - Removed fallback to regular wallet address for clearer user experience
+  - Made Refresh button in Account Overview section square (7x7) with centered icon
 - **Home Page Restructure (2025-01-19)**: Replaced individual sections with summary overviews
   - Added About OAuth 3 summary section with key benefits
   - Added Technology summary section with core components (EOA, CA, ZKP)

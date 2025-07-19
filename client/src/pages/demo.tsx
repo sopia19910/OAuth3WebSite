@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -96,6 +97,7 @@ export default function Demo() {
   const [zkpProgress, setZkpProgress] = useState(0);
   const [userEmail, setUserEmail] = useState("");
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [wallet, setWallet] = useState<WalletInfo | null>(null);
   const [walletBalance, setWalletBalance] = useState("0.0");
@@ -127,7 +129,12 @@ export default function Demo() {
         window.history.replaceState({}, document.title, '/demo');
       } else if (oauthSuccess === 'error') {
         const message = params.get('message') || 'Authentication failed';
-        alert(message);
+        toast({
+          title: "Authentication Error",
+          description: message,
+          variant: "destructive",
+          duration: 3000,
+        });
         window.history.replaceState({}, document.title, '/demo');
       }
 
@@ -398,10 +405,19 @@ export default function Demo() {
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert(`${label} copied to clipboard!`);
+      toast({
+        title: "Copied!",
+        description: `${label} copied to clipboard`,
+        duration: 2000,
+      });
     } catch (err) {
       console.error('Failed to copy: ', err);
-      alert(`Failed to copy ${label}`);
+      toast({
+        title: "Failed to copy",
+        description: `Could not copy ${label}`,
+        variant: "destructive",
+        duration: 2000,
+      });
     }
   };
 

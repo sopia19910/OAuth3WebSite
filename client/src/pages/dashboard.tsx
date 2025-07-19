@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -23,9 +24,11 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   ArrowPathIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
+import QRCode from 'qrcode';
 import {
   getWalletFromStorage,
   getWalletBalance,
@@ -36,7 +39,7 @@ import {
   checkZKAccount,
   waitForTransaction,
   transferETHFromZKAccount,
-  transferOA3FromZKAccount,
+  transferTokenFromZKAccount,
   type ZKAccountInfo,
   type TransferResult
 } from "@/lib/zkAccount";
@@ -44,6 +47,7 @@ import {
 export default function Dashboard() {
 
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [activeMenu, setActiveMenu] = useState<string>("overview");
   const [sendAmount, setSendAmount] = useState("");
   const [sendAddress, setSendAddress] = useState("");
@@ -51,6 +55,14 @@ export default function Dashboard() {
   const [tokenAddress, setTokenAddress] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [tokenName, setTokenName] = useState("");
+  const [customTokens, setCustomTokens] = useState<Array<{
+    id?: number;
+    address: string;
+    symbol: string;
+    name: string;
+    userEmail?: string;
+    createdAt?: Date | string;
+  }>>([]);
 
   // Wallet and account state
   const [wallet, setWallet] = useState<WalletInfo | null>(null);
@@ -76,10 +88,54 @@ export default function Dashboard() {
 
   // Configuration state
   const [config, setConfig] = useState<any>(null);
+  
+  // QR Code state
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   // Load wallet and account data on component mount
   useEffect(() => {
     loadWalletData();
+    loadTokensFromDB();
   }, []);
+
+  // Generate QR code when zkAccountInfo changes
+  useEffect(() => {
+    if (zkAccountInfo?.zkAccountAddress) {
+      QRCode.toDataURL(zkAccountInfo.zkAccountAddress, {
+        width: 192,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      })
+      .then((url) => {
+        setQrCodeDataUrl(url);
+      })
+      .catch((err) => {
+        console.error('Error generating QR code:', err);
+      });
+    }
+  }, [zkAccountInfo]);
+
+  const loadTokensFromDB = async () => {
+    try {
+      const response = await fetch('/api/tokens', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setCustomTokens(data.tokens);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load tokens from DB:', error);
+    }
+  };
 
   const loadWalletData = async () => {
     try {
@@ -160,10 +216,107 @@ export default function Dashboard() {
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert(`${label} copied to clipboard!`);
+      toast({
+        title: "Copied!",
+        description: `${label} copied to clipboard`,
+        duration: 2000,
+      });
     } catch (err) {
       console.error("Failed to copy: ", err);
-      alert(`Failed to copy ${label}`);
+      toast({
+        title: "Failed to copy",
+        description: `Could not copy ${label}`,
+        variant: "destructive",
+        duration: 2000,
+      });
+    }
+  };
+
+  const handleAddToken = async () => {
+    // Validate inputs
+    if (!tokenAddress || !tokenSymbol || !tokenName) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all token details",
+        variant: "destructive",
+        duration: 2000,
+      });
+      return;
+    }
+
+    // Validate Ethereum address format
+    if (!/^0x[a-fA-F0-9]{40}$/.test(tokenAddress)) {
+      toast({
+        title: "Invalid Address",
+        description: "Please enter a valid Ethereum address",
+        variant: "destructive",
+        duration: 2000,
+      });
+      return;
+    }
+
+    // Check if token already exists
+    const tokenExists = customTokens.some(token => 
+      token.address.toLowerCase() === tokenAddress.toLowerCase()
+    );
+    
+    if (tokenExists) {
+      toast({
+        title: "Token Already Added",
+        description: `${tokenSymbol} is already in your token list`,
+        variant: "destructive",
+        duration: 2000,
+      });
+      return;
+    }
+
+    try {
+      // Save to database
+      const response = await fetch('/api/tokens', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          address: tokenAddress,
+          symbol: tokenSymbol.toUpperCase(),
+          name: tokenName
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        toast({
+          title: "Failed to Add Token",
+          description: data.error || "Unable to save token",
+          variant: "destructive",
+          duration: 2000,
+        });
+        return;
+      }
+
+      // Update local state
+      setCustomTokens([...customTokens, data.token]);
+
+      // Clear form
+      setTokenAddress("");
+      setTokenSymbol("");
+      setTokenName("");
+
+      toast({
+        title: "Token Added",
+        description: `${tokenSymbol.toUpperCase()} has been added to your token list`,
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error("Failed to add token:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add token. Please try again.",
+        variant: "destructive",
+        duration: 2000,
+      });
     }
   };
 
@@ -236,11 +389,13 @@ export default function Dashboard() {
           sendAmount,
         );
       } else {
-        result = await transferOA3FromZKAccount(
+        // For all other tokens, use the generic token transfer function
+        result = await transferTokenFromZKAccount(
           wallet.privateKey,
           wallet.address,
           sendAddress,
           sendAmount,
+          selectedToken // This is the token address for custom tokens
         );
       }
 
@@ -331,27 +486,25 @@ export default function Dashboard() {
                   size="sm"
                   onClick={refreshAccountData}
                   disabled={isRefreshing}
-                  className="flex items-center gap-2"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/10 border border-gray-500 w-7 h-7 p-0 flex items-center justify-center"
                 >
                   <ArrowPathIcon
                     className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
                   />
-                  Refresh
                 </Button>
               </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Web2 OAuth Account */}
-              <Card className="bg-card border-border">
+              <Card className="bg-card border-border rounded-none">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <SiGoogle className="w-5 h-5 text-blue-500" />
+                  <CardTitle className="text-base">
                     Web2 OAuth Account
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Provider
                     </Label>
                     <p className="text-sm text-foreground mt-1">
@@ -359,7 +512,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Authentication Status
                     </Label>
                     <p className="text-sm text-green-500 mt-1">✓ Verified</p>
@@ -368,24 +521,23 @@ export default function Dashboard() {
               </Card>
 
               {/* Web3 Account */}
-              <Card className="bg-card border-border">
+              <Card className="bg-card border-border rounded-none">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <WalletIcon className="w-5 h-5 text-purple-500" />
+                  <CardTitle className="text-base">
                     Web3 Account
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Owner ETH (Gas Fee)
                     </Label>
                     <p className="text-sm text-foreground mt-1">
-                      {walletBalance} ETH
+                      {walletBalance} <span className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">ETH</span>
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Network
                     </Label>
                     <p className="text-sm text-foreground mt-1">
@@ -394,14 +546,12 @@ export default function Dashboard() {
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Address
                     </Label>
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs font-mono text-foreground">
-                        {wallet?.address
-                          ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
-                          : "No wallet"}
+                      <p className="text-xs font-mono text-foreground break-all">
+                        {wallet?.address || "No wallet"}
                       </p>
                       {wallet?.address && (
                         <Button
@@ -421,32 +571,31 @@ export default function Dashboard() {
               </Card>
 
               {/* ZKP Smart Contract */}
-              <Card className="bg-card border-border">
+              <Card className="bg-card border-border rounded-none">
                 <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <CogIcon className="w-5 h-5 text-cyan-500" />
+                  <CardTitle className="text-base">
                     ZKP Smart Contract (CA)
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       ETH Balance
                     </Label>
-                    <p className="text-sm text-foreground mt-1 font-semibold">
-                      {zkAccountInfo?.balance || "0"} ETH
+                    <p className="text-sm text-foreground mt-1">
+                      {zkAccountInfo?.balance || "0"} <span className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">ETH</span>
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       OA3 Token Balance
                     </Label>
-                    <p className="text-sm text-foreground mt-1 font-semibold">
-                      {zkAccountInfo?.tokenBalance || "0"} OA3
+                    <p className="text-sm text-foreground mt-1">
+                      {zkAccountInfo?.tokenBalance || "0"} <span className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">OA3</span>
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       ZKP Status
                     </Label>
                     <p className="text-sm text-green-500 mt-1">
@@ -456,14 +605,12 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Contract Address
                     </Label>
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-xs font-mono text-foreground">
-                        {zkAccountInfo?.zkAccountAddress
-                          ? `${zkAccountInfo.zkAccountAddress.slice(0, 6)}...${zkAccountInfo.zkAccountAddress.slice(-4)}`
-                          : "Not available"}
+                      <p className="text-xs font-mono text-foreground break-all">
+                        {zkAccountInfo?.zkAccountAddress || "Not available"}
                       </p>
                       {zkAccountInfo?.zkAccountAddress && (
                         <Button
@@ -490,252 +637,317 @@ export default function Dashboard() {
 
       case "add-token":
         return (
-          <div className="max-w-2xl mx-auto">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <PlusIcon className="w-5 h-5" />
-                  Add Token
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label
-                    htmlFor="token-address"
-                    className="text-sm font-medium"
-                  >
-                    Token Contract Address
-                  </Label>
-                  <Input
-                    id="token-address"
-                    placeholder="0x..."
-                    value={tokenAddress}
-                    onChange={(e) => setTokenAddress(e.target.value)}
-                    className="mt-1"
-                  />
+          <div className="max-w-2xl mx-auto space-y-6">
+            <h2 className="text-base font-semibold flex items-center gap-2">
+              <PlusIcon className="w-5 h-5" />
+              Add Token
+            </h2>
+            
+            {/* Custom Tokens List */}
+            {customTokens.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-muted-foreground">Added Tokens</h3>
+                <div className="space-y-2">
+                  {customTokens.map((token) => (
+                    <div 
+                      key={token.id || token.address} 
+                      className="flex items-center justify-between p-3 border border-border rounded bg-card/50"
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{token.symbol}</p>
+                        <p className="text-xs text-muted-foreground">{token.name}</p>
+                        <p className="text-xs text-muted-foreground font-mono mt-1">
+                          {token.address}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`/api/tokens/${token.id}`, {
+                              method: 'DELETE',
+                              headers: {
+                                'Content-Type': 'application/json'
+                              }
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok && data.success) {
+                              // Update local state
+                              const updatedTokens = customTokens.filter(
+                                t => t.id !== token.id
+                              );
+                              setCustomTokens(updatedTokens);
+                              
+                              toast({
+                                title: "Token Removed",
+                                description: `${token.symbol} has been removed`,
+                                duration: 2000,
+                              });
+                            } else {
+                              toast({
+                                title: "Failed to Remove Token",
+                                description: data.error || "Unable to remove token",
+                                variant: "destructive",
+                                duration: 2000,
+                              });
+                            }
+                          } catch (error) {
+                            console.error("Failed to remove token:", error);
+                            toast({
+                              title: "Error",
+                              description: "Failed to remove token. Please try again.",
+                              variant: "destructive",
+                              duration: 2000,
+                            });
+                          }
+                        }}
+                        className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 w-7 h-7 p-0 flex items-center justify-center"
+                      >
+                        <XMarkIcon className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <Label htmlFor="token-symbol" className="text-sm font-medium">
-                    Token Symbol
-                  </Label>
-                  <Input
-                    id="token-symbol"
-                    placeholder="e.g., USDC"
-                    value={tokenSymbol}
-                    onChange={(e) => setTokenSymbol(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="token-name" className="text-sm font-medium">
-                    Token Name
-                  </Label>
-                  <Input
-                    id="token-name"
-                    placeholder="e.g., USD Coin"
-                    value={tokenName}
-                    onChange={(e) => setTokenName(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  Add Token
-                </Button>
-              </CardContent>
-            </Card>
+              </div>
+            )}
+            <div>
+              <Label
+                htmlFor="token-address"
+                className="text-sm font-medium"
+              >
+                Token Contract Address
+              </Label>
+              <Input
+                id="token-address"
+                placeholder="0x..."
+                value={tokenAddress}
+                onChange={(e) => setTokenAddress(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="token-symbol" className="text-sm font-medium">
+                Token Symbol
+              </Label>
+              <Input
+                id="token-symbol"
+                placeholder="e.g., USDC"
+                value={tokenSymbol}
+                onChange={(e) => setTokenSymbol(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="token-name" className="text-sm font-medium">
+                Token Name
+              </Label>
+              <Input
+                id="token-name"
+                placeholder="e.g., USD Coin"
+                value={tokenName}
+                onChange={(e) => setTokenName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <Button 
+              className="w-full bg-primary hover:bg-primary/90"
+              onClick={handleAddToken}
+            >
+              Add Token
+            </Button>
           </div>
         );
 
       case "send":
         return (
-          <div className="max-w-2xl mx-auto">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowUpIcon className="w-5 h-5" />
-                  Send Coin/Token
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label htmlFor="recipient" className="text-sm font-medium">
-                    Recipient Address
-                  </Label>
-                  <Input
-                    id="recipient"
-                    placeholder="0x..."
-                    value={sendAddress}
-                    onChange={(e) => setSendAddress(e.target.value)}
-                    className="mt-1"
-                  />
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ArrowUpIcon className="w-5 h-5" />
+              <h2 className="text-lg font-semibold">Send Coin/Token</h2>
+            </div>
+            <div>
+              <Label htmlFor="recipient" className="text-sm font-medium">
+                Recipient Address
+              </Label>
+              <Input
+                id="recipient"
+                placeholder="0x..."
+                value={sendAddress}
+                onChange={(e) => setSendAddress(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="token-select" className="text-sm font-medium">
+                Select Token
+              </Label>
+              <Select
+                value={selectedToken}
+                onValueChange={setSelectedToken}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select a token" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ETH">ETH - Ethereum</SelectItem>
+                  {customTokens.map((token) => (
+                    <SelectItem key={token.id || token.address} value={token.address}>
+                      {token.symbol} - {token.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="amount" className="text-sm font-medium">
+                Amount
+              </Label>
+              <Input
+                id="amount"
+                type="number"
+                placeholder="0.00"
+                value={sendAmount}
+                onChange={(e) => setSendAmount(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            {isSending && (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-foreground">
+                    {sendProgress}%
+                  </span>
                 </div>
-                <div>
-                  <Label htmlFor="token-select" className="text-sm font-medium">
-                    Select Token
-                  </Label>
-                  <Select
-                    value={selectedToken}
-                    onValueChange={setSelectedToken}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select a token" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ETH">ETH - Ethereum</SelectItem>
-                      <SelectItem value="OA3">OA3 - OAuth3 Token</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="amount" className="text-sm font-medium">
-                    Amount
-                  </Label>
-                  <Input
-                    id="amount"
-                    type="number"
-                    placeholder="0.00"
-                    value={sendAmount}
-                    onChange={(e) => setSendAmount(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                {isSending && (
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-foreground">
-                        {sendProgress}%
-                      </span>
-                    </div>
-                    <Progress value={sendProgress} className="w-full" />
+                <Progress value={sendProgress} className="w-full" />
 
-                    <div className="text-center space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        {sendStatus}
-                      </p>
-                      {transactionHash && (
-                        <div className="space-y-2">
-                          <div className="p-3 bg-muted rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">
-                              Transaction Hash:
-                            </p>
-                            <div className="flex items-center justify-between">
-                              <p className="text-xs font-mono text-foreground break-all flex-1 mr-2">
-                                {transactionHash}
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  copyToClipboard(
-                                    transactionHash,
-                                    "Transaction Hash",
-                                  )
-                                }
-                                className="p-1 h-auto hover:bg-background"
-                              >
-                                <ClipboardIcon className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    {sendStatus}
+                  </p>
+                  {transactionHash && (
+                    <div className="space-y-2">
+                      <div className="p-3 bg-muted rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Transaction Hash:
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-mono text-foreground break-all flex-1 mr-2">
+                            {transactionHash}
+                          </p>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            onClick={() => {
-                              const explorerUrl =
-                                config?.explorerUrl ||
-                                "https://holesky.etherscan.io";
-                              window.open(
-                                `${explorerUrl}/tx/${transactionHash}`,
-                                "_blank",
-                              );
-                            }}
-                            className="w-full"
+                            onClick={() =>
+                              copyToClipboard(
+                                transactionHash,
+                                "Transaction Hash",
+                              )
+                            }
+                            className="p-1 h-auto hover:bg-background"
                           >
-                            View on Explorer
+                            <ClipboardIcon className="w-3 h-3" />
                           </Button>
                         </div>
-                      )}
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const explorerUrl =
+                            config?.explorerUrl ||
+                            "https://holesky.etherscan.io";
+                          window.open(
+                            `${explorerUrl}/tx/${transactionHash}`,
+                            "_blank",
+                          );
+                        }}
+                        className="w-full"
+                      >
+                        View on Explorer
+                      </Button>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              </div>
+            )}
 
-                {sendError && (
-                  <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                    <p className="text-sm text-destructive">{sendError}</p>
-                  </div>
-                )}
+            {sendError && (
+              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <p className="text-sm text-destructive">{sendError}</p>
+              </div>
+            )}
 
-                <Button
-                  onClick={handleSendTransaction}
-                  disabled={isSending || !zkAccountInfo?.hasZKAccount}
-                  className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50"
-                >
-                  {isSending
-                    ? "Sending..."
-                    : !zkAccountInfo?.hasZKAccount
-                      ? "No ZK Account Found"
-                      : "Send Transaction"}
-                </Button>
-              </CardContent>
-            </Card>
+            <Button
+              onClick={handleSendTransaction}
+              disabled={isSending || !zkAccountInfo?.hasZKAccount}
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50"
+            >
+              {isSending
+                ? "Sending..."
+                : !zkAccountInfo?.hasZKAccount
+                  ? "No ZK Account Found"
+                  : "Send Transaction"}
+            </Button>
           </div>
         );
 
       case "receive":
         return (
-          <div className="max-w-2xl mx-auto">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowDownIcon className="w-5 h-5" />
-                  Receive Coin/Token
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label className="text-sm font-medium">
-                    Your Wallet Address
-                  </Label>
-                  <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
-                    <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
-                      {zkAccountInfo?.zkAccountAddress ||
-                        wallet?.address ||
-                        "No address available"}
-                    </p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        copyToClipboard(
-                          zkAccountInfo?.zkAccountAddress ||
-                            wallet?.address ||
-                            "",
-                          "Wallet Address",
-                        )
-                      }
-                      className="p-1 h-auto hover:bg-background"
-                    >
-                      <ClipboardIcon
-                        className="w-4 h-4 text-muted-foreground hover:text-foreground"
-                        strokeWidth={1}
-                      />
-                    </Button>
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ArrowDownIcon className="w-5 h-5" />
+              <h2 className="text-lg font-semibold">Receive Coin/Token</h2>
+            </div>
+            <div>
+              <Label className="text-sm font-medium">
+                ZKP Contract Account Address
+              </Label>
+              <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
+                <p className="text-sm text-foreground font-mono break-all flex-1 mr-2">
+                  {zkAccountInfo?.zkAccountAddress || "No ZKP account available"}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    copyToClipboard(
+                      zkAccountInfo?.zkAccountAddress || "",
+                      "ZKP Contract Account Address",
+                    )
+                  }
+                  className="p-1 h-auto hover:bg-background"
+                  disabled={!zkAccountInfo?.zkAccountAddress}
+                >
+                  <ClipboardIcon
+                    className="w-4 h-4 text-muted-foreground hover:text-foreground"
+                    strokeWidth={1}
+                  />
+                </Button>
+              </div>
+            </div>
+            <div className="text-center">
+              <Label className="text-sm font-medium">QR Code</Label>
+              <div className="mt-2 flex justify-center">
+                {zkAccountInfo?.zkAccountAddress && qrCodeDataUrl ? (
+                  <img 
+                    src={qrCodeDataUrl} 
+                    alt="ZKP Account QR Code" 
+                    className="w-48 h-48 rounded-lg"
+                  />
+                ) : (
+                  <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
+                    <QrCodeIcon className="w-24 h-24 text-muted-foreground" />
                   </div>
-                </div>
-                <div className="text-center">
-                  <Label className="text-sm font-medium">QR Code</Label>
-                  <div className="mt-2 flex justify-center">
-                    <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
-                      <QrCodeIcon className="w-24 h-24 text-muted-foreground" />
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Scan this QR code to send tokens to your wallet
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Scan this QR code to send tokens to your ZKP Contract Account
+              </p>
+            </div>
           </div>
         );
 
@@ -748,7 +960,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background">
       <Navbar />
       {/* Session Status Bar */}
-      <div className="fixed top-16 left-0 right-0 bg-muted/50 backdrop-blur-sm border-b border-border z-40">
+      <div className="fixed top-16 left-0 right-0 bg-muted/50 backdrop-blur-sm border-b border-border z-[60]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12">
             <div className="flex items-center gap-4">
@@ -830,9 +1042,9 @@ export default function Dashboard() {
                   size="sm"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20"
+                  className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 text-xs py-1 h-7"
                 >
-                  {isLoggingOut ? "Logging out..." : "Logout"}
+                  {isLoggingOut ? "Disconnecting..." : "Disconnect"}
                 </Button>
               </div>
             </div>
@@ -890,38 +1102,6 @@ export default function Dashboard() {
 
         {/* Main Content */}
         <div className="flex-1 p-8">
-          {/* Current Selection Header */}
-          <div className="mb-6 pb-4 border-b border-border">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">
-                  {activeMenu === "overview" && "Dashboard Overview"}
-                  {activeMenu === "add-token" && "Add Token"}
-                  {activeMenu === "send" && "Send Coin/Token"}
-                  {activeMenu === "receive" && "Receive Coin/Token"}
-                </h1>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {activeMenu === "overview" &&
-                    "Account information and status overview"}
-                  {activeMenu === "add-token" &&
-                    "Add new tokens to your wallet"}
-                  {activeMenu === "send" &&
-                    "Send coins or tokens to other addresses"}
-                  {activeMenu === "receive" &&
-                    "Receive coins or tokens from others"}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Current Section:</span>
-                <span className="px-2 py-1 bg-primary/10 text-primary rounded-md font-medium">
-                  {activeMenu === "overview" && "Overview"}
-                  {activeMenu === "add-token" && "Add Token"}
-                  {activeMenu === "send" && "Send"}
-                  {activeMenu === "receive" && "Receive"}
-                </span>
-              </div>
-            </div>
-          </div>
           {/* Selected Content */}
           {renderMainContent()}
         </div>

@@ -380,6 +380,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Token Management APIs
+  app.get('/api/tokens', requireAuth, async (req, res) => {
+    try {
+      const userEmail = req.session.user?.email;
+      if (!userEmail) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized'
+        });
+      }
+
+      const tokens = await storage.getTokensByEmail(userEmail);
+      res.json({
+        success: true,
+        tokens
+      });
+    } catch (error) {
+      console.error('❌ Error fetching tokens:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch tokens'
+      });
+    }
+  });
+
+  app.post('/api/tokens', requireAuth, async (req, res) => {
+    try {
+      const userEmail = req.session.user?.email;
+      if (!userEmail) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized'
+        });
+      }
+
+      const { insertTokenSchema } = await import('@shared/schema');
+      const validatedData = insertTokenSchema.parse({
+        ...req.body,
+        userEmail
+      });
+
+      const token = await storage.createToken(validatedData);
+      res.json({
+        success: true,
+        token
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          success: false,
+          error: 'Validation error',
+          details: error.errors
+        });
+      }
+      console.error('❌ Error creating token:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create token'
+      });
+    }
+  });
+
+  app.delete('/api/tokens/:id', requireAuth, async (req, res) => {
+    try {
+      const userEmail = req.session.user?.email;
+      if (!userEmail) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized'
+        });
+      }
+
+      const tokenId = parseInt(req.params.id);
+      if (isNaN(tokenId)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid token ID'
+        });
+      }
+
+      const deleted = await storage.deleteToken(tokenId, userEmail);
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          error: 'Token not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Token deleted successfully'
+      });
+    } catch (error) {
+      console.error('❌ Error deleting token:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete token'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
