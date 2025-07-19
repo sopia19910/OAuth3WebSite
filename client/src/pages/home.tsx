@@ -33,8 +33,8 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <ShieldCheckIcon className="w-6 h-6 text-primary" strokeWidth={2} />
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <ShieldCheckIcon className="w-6 h-6 text-gray-600" strokeWidth={2} />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">Enhanced Security</h3>
@@ -45,8 +45,8 @@ export default function Home() {
               </div>
               
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <KeyIcon className="w-6 h-6 text-primary" strokeWidth={2} />
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <KeyIcon className="w-6 h-6 text-gray-600" strokeWidth={2} />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">Easy Access</h3>
@@ -57,8 +57,8 @@ export default function Home() {
               </div>
               
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <GlobeAltIcon className="w-6 h-6 text-primary" strokeWidth={2} />
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <GlobeAltIcon className="w-6 h-6 text-gray-600" strokeWidth={2} />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">Web3 Benefits</h3>
@@ -117,8 +117,8 @@ export default function Home() {
               <div className="relative h-full bg-gradient-to-br from-card to-card/50 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl hover:border-primary/50 transition-all duration-300">
                 <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mb-6">
-                    <UsersIcon className="w-8 h-8 text-primary" strokeWidth={2} />
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6">
+                    <UsersIcon className="w-8 h-8 text-gray-600" strokeWidth={2} />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-2">EOA</h3>
                   <p className="text-sm font-medium mb-3 text-primary">Externally Owned Account</p>
@@ -133,8 +133,8 @@ export default function Home() {
               <div className="relative h-full bg-gradient-to-br from-card to-card/50 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl hover:border-accent/50 transition-all duration-300">
                 <div className="absolute top-0 right-0 w-20 h-20 bg-accent/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/5 rounded-2xl flex items-center justify-center mb-6">
-                    <CogIcon className="w-8 h-8 text-accent" strokeWidth={2} />
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6">
+                    <CogIcon className="w-8 h-8 text-gray-600" strokeWidth={2} />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-2">CA</h3>
                   <p className="text-sm font-medium mb-3 text-accent">Contract Account</p>
@@ -149,8 +149,8 @@ export default function Home() {
               <div className="relative h-full bg-gradient-to-br from-card to-card/50 backdrop-blur border border-border/50 rounded-2xl p-8 hover:shadow-2xl hover:border-primary/50 transition-all duration-300">
                 <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mb-6">
-                    <ShieldCheckIcon className="w-8 h-8 text-primary" strokeWidth={2} />
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6">
+                    <ShieldCheckIcon className="w-8 h-8 text-gray-600" strokeWidth={2} />
                   </div>
                   <h3 className="text-2xl font-bold text-foreground mb-2">ZKP</h3>
                   <p className="text-sm font-medium mb-3 text-primary">Zero-Knowledge Proof</p>
@@ -191,8 +191,8 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent rounded-3xl blur-2xl" />
               <div className="relative h-full bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-3xl p-8 hover:shadow-2xl hover:border-primary/50 transition-all duration-300">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center">
-                    <UsersIcon className="w-7 h-7 text-primary" strokeWidth={2} />
+                  <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center">
+                    <UsersIcon className="w-7 h-7 text-gray-600" strokeWidth={2} />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-foreground">Individual Users</h3>
@@ -236,8 +236,8 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-r from-accent/10 to-transparent rounded-3xl blur-2xl" />
               <div className="relative h-full bg-gradient-to-br from-card to-card/80 border border-border/50 rounded-3xl p-8 hover:shadow-2xl hover:border-accent/50 transition-all duration-300">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-accent/20 to-accent/10 rounded-2xl flex items-center justify-center">
-                    <BuildingOfficeIcon className="w-7 h-7 text-accent" strokeWidth={2} />
+                  <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center">
+                    <BuildingOfficeIcon className="w-7 h-7 text-gray-600" strokeWidth={2} />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-foreground">Enterprise</h3>
