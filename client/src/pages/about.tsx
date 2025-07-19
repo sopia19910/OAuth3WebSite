@@ -14,17 +14,17 @@ import Footer from "@/components/footer";
 export default function About() {
   const keyBenefits = [
     {
-      icon: <ShieldCheckIcon className="w-12 h-12 text-primary" />,
+      icon: <ShieldCheckIcon className="w-12 h-12 text-primary [&>path]:stroke-[1.5]" />,
       title: "Enhanced Security",
       description: "Multi-layered authentication combining Web2 convenience with Web3 cryptographic security."
     },
     {
-      icon: <UserGroupIcon className="w-12 h-12 text-primary" />,
+      icon: <UserGroupIcon className="w-12 h-12 text-primary [&>path]:stroke-[1.5]" />,
       title: "User Experience",
       description: "Familiar login methods while maintaining full control over digital assets."
     },
     {
-      icon: <LockClosedIcon className="w-12 h-12 text-primary" />,
+      icon: <LockClosedIcon className="w-12 h-12 text-primary [&>path]:stroke-[1.5]" />,
       title: "Privacy First",
       description: "Zero-knowledge proofs ensure personal data never leaves your control."
     }
@@ -64,21 +64,21 @@ export default function About() {
               </p>
               <div className="grid gap-4">
                 <div className="flex items-start gap-3">
-                  <GlobeAltIcon className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
+                  <GlobeAltIcon className="w-6 h-6 text-primary mt-1 flex-shrink-0 [&>path]:stroke-[1.5]" />
                   <div>
                     <h4 className="font-semibold text-foreground">Web2 Login Methods</h4>
                     <p className="text-muted-foreground">Familiar social logins (Google, Facebook) that users already know</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <KeyIcon className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
+                  <KeyIcon className="w-6 h-6 text-primary mt-1 flex-shrink-0 [&>path]:stroke-[1.5]" />
                   <div>
                     <h4 className="font-semibold text-foreground">Web3 Security</h4>
                     <p className="text-muted-foreground">Blockchain-based authentication and decentralized control</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <ShieldCheckIcon className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
+                  <ShieldCheckIcon className="w-6 h-6 text-primary mt-1 flex-shrink-0 [&>path]:stroke-[1.5]" />
                   <div>
                     <h4 className="font-semibold text-foreground">Zero-Knowledge Proofs</h4>
                     <p className="text-muted-foreground">Privacy-preserving technology that protects user data</p>
@@ -118,19 +118,19 @@ export default function About() {
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-center flex-1">
-                  <GlobeAltIcon className="w-12 h-12 text-primary mx-auto mb-3" />
+                  <GlobeAltIcon className="w-12 h-12 text-primary mx-auto mb-3 [&>path]:stroke-[1.5]" />
                   <h4 className="font-semibold text-foreground">1. Web2 Login</h4>
                   <p className="text-sm text-muted-foreground">Sign in with Google</p>
                 </div>
                 
                 <div className="text-center flex-1">
-                  <KeyIcon className="w-12 h-12 text-primary mx-auto mb-3" />
+                  <KeyIcon className="w-12 h-12 text-primary mx-auto mb-3 [&>path]:stroke-[1.5]" />
                   <h4 className="font-semibold text-foreground">2. Web3 Signature</h4>
                   <p className="text-sm text-muted-foreground">Verify with private key</p>
                 </div>
                 
                 <div className="text-center flex-1">
-                  <ShieldCheckIcon className="w-12 h-12 text-primary mx-auto mb-3" />
+                  <ShieldCheckIcon className="w-12 h-12 text-primary mx-auto mb-3 [&>path]:stroke-[1.5]" />
                   <h4 className="font-semibold text-foreground">3. Secure Access</h4>
                   <p className="text-sm text-muted-foreground">Transaction authorized</p>
                 </div>
