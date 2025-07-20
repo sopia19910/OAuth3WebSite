@@ -122,41 +122,84 @@ export default function Demo() {
   const [chains, setChains] = useState<any[]>([]);
   const [selectedChainId, setSelectedChainId] = useState<string>("");
 
-  // Check for OAuth callback parameters
+  // Check for OAuth callback parameters and existing session
   useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const oauthSuccess = params.get('oauth');
-      const email = params.get('email');
-      
-      if (oauthSuccess === 'success' && email) {
-        setUserEmail(email);
-        setCurrentStep("web3-setup");
-        // Clear the URL parameters
-        window.history.replaceState({}, document.title, '/personalservice');
-      } else if (oauthSuccess === 'error') {
-        const message = params.get('message') || 'Authentication failed';
-        toast({
-          title: "Authentication Error",
-          description: message,
-          variant: "destructive",
-          duration: 3000,
-        });
-        window.history.replaceState({}, document.title, '/personalservice');
-      }
+    const initializeSession = async () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const oauthSuccess = params.get('oauth');
+        const email = params.get('email');
+        const fromDashboard = params.get('from') === 'dashboard';
+        const chainId = params.get('chainId');
+        
+        // Handle OAuth callback
+        if (oauthSuccess === 'success' && email) {
+          setUserEmail(email);
+          setCurrentStep("web3-setup");
+          // Clear the URL parameters
+          window.history.replaceState({}, document.title, '/personalservice');
+        } else if (oauthSuccess === 'error') {
+          const message = params.get('message') || 'Authentication failed';
+          toast({
+            title: "Authentication Error",
+            description: message,
+            variant: "destructive",
+            duration: 3000,
+          });
+          window.history.replaceState({}, document.title, '/personalservice');
+        } else {
+          // Check for existing OAuth session
+          try {
+            const authResponse = await fetch('/api/auth/me');
+            const authData = await authResponse.json();
+            
+            if (authData.success && authData.user && authData.user.email) {
+              console.log('✅ Found existing OAuth session:', authData.user.email);
+              setUserEmail(authData.user.email);
+              
+              // Check for existing wallet in storage
+              const savedWallet = getWalletFromStorage();
+              if (savedWallet) {
+                setWallet(savedWallet);
+                console.log('✅ Found existing wallet:', savedWallet.address);
+                
+                // If user has both OAuth session and wallet, skip to balance step
+                setCurrentStep("balance");
+                
+                // If coming from dashboard with specific chain, set it
+                if (fromDashboard && chainId) {
+                  setSelectedChainId(chainId);
+                }
+              } else {
+                // Has OAuth but no wallet, go to web3 setup
+                setCurrentStep("web3-setup");
+              }
+            }
+          } catch (error) {
+            console.error('Error checking auth session:', error);
+          }
+        }
 
-      // Check for existing wallet in storage
-      const savedWallet = getWalletFromStorage();
-      if (savedWallet) {
-        setWallet(savedWallet);
-      }
+        // Check for existing wallet in storage (even without OAuth)
+        const savedWallet = getWalletFromStorage();
+        if (savedWallet && !wallet) {
+          setWallet(savedWallet);
+        }
 
-      // Get network info
-      const info = getNetworkInfo();
-      setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
-    } catch (error) {
-      console.error('Error during initialization:', error);
-    }
+        // Get network info
+        const info = getNetworkInfo();
+        setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
+        
+        // Clear URL parameters if coming from dashboard
+        if (fromDashboard) {
+          window.history.replaceState({}, document.title, '/personalservice');
+        }
+      } catch (error) {
+        console.error('Error during initialization:', error);
+      }
+    };
+    
+    initializeSession();
   }, []);
 
   // Fetch available chains
@@ -196,6 +239,30 @@ export default function Demo() {
             const balance = await getWalletBalance(wallet.address, provider);
             setWalletBalance(balance.formatted);
             setBalanceError("");
+            
+            // Check if ZK Account exists on this chain
+            if (userEmail && currentStep === "balance") {
+              console.log('🔍 Checking for ZK Account on chain:', selectedChain.networkName);
+              try {
+                const zkInfo = await checkZKAccount(wallet.address, selectedChainId);
+                if (zkInfo.hasZKAccount) {
+                  setZkAccountInfo(zkInfo);
+                  console.log('✅ Found ZK Account on this chain:', zkInfo.zkAccountAddress);
+                  
+                  // Redirect to dashboard if ZK Account exists
+                  toast({
+                    title: "ZK Account Found",
+                    description: "You already have a ZK Account on this network. Redirecting to dashboard...",
+                    duration: 2000,
+                  });
+                  setTimeout(() => {
+                    setLocation("/dashboard");
+                  }, 2000);
+                }
+              } catch (error) {
+                console.error('Error checking ZK Account:', error);
+              }
+            }
           }
         } catch (error) {
           console.error('Failed to fetch balance:', error);
@@ -211,7 +278,7 @@ export default function Demo() {
         console.error('Balance fetch error:', err);
       });
     }
-  }, [wallet, selectedChainId, chains]);
+  }, [wallet, selectedChainId, chains, userEmail, currentStep]);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
@@ -292,10 +359,10 @@ export default function Demo() {
       }
 
       // Check for existing ZK Account
-      if (userEmail) {
+      if (userEmail && selectedChainId) {
         setWalletCreationStatus("Checking for existing ZK Account...");
         try {
-          const existingAccount = await checkZKAccount(walletInfo.address);
+          const existingAccount = await checkZKAccount(walletInfo.address, selectedChainId);
           if (existingAccount.hasZKAccount) {
             setZkAccountInfo(existingAccount);
             console.log('✅ Found existing ZK Account during wallet setup:', existingAccount.zkAccountAddress);

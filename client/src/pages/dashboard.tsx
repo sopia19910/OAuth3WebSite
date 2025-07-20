@@ -758,7 +758,7 @@ export default function Dashboard() {
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Your ZKP Contract Account has not been created on the {networkName} network. 
-                      To create your ZKP CA, please go to the <a href="/personalservice" className="underline hover:text-foreground">Personal Service page</a> and complete the ZKP generation process.
+                      To create your ZKP CA, please go to the <a href={`/personalservice?from=dashboard&chainId=${selectedChainId}`} className="underline hover:text-foreground">Personal Service page</a> and complete the ZKP generation process.
                     </p>
                   </div>
                 </div>
