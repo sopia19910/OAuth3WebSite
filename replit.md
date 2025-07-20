@@ -120,6 +120,12 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Dashboard Chain Selector and ZKP CA Warning (2025-01-20)**:
+  - Added chain network selector dropdown in Session Status Bar
+  - Users can now switch between available chains from dashboard
+  - Added warning message when ZKP CA is not created on selected network
+  - ZKP Smart Contract card highlights in red when CA not created
+  - Warning directs users to Demo page for ZKP generation
 - **Chain Configuration Database Migration (2025-01-20)**:
   - Created `chains` table in PostgreSQL for network configuration storage
   - Added API endpoints: GET /api/chains, POST /api/chains, PUT /api/chains/:id, DELETE /api/chains/:id

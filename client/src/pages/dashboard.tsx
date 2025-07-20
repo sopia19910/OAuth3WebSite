@@ -91,10 +91,15 @@ export default function Dashboard() {
   
   // QR Code state
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  
+  // Chain state
+  const [chains, setChains] = useState<any[]>([]);
+  const [selectedChainId, setSelectedChainId] = useState<string>("");
   // Load wallet and account data on component mount
   useEffect(() => {
     loadWalletData();
     loadTokensFromDB();
+    loadChains();
   }, []);
 
   // Generate QR code when zkAccountInfo changes
@@ -116,6 +121,24 @@ export default function Dashboard() {
       });
     }
   }, [zkAccountInfo]);
+
+  const loadChains = async () => {
+    try {
+      const response = await fetch('/api/chains');
+      if (response.ok) {
+        const data = await response.json();
+        setChains(data.chains || []);
+        // Find the active chain and set it as selected
+        const activeChain = data.chains?.find((chain: any) => chain.isActive);
+        if (activeChain) {
+          setSelectedChainId(activeChain.id.toString());
+          setNetworkName(activeChain.networkName);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load chains:', error);
+    }
+  };
 
   const loadTokensFromDB = async () => {
     try {
@@ -571,7 +594,7 @@ export default function Dashboard() {
               </Card>
 
               {/* ZKP Smart Contract */}
-              <Card className="bg-card border-border rounded-none">
+              <Card className={`bg-card border-border rounded-none ${!zkAccountInfo?.hasZKAccount ? 'border-destructive/50 bg-destructive/5' : ''}`}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">
                     ZKP Smart Contract (CA)
@@ -632,6 +655,28 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+            
+            {/* ZKP CA Creation Warning */}
+            {!zkAccountInfo?.hasZKAccount && (
+              <div className="mt-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                    <svg className="w-5 h-5 text-destructive" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-medium text-destructive">
+                      ZKP Contract Account Not Created
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Your ZKP Contract Account has not been created on the {networkName} network. 
+                      To create your ZKP CA, please go to the <a href="/demo" className="underline hover:text-foreground">Demo page</a> and complete the ZKP generation process.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         );
 
@@ -977,9 +1022,29 @@ export default function Dashboard() {
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">Network:</span>
-                <span className="font-medium text-foreground">
-                  {networkName}
-                </span>
+                <Select
+                  value={selectedChainId}
+                  onValueChange={(value) => {
+                    setSelectedChainId(value);
+                    const selected = chains.find(chain => chain.id.toString() === value);
+                    if (selected) {
+                      setNetworkName(selected.networkName);
+                      // Refresh account data for the new chain
+                      refreshAccountData();
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-32 h-7 text-xs bg-background">
+                    <SelectValue placeholder="Select network" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {chains.map((chain) => (
+                      <SelectItem key={chain.id} value={chain.id.toString()}>
+                        {chain.networkName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">Owner:</span>
