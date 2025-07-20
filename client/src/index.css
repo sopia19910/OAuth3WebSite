@@ -78,6 +78,18 @@
   html {
     scroll-behavior: smooth;
   }
+  
+  /* Purple focus border for all input elements */
+  input:focus,
+  input:focus-visible,
+  textarea:focus,
+  textarea:focus-visible,
+  select:focus,
+  select:focus-visible {
+    outline: none !important;
+    border-color: hsl(260, 100%, 70%) !important;
+    box-shadow: none !important;
+  }
 }
 
 @layer components {
