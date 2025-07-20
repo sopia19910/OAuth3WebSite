@@ -28,6 +28,8 @@ Preferred communication style: Simple, everyday language.
 - **Database Tables**:
   - `users`: Stores user accounts (id, username, password)
   - `contacts`: Stores contact form submissions (id, first_name, last_name, email, company, message, created_at)
+  - `tokens`: Stores custom ERC20 tokens (id, user_email, address, symbol, name, created_at)
+  - `chains`: Stores blockchain network configurations (id, network_name, rpc_url, chain_id, explorer_url, is_active, created_at, updated_at)
 
 ### Key Components
 
@@ -118,6 +120,13 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Chain Configuration Database Migration (2025-01-20)**:
+  - Created `chains` table in PostgreSQL for network configuration storage
+  - Added API endpoints: GET /api/chains, POST /api/chains, PUT /api/chains/:id, DELETE /api/chains/:id
+  - Migrated from environment variables to database for chain configuration
+  - Added holesky chain as default active network with RPC URL and explorer
+  - Configuration endpoint now reads from database instead of environment variables
+  - Supports multiple chains with active/inactive status management
 - **Token Storage Migration to Database (2025-01-19)**:
   - Created `tokens` table in PostgreSQL for persistent token storage
   - Added API endpoints: GET /api/tokens, POST /api/tokens, DELETE /api/tokens/:id

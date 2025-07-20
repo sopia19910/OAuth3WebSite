@@ -2,11 +2,12 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertContactSchema } from "@shared/schema";
+import { insertContactSchema, insertChainSchema } from "@shared/schema";
 import { getOAuth2Client, requireAuth, generateSecureCircuitInput, generateSecureZKProof } from "./auth";
 import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
+import { z } from "zod";
 
 // Contract addresses and configuration
 const RPC_URL = process.env.RPC_URL || 'https://rpc-holesky.rockx.com';
@@ -170,19 +171,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get configuration (including RPC URL and contract addresses)
-  app.get('/api/config', (req, res) => {
-    res.json({
-      success: true,
-      rpcUrl: process.env.RPC_URL || 'https://rpc-holesky.rockx.com',
-      networkName: process.env.NETWORK_NAME || 'holesky',
-      chainId: process.env.CHAIN_ID || '17000',
-      explorerUrl: process.env.EXPLORER_URL || 'https://holesky.etherscan.io',
-      zkVerifierV3Address: process.env.ZK_VERIFIER_V3_ADDRESS || '0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd',
-      zkAccountFactoryV3Address: process.env.ZK_ACCOUNT_FACTORY_V3_ADDRESS || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0',
-      oa3TokenAddress: process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea',
-      taikoTokenAddress: process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890'
-    });
+  // Get configuration (including RPC URL and contract addresses) - now uses database
+  app.get('/api/config', async (req, res) => {
+    try {
+      const activeChain = await storage.getActiveChain();
+      
+      if (!activeChain) {
+        // If no active chain in database, return default values
+        return res.json({
+          success: true,
+          rpcUrl: process.env.RPC_URL || 'https://rpc-holesky.rockx.com',
+          networkName: process.env.NETWORK_NAME || 'holesky',
+          chainId: process.env.CHAIN_ID || '17000',
+          explorerUrl: process.env.EXPLORER_URL || 'https://holesky.etherscan.io',
+          zkVerifierV3Address: process.env.ZK_VERIFIER_V3_ADDRESS || '0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd',
+          zkAccountFactoryV3Address: process.env.ZK_ACCOUNT_FACTORY_V3_ADDRESS || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0',
+          oa3TokenAddress: process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea',
+          taikoTokenAddress: process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890'
+        });
+      }
+      
+      res.json({
+        success: true,
+        rpcUrl: activeChain.rpcUrl,
+        networkName: activeChain.networkName,
+        chainId: activeChain.chainId.toString(),
+        explorerUrl: activeChain.explorerUrl,
+        zkVerifierV3Address: process.env.ZK_VERIFIER_V3_ADDRESS || '0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd',
+        zkAccountFactoryV3Address: process.env.ZK_ACCOUNT_FACTORY_V3_ADDRESS || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0',
+        oa3TokenAddress: process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea',
+        taikoTokenAddress: process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890'
+      });
+    } catch (error) {
+      console.error('Error fetching config:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch configuration'
+      });
+    }
   });
 
   // Check ZK Account V3
@@ -477,6 +503,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: 'Failed to delete token'
+      });
+    }
+  });
+
+  // Chain Management APIs
+  app.get('/api/chains', async (req, res) => {
+    try {
+      const chains = await storage.getChains();
+      res.json({
+        success: true,
+        chains
+      });
+    } catch (error) {
+      console.error('❌ Error fetching chains:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch chains'
+      });
+    }
+  });
+
+  app.post('/api/chains', async (req, res) => {
+    try {
+      const validatedData = insertChainSchema.parse(req.body);
+      
+      // If this chain should be active, deactivate all others first
+      if (validatedData.isActive) {
+        const existingChains = await storage.getChains();
+        for (const chain of existingChains) {
+          if (chain.isActive) {
+            await storage.updateChain(chain.id, { isActive: false });
+          }
+        }
+      }
+      
+      const chain = await storage.createChain(validatedData);
+      res.json({
+        success: true,
+        chain
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          success: false,
+          error: 'Validation error',
+          details: error.errors
+        });
+      }
+      console.error('❌ Error creating chain:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create chain'
+      });
+    }
+  });
+
+  app.put('/api/chains/:id', async (req, res) => {
+    try {
+      const chainId = parseInt(req.params.id);
+      if (isNaN(chainId)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid chain ID'
+        });
+      }
+
+      const validatedData = insertChainSchema.partial().parse(req.body);
+      
+      // If setting this chain as active, deactivate all others first
+      if (validatedData.isActive) {
+        const existingChains = await storage.getChains();
+        for (const chain of existingChains) {
+          if (chain.isActive && chain.id !== chainId) {
+            await storage.updateChain(chain.id, { isActive: false });
+          }
+        }
+      }
+      
+      const chain = await storage.updateChain(chainId, validatedData);
+      if (!chain) {
+        return res.status(404).json({
+          success: false,
+          error: 'Chain not found'
+        });
+      }
+      
+      res.json({
+        success: true,
+        chain
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          success: false,
+          error: 'Validation error',
+          details: error.errors
+        });
+      }
+      console.error('❌ Error updating chain:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update chain'
+      });
+    }
+  });
+
+  app.delete('/api/chains/:id', async (req, res) => {
+    try {
+      const chainId = parseInt(req.params.id);
+      if (isNaN(chainId)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid chain ID'
+        });
+      }
+
+      const deleted = await storage.deleteChain(chainId);
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          error: 'Chain not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Chain deleted successfully'
+      });
+    } catch (error) {
+      console.error('❌ Error deleting chain:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete chain'
       });
     }
   });
