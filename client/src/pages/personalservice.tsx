@@ -263,15 +263,17 @@ export default function Demo() {
                   setZkAccountInfo(zkInfo);
                   console.log('✅ Found ZK Account on this chain:', zkInfo.zkAccountAddress);
                   
-                  // Redirect to dashboard if ZK Account exists
-                  toast({
-                    title: "ZK Account Found",
-                    description: "You already have a ZK Account on this network. Redirecting to dashboard...",
-                    duration: 2000,
-                  });
-                  setTimeout(() => {
-                    setLocation("/dashboard");
-                  }, 2000);
+                  // Only redirect if not coming from dashboard
+                  if (!urlChainId) {
+                    toast({
+                      title: "ZK Account Found",
+                      description: "You already have a ZK Account on this network. Redirecting to dashboard...",
+                      duration: 2000,
+                    });
+                    setTimeout(() => {
+                      setLocation("/dashboard");
+                    }, 2000);
+                  }
                 }
               } catch (error) {
                 console.error('Error checking ZK Account:', error);
@@ -292,7 +294,7 @@ export default function Demo() {
         console.error('Balance fetch error:', err);
       });
     }
-  }, [wallet, selectedChainId, chains, userEmail, currentStep]);
+  }, [wallet, selectedChainId, chains, userEmail, currentStep, urlChainId]);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
