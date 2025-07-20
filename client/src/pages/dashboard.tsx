@@ -1101,11 +1101,20 @@ export default function Dashboard() {
                 <span className="text-sm font-semibold text-foreground">
                   {userEmail}
                 </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 text-xs py-1 h-7 ml-2"
+                >
+                  {isLoggingOut ? "Disconnecting..." : "Disconnect"}
+                </Button>
               </div>
             </div>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">Network:</span>
+                <span className="text-muted-foreground">Chain Network:</span>
                 <Select
                   value={selectedChainId}
                   disabled={isRefreshing}
@@ -1184,17 +1193,6 @@ export default function Dashboard() {
                     </Button>
                   )}
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  disabled={isLoggingOut}
-                  className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 text-xs py-1 h-7"
-                >
-                  {isLoggingOut ? "Disconnecting..." : "Disconnect"}
-                </Button>
               </div>
             </div>
           </div>
