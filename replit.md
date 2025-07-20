@@ -127,6 +127,9 @@ The application is designed to be easily extensible for implementing the actual 
   - Added holesky chain as default active network with RPC URL and explorer
   - Configuration endpoint now reads from database instead of environment variables
   - Supports multiple chains with active/inactive status management
+  - Removed all hardcoded RPC URLs and chain IDs from codebase
+  - Updated ZK account check to use database RPC URL
+  - Removed fallback RPC URLs - now requires active chain in database
 - **Token Storage Migration to Database (2025-01-19)**:
   - Created `tokens` table in PostgreSQL for persistent token storage
   - Added API endpoints: GET /api/tokens, POST /api/tokens, DELETE /api/tokens/:id

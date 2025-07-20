@@ -10,7 +10,6 @@ import path from "path";
 import { z } from "zod";
 
 // Contract addresses and configuration
-const RPC_URL = process.env.RPC_URL || 'https://rpc-holesky.rockx.com';
 const ZK_ACCOUNT_FACTORY_V3_ADDRESS = process.env.ZK_ACCOUNT_FACTORY_V3_ADDRESS || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0';
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -177,17 +176,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const activeChain = await storage.getActiveChain();
       
       if (!activeChain) {
-        // If no active chain in database, return default values
-        return res.json({
-          success: true,
-          rpcUrl: process.env.RPC_URL || 'https://rpc-holesky.rockx.com',
-          networkName: process.env.NETWORK_NAME || 'holesky',
-          chainId: process.env.CHAIN_ID || '17000',
-          explorerUrl: process.env.EXPLORER_URL || 'https://holesky.etherscan.io',
-          zkVerifierV3Address: process.env.ZK_VERIFIER_V3_ADDRESS || '0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd',
-          zkAccountFactoryV3Address: process.env.ZK_ACCOUNT_FACTORY_V3_ADDRESS || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0',
-          oa3TokenAddress: process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea',
-          taikoTokenAddress: process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890'
+        // If no active chain in database, return error
+        return res.status(500).json({
+          success: false,
+          error: 'No active chain configured in database'
         });
       }
       
@@ -239,8 +231,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ];
 
       // Connect to factory V3
-      const rpcUrl = process.env.RPC_URL || 'https://rpc-holesky.rockx.com';
-      const provider = new ethers.JsonRpcProvider(rpcUrl);
+      // Get active chain RPC URL from database
+      const activeChain = await storage.getActiveChain();
+      if (!activeChain) {
+        return res.status(500).json({ 
+          success: false, 
+          error: 'No active chain configured in database' 
+        });
+      }
+      const provider = new ethers.JsonRpcProvider(activeChain.rpcUrl);
       const zkAccountFactoryV3 = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, zkAccountFactoryV3ABI, provider);
 
       // Get user's ZK accounts from V3 factory
