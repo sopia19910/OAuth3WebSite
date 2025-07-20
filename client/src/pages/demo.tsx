@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ShieldCheckIcon, 
   KeyIcon, 
@@ -34,6 +35,7 @@ import {
   getNetworkInfo,
   type WalletInfo 
 } from "@/lib/wallet";
+import { ethers } from "ethers";
 import { 
   createZKAccount, 
   checkZKAccount, 
@@ -114,6 +116,10 @@ export default function Demo() {
   // Wallet creation/import loading state
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
   const [walletCreationStatus, setWalletCreationStatus] = useState("");
+  
+  // Chain state
+  const [chains, setChains] = useState<any[]>([]);
+  const [selectedChainId, setSelectedChainId] = useState<string>("");
 
   // Check for OAuth callback parameters
   useEffect(() => {
@@ -152,17 +158,44 @@ export default function Demo() {
     }
   }, []);
 
-  // Auto-refresh balance when wallet changes
+  // Fetch available chains
   useEffect(() => {
-    if (wallet) {
+    const fetchChains = async () => {
+      try {
+        const response = await fetch('/api/chains');
+        const data = await response.json();
+        if (data.success && data.chains) {
+          setChains(data.chains);
+          // Set the active chain as selected by default
+          const activeChain = data.chains.find((chain: any) => chain.isActive);
+          if (activeChain) {
+            setSelectedChainId(activeChain.id.toString());
+            setNetworkName(activeChain.networkName);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching chains:', error);
+      }
+    };
+    fetchChains();
+  }, []);
+
+  // Auto-refresh balance when wallet or chain changes
+  useEffect(() => {
+    if (wallet && selectedChainId) {
       // Create promise and handle errors properly
       const fetchBalance = async () => {
         setIsRefreshingBalance(true);
         setBalanceError("");
         try {
-          const balance = await getWalletBalance(wallet.address);
-          setWalletBalance(balance.formatted);
-          setBalanceError("");
+          // Find the selected chain
+          const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+          if (selectedChain) {
+            const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+            const balance = await getWalletBalance(wallet.address, provider);
+            setWalletBalance(balance.formatted);
+            setBalanceError("");
+          }
         } catch (error) {
           console.error('Failed to fetch balance:', error);
           setBalanceError('Failed to fetch balance. Please check your network connection.');
@@ -177,7 +210,7 @@ export default function Demo() {
         console.error('Balance fetch error:', err);
       });
     }
-  }, [wallet]);
+  }, [wallet, selectedChainId, chains]);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
@@ -238,9 +271,19 @@ export default function Demo() {
       // Get wallet balance
       setWalletCreationStatus("Fetching balance...");
       try {
-        const balance = await getWalletBalance(walletInfo.address);
-        setWalletBalance(balance.formatted);
-        setBalanceError("");
+        if (selectedChainId) {
+          const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+          if (selectedChain) {
+            const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+            const balance = await getWalletBalance(walletInfo.address, provider);
+            setWalletBalance(balance.formatted);
+            setBalanceError("");
+          }
+        } else {
+          const balance = await getWalletBalance(walletInfo.address);
+          setWalletBalance(balance.formatted);
+          setBalanceError("");
+        }
       } catch (error) {
         console.error('Failed to fetch initial balance:', error);
         setBalanceError('Failed to fetch balance. You can try refreshing later.');
@@ -283,14 +326,19 @@ export default function Demo() {
   };
 
   const refreshBalance = async () => {
-    if (!wallet) return;
+    if (!wallet || !selectedChainId) return;
     
     setIsRefreshingBalance(true);
     setBalanceError("");
     try {
-      const balance = await getWalletBalance(wallet.address);
-      setWalletBalance(balance.formatted);
-      setBalanceError("");
+      // Find the selected chain
+      const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+      if (selectedChain) {
+        const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+        const balance = await getWalletBalance(wallet.address, provider);
+        setWalletBalance(balance.formatted);
+        setBalanceError("");
+      }
       console.log('✅ Balance refreshed:', balance.formatted, 'ETH');
     } catch (error) {
       console.error('Failed to refresh balance:', error);
@@ -698,8 +746,25 @@ export default function Demo() {
                 </div>
                 <div className="text-center space-y-4">
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Network</h4>
-                    <p className="text-foreground">{networkName}</p>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-2">Network</h4>
+                    <Select value={selectedChainId} onValueChange={(value) => {
+                      setSelectedChainId(value);
+                      const chain = chains.find(c => c.id.toString() === value);
+                      if (chain) {
+                        setNetworkName(chain.networkName);
+                      }
+                    }}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a network" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {chains.map((chain) => (
+                          <SelectItem key={chain.id} value={chain.id.toString()}>
+                            {chain.networkName} {chain.isActive && "(Active)"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <h4 className="text-md font-medium text-foreground mb-2">ETH Balance</h4>
