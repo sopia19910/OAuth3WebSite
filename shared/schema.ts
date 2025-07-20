@@ -33,6 +33,7 @@ export const chains = pgTable("chains", {
   rpcUrl: text("rpc_url").notNull(),
   chainId: integer("chain_id").notNull().unique(),
   explorerUrl: text("explorer_url").notNull(),
+  networkImage: text("network_image"),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -72,12 +73,14 @@ export const insertChainSchema = createInsertSchema(chains).pick({
   rpcUrl: true,
   chainId: true,
   explorerUrl: true,
+  networkImage: true,
   isActive: true,
 }).extend({
   networkName: z.string().min(1, "Network name is required"),
   rpcUrl: z.string().url("Invalid RPC URL"),
   chainId: z.number().positive("Chain ID must be positive"),
   explorerUrl: z.string().url("Invalid explorer URL"),
+  networkImage: z.string().optional(),
   isActive: z.boolean().optional().default(true),
 });
 

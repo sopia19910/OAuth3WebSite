@@ -120,6 +120,11 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Network Image Support in Database (2025-01-20)**:
+  - Added `network_image` column to `chains` table for displaying network logos
+  - Updated schema to support optional network image paths
+  - Added Ethereum logo (@assets/image_1752985874370.png) to all existing chains
+  - Ready for UI integration to display network logos in chain selector
 - **Dashboard Chain Selector and ZKP CA Warning (2025-01-20)**:
   - Added chain network selector dropdown in Session Status Bar
   - Users can now switch between available chains from dashboard
