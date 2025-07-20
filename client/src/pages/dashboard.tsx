@@ -1123,6 +1123,8 @@ export default function Dashboard() {
                     const selected = chains.find(chain => chain.id.toString() === value);
                     if (selected) {
                       setNetworkName(selected.networkName);
+                      // Switch to Overview when chain changes
+                      setActiveMenu("overview");
                       // The useEffect will handle refreshing account data with debouncing
                     }
                   }}
