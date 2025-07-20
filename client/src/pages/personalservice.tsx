@@ -26,6 +26,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
+import ethereumLogo from "@assets/image_1752985874370.png";
 import { 
   createWallet, 
   importWallet, 
@@ -764,7 +765,16 @@ export default function Demo() {
                       <SelectContent>
                         {chains.map((chain) => (
                           <SelectItem key={chain.id} value={chain.id.toString()}>
-                            {chain.networkName} {chain.isActive && "(Active)"}
+                            <div className="flex items-center gap-2">
+                              {chain.networkImage && (
+                                <img 
+                                  src={ethereumLogo} 
+                                  alt={chain.networkName}
+                                  className="w-4 h-4 object-contain"
+                                />
+                              )}
+                              <span>{chain.networkName} {chain.isActive && "(Active)"}</span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
