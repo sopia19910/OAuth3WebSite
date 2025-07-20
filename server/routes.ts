@@ -268,8 +268,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({
           success: true,
           hasZKAccount: false,
-          error: `ZK Account Factory not deployed on ${selectedChain.networkName}`,
-          factoryAddress: ZK_ACCOUNT_FACTORY_V3_ADDRESS
+          zkAccountAddress: null,
+          currentOwner: null,
+          balance: '0',
+          tokenBalance: '0',
+          taikoBalance: '0',
+          requiresZKProof: false,
+          factoryAddress: ZK_ACCOUNT_FACTORY_V3_ADDRESS,
+          emailHash: '0',
+          domainHash: '0',
+          verifierContract: null,
+          accountNonce: '0',
+          error: `ZK Account Factory not deployed on ${selectedChain.networkName}`
         });
       }
 
