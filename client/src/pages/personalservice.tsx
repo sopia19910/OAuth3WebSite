@@ -172,6 +172,8 @@ export default function Demo() {
                 if (fromDashboard && chainId) {
                   setUrlChainId(chainId);
                   console.log('📌 Chain ID from dashboard:', chainId);
+                  // Clear any existing ZK Account info when coming from dashboard
+                  setZkAccountInfo(null);
                 }
               } else {
                 // Has OAuth but no wallet, go to web3 setup
@@ -221,6 +223,8 @@ export default function Demo() {
               setSelectedChainId(urlChainId);
               setNetworkName(targetChain.networkName);
               console.log('🎯 Using chain from dashboard:', targetChain.networkName);
+              // Clear ZK Account info when setting chain from URL
+              setZkAccountInfo(null);
             }
           } else {
             // Otherwise, set the active chain as selected by default
