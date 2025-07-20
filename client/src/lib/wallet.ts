@@ -91,10 +91,7 @@ export async function getWalletBalance(address: string, provider?: ethers.Provid
     };
   } catch (error) {
     console.error('Error getting balance:', error);
-    return {
-      eth: '0',
-      formatted: '0.0'
-    };
+    throw error;  // Re-throw to let caller handle the error
   }
 }
 
