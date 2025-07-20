@@ -173,6 +173,7 @@ The application is designed to be easily extensible for implementing the actual 
   - Added purple 1px border to all input, textarea, and select elements on focus
   - Removed default focus ring styles from Input and Textarea components
   - Applied consistent purple focus border (hsl(260, 100%, 70%)) across all pages
+  - Extended purple focus border to Select components (combo boxes) with 1px width
 - **Demo Page Private Key Warning (2025-01-20)**:
   - Changed private key copy warning from alert dialog to toast popup message
   - Added destructive variant toast with 2-second duration for better UX
