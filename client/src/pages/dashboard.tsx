@@ -204,7 +204,7 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Failed to validate OAuth session:", error);
         alert("Failed to validate session. Please login again.");
-        setLocation("/demo");
+        setLocation("/personalservice");
         return;
       }
 

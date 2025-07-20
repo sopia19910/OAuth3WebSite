@@ -125,7 +125,7 @@ The application is designed to be easily extensible for implementing the actual 
   - Users can now switch between available chains from dashboard
   - Added warning message when ZKP CA is not created on selected network
   - ZKP Smart Contract card highlights in red when CA not created
-  - Warning directs users to Demo page for ZKP generation
+  - Warning directs users to Personal Service page for ZKP generation
 - **Chain Configuration Database Migration (2025-01-20)**:
   - Created `chains` table in PostgreSQL for network configuration storage
   - Added API endpoints: GET /api/chains, POST /api/chains, PUT /api/chains/:id, DELETE /api/chains/:id
@@ -157,7 +157,7 @@ The application is designed to be easily extensible for implementing the actual 
   - Ethereum address validation for token contracts
 - **Toast Notification System (2025-01-19)**:
   - Replaced alert messages with toast popups on Dashboard page
-  - Extended toast system to Demo page for copy operations
+  - Extended toast system to Personal Service page for copy operations
   - 2-second auto-dismiss with error variants for failures
 - **Dashboard UI Updates (2025-01-19)**: Made multiple refinements to the dashboard interface
   - Changed "Logout" button to "Disconnect" with gray border styling
@@ -183,7 +183,7 @@ The application is designed to be easily extensible for implementing the actual 
   - Removed default focus ring styles from Input and Textarea components
   - Applied consistent purple focus border (hsl(260, 100%, 70%)) across all pages
   - Extended purple focus border to Select components (combo boxes) with 1px width
-- **Demo Page Private Key Warning (2025-01-20)**:
+- **Personal Service Page Private Key Warning (2025-01-20)**:
   - Changed private key copy warning from alert dialog to toast popup message
   - Added destructive variant toast with 2-second duration for better UX
   - Made Balance Information refresh button icon-only matching dashboard style
@@ -196,9 +196,9 @@ The application is designed to be easily extensible for implementing the actual 
 - **Navigation Update (2025-01-19)**: Changed "Resources" to "Docs" in main menu
 - **Services Page Enhancement (2025-01-19)**: 
   - Added professional card designs with gradients and icons
-  - Individual Services: Added "Get Started" button linking to /demo
+  - Individual Services: Added "Get Started" button linking to /personalservice
   - Enterprise Services: Added "Coming Soon" label
-- **View Demo Page (2025-01-17)**: Added comprehensive interactive demo
+- **Personal Service Page (2025-01-17)**: Added comprehensive interactive personal service
   - 6-step authentication flow simulation
   - Google OAuth login, Web3 account connection, ZKP generation
   - Progress tracking and detailed account information display

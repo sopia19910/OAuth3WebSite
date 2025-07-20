@@ -132,7 +132,7 @@ export default function Demo() {
         setUserEmail(email);
         setCurrentStep("web3-setup");
         // Clear the URL parameters
-        window.history.replaceState({}, document.title, '/demo');
+        window.history.replaceState({}, document.title, '/personalservice');
       } else if (oauthSuccess === 'error') {
         const message = params.get('message') || 'Authentication failed';
         toast({
@@ -141,7 +141,7 @@ export default function Demo() {
           variant: "destructive",
           duration: 3000,
         });
-        window.history.replaceState({}, document.title, '/demo');
+        window.history.replaceState({}, document.title, '/personalservice');
       }
 
       // Check for existing wallet in storage
