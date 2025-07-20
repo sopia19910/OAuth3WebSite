@@ -691,10 +691,9 @@ export default function Demo() {
                     size="sm"
                     onClick={refreshBalance}
                     disabled={isRefreshingBalance}
-                    className="flex items-center gap-2"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted/10 border border-gray-500 w-7 h-7 p-0 flex items-center justify-center"
                   >
                     <ArrowPathIcon className={`w-4 h-4 ${isRefreshingBalance ? 'animate-spin' : ''}`} />
-                    Refresh
                   </Button>
                 </div>
                 <div className="text-center space-y-4">
