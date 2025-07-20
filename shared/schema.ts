@@ -34,6 +34,8 @@ export const chains = pgTable("chains", {
   chainId: integer("chain_id").notNull().unique(),
   explorerUrl: text("explorer_url").notNull(),
   networkImage: text("network_image"),
+  zkAccountFactory: text("zk_account_factory"),
+  verifierAddress: text("verifier_address"),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -74,6 +76,8 @@ export const insertChainSchema = createInsertSchema(chains).pick({
   chainId: true,
   explorerUrl: true,
   networkImage: true,
+  zkAccountFactory: true,
+  verifierAddress: true,
   isActive: true,
 }).extend({
   networkName: z.string().min(1, "Network name is required"),
@@ -81,6 +85,8 @@ export const insertChainSchema = createInsertSchema(chains).pick({
   chainId: z.number().positive("Chain ID must be positive"),
   explorerUrl: z.string().url("Invalid explorer URL"),
   networkImage: z.string().optional(),
+  zkAccountFactory: z.string().optional(),
+  verifierAddress: z.string().optional(),
   isActive: z.boolean().optional().default(true),
 });
 

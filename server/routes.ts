@@ -189,8 +189,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         networkName: activeChain.networkName,
         chainId: activeChain.chainId.toString(),
         explorerUrl: activeChain.explorerUrl,
-        zkVerifierV3Address: process.env.ZK_VERIFIER_V3_ADDRESS || '0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd',
-        zkAccountFactoryV3Address: process.env.ZK_ACCOUNT_FACTORY_V3_ADDRESS || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0',
+        zkVerifierV3Address: activeChain.verifierAddress || '0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd',
+        zkAccountFactoryV3Address: activeChain.zkAccountFactory || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0',
         oa3TokenAddress: process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea',
         taikoTokenAddress: process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890'
       });
@@ -218,8 +218,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🔍 Checking V3 ZK accounts for:', walletAddress, 'on chain:', chainId || 'active');
 
       // Contract addresses from environment or defaults
-      const ZK_VERIFIER_V3_ADDRESS = process.env.ZK_VERIFIER_V3_ADDRESS || '0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd';
-      const ZK_ACCOUNT_FACTORY_V3_ADDRESS = process.env.ZK_ACCOUNT_FACTORY_V3_ADDRESS || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0';
       const OA3_TOKEN_ADDRESS = process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea';
       const TAIKO_TOKEN_ADDRESS = process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890';
 
@@ -254,8 +252,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log('📍 Using chain:', selectedChain.networkName, 'with RPC:', selectedChain.rpcUrl);
+      
+      // Check if ZK Account Factory is deployed on this chain
+      if (!selectedChain.zkAccountFactory || !selectedChain.verifierAddress) {
+        console.log(`⚠️ ZK Account Factory not deployed on ${selectedChain.networkName}`);
+        return res.json({
+          success: true,
+          hasZKAccount: false,
+          zkAccountAddress: null,
+          currentOwner: null,
+          balance: '0',
+          tokenBalance: '0',
+          taikoBalance: '0',
+          requiresZKProof: false,
+          factoryAddress: null,
+          emailHash: '0',
+          domainHash: '0',
+          verifierContract: null,
+          accountNonce: '0',
+          error: `ZK Account Factory not deployed on ${selectedChain.networkName}`
+        });
+      }
+      
       const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
-      const zkAccountFactoryV3 = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, zkAccountFactoryV3ABI, provider);
+      const zkAccountFactoryV3 = new ethers.Contract(selectedChain.zkAccountFactory, zkAccountFactoryV3ABI, provider);
 
       // Get user's ZK accounts from V3 factory
       let userAccounts;
@@ -274,7 +294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tokenBalance: '0',
           taikoBalance: '0',
           requiresZKProof: false,
-          factoryAddress: ZK_ACCOUNT_FACTORY_V3_ADDRESS,
+          factoryAddress: selectedChain.zkAccountFactory,
           emailHash: '0',
           domainHash: '0',
           verifierContract: null,
@@ -357,10 +377,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tokenBalance: tokenBalanceFormatted,
           taikoBalance: taikoBalanceFormatted,
           requiresZKProof: requiresZKProof,
-          factoryAddress: ZK_ACCOUNT_FACTORY_V3_ADDRESS,
+          factoryAddress: selectedChain.zkAccountFactory,
           emailHash: emailHash?.toString() || '0',
           domainHash: domainHash?.toString() || '0',
-          verifierContract: verifierContract || ZK_VERIFIER_V3_ADDRESS,
+          verifierContract: verifierContract || selectedChain.verifierAddress,
           accountNonce: nonce?.toString() || '0'
         });
       } else {
@@ -369,7 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: true,
           hasZKAccount: false,
           zkAccountAddress: null,
-          factoryAddress: ZK_ACCOUNT_FACTORY_V3_ADDRESS
+          factoryAddress: selectedChain.zkAccountFactory
         });
       }
 
