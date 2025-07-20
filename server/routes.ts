@@ -9,8 +9,7 @@ import fs from "fs";
 import path from "path";
 import { z } from "zod";
 
-// Contract addresses and configuration
-const ZK_ACCOUNT_FACTORY_V3_ADDRESS = process.env.ZK_ACCOUNT_FACTORY_V3_ADDRESS || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0';
+// Contract addresses are now stored in database per chain
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configure session middleware
@@ -189,8 +188,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         networkName: activeChain.networkName,
         chainId: activeChain.chainId.toString(),
         explorerUrl: activeChain.explorerUrl,
-        zkVerifierV3Address: activeChain.verifierAddress || '0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd',
-        zkAccountFactoryV3Address: activeChain.zkAccountFactory || '0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0',
+        zkVerifierV3Address: activeChain.verifierAddress,
+        zkAccountFactoryV3Address: activeChain.zkAccountFactory,
         oa3TokenAddress: process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea',
         taikoTokenAddress: process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890'
       });
