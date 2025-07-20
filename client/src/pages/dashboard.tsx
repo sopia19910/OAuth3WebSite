@@ -1178,7 +1178,7 @@ export default function Dashboard() {
                 disabled={!zkAccountInfo?.hasZKAccount}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   !zkAccountInfo?.hasZKAccount
-                    ? "text-muted-foreground/50 cursor-not-allowed"
+                    ? "text-muted-foreground/50"
                     : activeMenu === "add-token"
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -1191,7 +1191,7 @@ export default function Dashboard() {
                 disabled={!zkAccountInfo?.hasZKAccount}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   !zkAccountInfo?.hasZKAccount
-                    ? "text-muted-foreground/50 cursor-not-allowed"
+                    ? "text-muted-foreground/50"
                     : activeMenu === "send"
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -1204,7 +1204,7 @@ export default function Dashboard() {
                 disabled={!zkAccountInfo?.hasZKAccount}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   !zkAccountInfo?.hasZKAccount
-                    ? "text-muted-foreground/50 cursor-not-allowed"
+                    ? "text-muted-foreground/50"
                     : activeMenu === "receive"
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
