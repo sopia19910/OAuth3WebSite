@@ -1174,9 +1174,12 @@ export default function Dashboard() {
                 Overview
               </button>
               <button
-                onClick={() => setActiveMenu("add-token")}
+                onClick={() => !zkAccountInfo?.hasZKAccount ? null : setActiveMenu("add-token")}
+                disabled={!zkAccountInfo?.hasZKAccount}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeMenu === "add-token"
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-muted-foreground/50 cursor-not-allowed"
+                    : activeMenu === "add-token"
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
@@ -1184,9 +1187,12 @@ export default function Dashboard() {
                 Add Token
               </button>
               <button
-                onClick={() => setActiveMenu("send")}
+                onClick={() => !zkAccountInfo?.hasZKAccount ? null : setActiveMenu("send")}
+                disabled={!zkAccountInfo?.hasZKAccount}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeMenu === "send"
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-muted-foreground/50 cursor-not-allowed"
+                    : activeMenu === "send"
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
@@ -1194,9 +1200,12 @@ export default function Dashboard() {
                 Send
               </button>
               <button
-                onClick={() => setActiveMenu("receive")}
+                onClick={() => !zkAccountInfo?.hasZKAccount ? null : setActiveMenu("receive")}
+                disabled={!zkAccountInfo?.hasZKAccount}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeMenu === "receive"
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-muted-foreground/50 cursor-not-allowed"
+                    : activeMenu === "receive"
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
