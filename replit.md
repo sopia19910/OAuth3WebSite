@@ -149,6 +149,16 @@ The application is designed to be easily extensible for implementing the actual 
   - Removed all hardcoded RPC URLs and chain IDs from codebase
   - Updated ZK account check to use database RPC URL
   - Removed fallback RPC URLs - now requires active chain in database
+- **ZKP Smart Contract Database Integration (2025-07-20)**:
+  - chains 테이블에 zkAccountFactory와 verifierAddress 컬럼 추가
+  - 각 체인별로 ZKP CA 작동을 위한 두 개의 스마트 컨트랙트 주소 저장
+  - Holesky Testnet ZKP 스마트 컨트랙트 추가:
+    - ZKAccountFactoryV3: 0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0
+    - Groth16Verifier: 0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd
+  - Sepolia Testnet ZKP 스마트 컨트랙트 업데이트:
+    - ZKAccountFactoryV3: 0x79964F88c2d3C4a8Fa6EBCC8b2c5601F231A5272
+    - Groth16Verifier: 0xA8e3217e6a2545c1B262716C6e7d4B3dEbEb7784
+  - 애플리케이션이 환경 변수 대신 데이터베이스에서 체인별 컨트랙트 주소 읽음
 - **Token Storage Migration to Database (2025-01-19)**:
   - Created `tokens` table in PostgreSQL for persistent token storage
   - Added API endpoints: GET /api/tokens, POST /api/tokens, DELETE /api/tokens/:id
