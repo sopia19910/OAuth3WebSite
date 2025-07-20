@@ -120,6 +120,14 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Smart Contract Deployment to Sepolia (2025-01-20)**:
+  - Successfully deployed all 3 contracts to Sepolia testnet:
+    - Groth16Verifier: 0x83f76458Ed154A34a9Ef071d1D08e31bb2E9E610
+    - ZKAccountV3 Implementation: 0x858b3ce1378451b4A1995fCB1ef46208Dc85456c
+    - ZKAccountFactoryV3: 0xE574f47Ad3D2fD2e60512CDB71d490FdacD2a56D
+  - Database updated with deployed contract addresses for Sepolia
+  - Application now shows ZK Account functionality only on Sepolia
+  - Holesky and other chains show appropriate warning messages
 - **Network Image Support in Database (2025-01-20)**:
   - Added `network_image` column to `chains` table for displaying network logos
   - Updated schema to support optional network image paths

@@ -1,9 +1,9 @@
 {
   "network": "sepolia",
-  "timestamp": "2025-07-20T06:03:38.582Z",
+  "timestamp": "2025-07-20T06:13:54.151Z",
   "contracts": {
-    "Groth16Verifier": "0x6291f5639b24D08D12008fDa79Ac6595c13130D7",
-    "ZKAccountV3Implementation": "0xd906cEd3E9fDB10b294Ae5d9e28Eaf0408e99C3e",
-    "ZKAccountFactoryV3": "0xbCE82617e728626e23FA1c08516646AdB0164680"
+    "Groth16Verifier": "0x83f76458Ed154A34a9Ef071d1D08e31bb2E9E610",
+    "ZKAccountV3Implementation": "0x858b3ce1378451b4A1995fCB1ef46208Dc85456c",
+    "ZKAccountFactoryV3": "0xE574f47Ad3D2fD2e60512CDB71d490FdacD2a56D"
   }
 }
