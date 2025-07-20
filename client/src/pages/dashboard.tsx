@@ -25,6 +25,7 @@ import {
   ArrowDownIcon,
   ArrowPathIcon,
   XMarkIcon,
+  Bars3Icon,
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
@@ -74,6 +75,7 @@ export default function Dashboard() {
   );
   const [networkName, setNetworkName] = useState("Loading...");
   const [userEmail, setUserEmail] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Send transaction state
   const [isSending, setIsSending] = useState(false);
@@ -602,7 +604,7 @@ export default function Dashboard() {
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               {/* Web2 OAuth Account */}
               <Card className="bg-card border-border rounded-none">
                 <CardHeader className="pb-3">
@@ -767,7 +769,7 @@ export default function Dashboard() {
 
       case "add-token":
         return (
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* Left Column - Added Tokens List */}
             <div className="space-y-4">
               <h2 className="text-base font-semibold">Added Tokens</h2>
@@ -1101,7 +1103,8 @@ export default function Dashboard() {
       {/* Session Status Bar */}
       <div className="fixed top-16 left-0 right-0 bg-muted/50 backdrop-blur-sm border-b border-border z-[60]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-12">
+          {/* Desktop Layout */}
+          <div className="hidden md:flex items-center justify-between h-12">
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium text-muted-foreground">
                 Current Session:
@@ -1217,11 +1220,95 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+          
+          {/* Mobile Layout */}
+          <div className="md:hidden py-2">
+            <div className="flex items-center justify-between mb-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-1"
+              >
+                <Bars3Icon className="w-6 h-6" />
+              </Button>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs font-semibold text-foreground truncate max-w-[150px]">
+                  {userEmail}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 text-xs py-1 h-7"
+                >
+                  {isLoggingOut ? "..." : "Disconnect"}
+                </Button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Network:</span>
+                <Select
+                  value={selectedChainId}
+                  disabled={isRefreshing}
+                  onValueChange={(value) => {
+                    setSelectedChainId(value);
+                    const selected = chains.find(chain => chain.id.toString() === value);
+                    if (selected) {
+                      setNetworkName(selected.networkName);
+                      setActiveMenu("overview");
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-32 h-6 text-xs bg-background">
+                    <SelectValue placeholder="Select network" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {chains.map((chain) => (
+                      <SelectItem key={chain.id} value={chain.id.toString()}>
+                        <div className="flex items-center gap-2">
+                          {chain.networkImage && (
+                            <img 
+                              src={ethereumLogo} 
+                              alt={chain.networkName}
+                              className="w-4 h-4 object-contain"
+                            />
+                          )}
+                          <span>{chain.networkName}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Owner:</span>
+                  <span className="font-mono text-xs text-foreground">
+                    {wallet?.address
+                      ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
+                      : "No wallet"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">ZKP:</span>
+                  <span className="font-mono text-xs text-foreground">
+                    {zkAccountInfo?.zkAccountAddress
+                      ? `${zkAccountInfo.zkAccountAddress.slice(0, 6)}...${zkAccountInfo.zkAccountAddress.slice(-4)}`
+                      : "Not created"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="pt-28 flex">
-        {/* Left Sidebar */}
-        <div className="w-56 bg-background border-r border-border/50 min-h-screen">
+      <div className="pt-32 md:pt-28 flex relative">
+        {/* Left Sidebar - Desktop */}
+        <div className="hidden md:block w-56 bg-background border-r border-border/50 min-h-screen">
           <div className="p-6">
             <nav className="space-y-1">
               <button
@@ -1276,9 +1363,97 @@ export default function Dashboard() {
             </nav>
           </div>
         </div>
+        
+        {/* Mobile Sidebar */}
+        <div className={`md:hidden fixed inset-0 z-[70] bg-background transition-transform duration-300 ease-in-out pt-32 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold">Menu</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-1"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </Button>
+            </div>
+            <nav className="space-y-2">
+              <button
+                onClick={() => {
+                  setActiveMenu("overview");
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                  activeMenu === "overview"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => {
+                  if (zkAccountInfo?.hasZKAccount) {
+                    setActiveMenu("add-token");
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+                disabled={!zkAccountInfo?.hasZKAccount}
+                className={`w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-gray-400"
+                    : activeMenu === "add-token"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                Add Token
+              </button>
+              <button
+                onClick={() => {
+                  if (zkAccountInfo?.hasZKAccount) {
+                    setActiveMenu("send");
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+                disabled={!zkAccountInfo?.hasZKAccount}
+                className={`w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-gray-400"
+                    : activeMenu === "send"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                Send
+              </button>
+              <button
+                onClick={() => {
+                  if (zkAccountInfo?.hasZKAccount) {
+                    setActiveMenu("receive");
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+                disabled={!zkAccountInfo?.hasZKAccount}
+                className={`w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-gray-400"
+                    : activeMenu === "receive"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                Receive
+              </button>
+            </nav>
+          </div>
+        </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8">
           {/* Selected Content */}
           {renderMainContent()}
         </div>
