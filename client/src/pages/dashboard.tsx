@@ -29,6 +29,7 @@ import {
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
 import QRCode from 'qrcode';
+import ethereumLogo from "@assets/image_1752985874370.png";
 import {
   getWalletFromStorage,
   getWalletBalance,
@@ -1144,7 +1145,16 @@ export default function Dashboard() {
                   <SelectContent>
                     {chains.map((chain) => (
                       <SelectItem key={chain.id} value={chain.id.toString()}>
-                        {chain.networkName}
+                        <div className="flex items-center gap-2">
+                          {chain.networkImage && (
+                            <img 
+                              src={ethereumLogo} 
+                              alt={chain.networkName}
+                              className="w-4 h-4 object-contain"
+                            />
+                          )}
+                          <span>{chain.networkName}</span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
