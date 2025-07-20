@@ -36,7 +36,7 @@ function compileContract(contractName: string, contractSource: string, imports: 
   // Import callback for OpenZeppelin contracts
   function findImports(importPath: string) {
     if (importPath.startsWith('@openzeppelin/')) {
-      const ozPath = path.join('node_modules', importPath);
+      const ozPath = path.join('../node_modules', importPath);
       try {
         const content = fs.readFileSync(ozPath, 'utf8');
         return { contents: content };
@@ -78,9 +78,9 @@ async function deployContracts() {
   console.log('💰 Balance:', ethers.formatEther(balance), 'ETH\n');
 
   // Read contract sources
-  const verifierSource = fs.readFileSync('contracts/SecureGoogleOAuthVerifier.sol', 'utf8');
-  const zkAccountSource = fs.readFileSync('contracts/ZKAccountV3.sol', 'utf8');
-  const factorySource = fs.readFileSync('contracts/ZKAccountFactoryV3.sol', 'utf8');
+  const verifierSource = fs.readFileSync('../attached_assets/SecureGoogleOAuthVerifier_1752991058294.sol', 'utf8');
+  const zkAccountSource = fs.readFileSync('../attached_assets/ZKAccountV3_1752991058296.sol', 'utf8');
+  const factorySource = fs.readFileSync('../attached_assets/ZKAccountFactoryV3_1752991058295.sol', 'utf8');
 
   // Step 1: Deploy SecureGoogleOAuthVerifier
   console.log('1️⃣ Deploying SecureGoogleOAuthVerifier...');
@@ -94,6 +94,7 @@ async function deployContracts() {
   );
   
   const verifier = await VerifierFactory.deploy();
+  console.log('📝 Verifier deployment tx hash:', verifier.deploymentTransaction()?.hash);
   await verifier.waitForDeployment();
   const verifierAddress = await verifier.getAddress();
   console.log('✅ Verifier deployed at:', verifierAddress);
@@ -114,6 +115,7 @@ async function deployContracts() {
   );
   
   const zkAccountImpl = await ZKAccountFactory.deploy();
+  console.log('📝 ZKAccount deployment tx hash:', zkAccountImpl.deploymentTransaction()?.hash);
   await zkAccountImpl.waitForDeployment();
   const zkAccountImplAddress = await zkAccountImpl.getAddress();
   console.log('✅ ZKAccountV3 Implementation deployed at:', zkAccountImplAddress);
@@ -137,6 +139,7 @@ async function deployContracts() {
   );
   
   const factory = await FactoryFactory.deploy(zkAccountImplAddress, verifierAddress);
+  console.log('📝 Factory deployment tx hash:', factory.deploymentTransaction()?.hash);
   await factory.waitForDeployment();
   const factoryAddress = await factory.getAddress();
   console.log('✅ ZKAccountFactoryV3 deployed at:', factoryAddress);
