@@ -257,6 +257,9 @@ export default function Demo() {
             // Check if ZK Account exists on this chain
             if (userEmail && currentStep === "balance") {
               console.log('🔍 Checking for ZK Account on chain:', selectedChain.networkName);
+              // Clear previous ZK Account info before checking new chain
+              setZkAccountInfo(null);
+              
               try {
                 const zkInfo = await checkZKAccount(wallet.address, selectedChainId);
                 if (zkInfo.hasZKAccount) {
@@ -275,12 +278,11 @@ export default function Demo() {
                     }, 2000);
                   }
                 } else {
-                  // Clear ZK Account info if not found on this chain
-                  setZkAccountInfo(null);
                   console.log('❌ No ZK Account on this chain');
                 }
               } catch (error) {
                 console.error('Error checking ZK Account:', error);
+                setZkAccountInfo(null);
               }
             }
           }
