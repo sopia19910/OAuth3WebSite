@@ -274,6 +274,10 @@ export default function Demo() {
                       setLocation("/dashboard");
                     }, 2000);
                   }
+                } else {
+                  // Clear ZK Account info if not found on this chain
+                  setZkAccountInfo(null);
+                  console.log('❌ No ZK Account on this chain');
                 }
               } catch (error) {
                 console.error('Error checking ZK Account:', error);
