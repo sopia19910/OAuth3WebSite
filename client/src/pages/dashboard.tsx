@@ -35,6 +35,7 @@ import {
   getNetworkInfo,
   type WalletInfo,
 } from "@/lib/wallet";
+import { ethers } from "ethers";
 import {
   checkZKAccount,
   waitForTransaction,
@@ -97,9 +98,13 @@ export default function Dashboard() {
   const [selectedChainId, setSelectedChainId] = useState<string>("");
   // Load wallet and account data on component mount
   useEffect(() => {
-    loadWalletData();
-    loadTokensFromDB();
-    loadChains();
+    // Load chains first, then wallet data
+    const loadInitialData = async () => {
+      await loadChains();
+      await loadWalletData();
+      await loadTokensFromDB();
+    };
+    loadInitialData();
   }, []);
 
   // Generate QR code when zkAccountInfo changes
@@ -121,6 +126,13 @@ export default function Dashboard() {
       });
     }
   }, [zkAccountInfo]);
+
+  // Refresh balance when selected chain changes
+  useEffect(() => {
+    if (wallet && selectedChainId && chains.length > 0) {
+      refreshAccountData();
+    }
+  }, [selectedChainId]);
 
   const loadChains = async () => {
     try {
@@ -193,9 +205,21 @@ export default function Dashboard() {
       if (savedWallet) {
         setWallet(savedWallet);
 
-        // Get wallet balance
-        const balance = await getWalletBalance(savedWallet.address);
-        setWalletBalance(balance.formatted);
+        // Get wallet balance using active chain if available
+        if (selectedChainId && chains.length > 0) {
+          const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+          if (selectedChain) {
+            const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+            const balance = await getWalletBalance(savedWallet.address, provider);
+            setWalletBalance(balance.formatted);
+          } else {
+            const balance = await getWalletBalance(savedWallet.address);
+            setWalletBalance(balance.formatted);
+          }
+        } else {
+          const balance = await getWalletBalance(savedWallet.address);
+          setWalletBalance(balance.formatted);
+        }
 
         // Check for ZK Account
         const zkInfo = await checkZKAccount(savedWallet.address);
@@ -221,9 +245,21 @@ export default function Dashboard() {
 
     setIsRefreshing(true);
     try {
-      // Refresh wallet balance
-      const balance = await getWalletBalance(wallet.address);
-      setWalletBalance(balance.formatted);
+      // Get the selected chain
+      const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+      if (selectedChain) {
+        // Create provider for the selected chain
+        const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+        
+        // Refresh wallet balance using the selected chain's provider
+        const balance = await getWalletBalance(wallet.address, provider);
+        setWalletBalance(balance.formatted);
+        console.log(`💰 Balance on ${selectedChain.networkName}: ${balance.formatted} ETH`);
+      } else {
+        // Fallback to default provider
+        const balance = await getWalletBalance(wallet.address);
+        setWalletBalance(balance.formatted);
+      }
 
       // Refresh ZK Account info
       const zkInfo = await checkZKAccount(wallet.address);
@@ -231,6 +267,12 @@ export default function Dashboard() {
       console.log('✅ Account data refreshed');
     } catch (error) {
       console.error("Failed to refresh account data:", error);
+      toast({
+        title: "Failed to refresh",
+        description: "Could not refresh account data. Please try again.",
+        variant: "destructive",
+        duration: 2000,
+      });
     } finally {
       setIsRefreshing(false);
     }
