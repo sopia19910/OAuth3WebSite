@@ -841,6 +841,8 @@ export default function Demo() {
                       if (chain) {
                         setNetworkName(chain.networkName);
                       }
+                      // Clear ZK Account info when chain changes
+                      setZkAccountInfo(null);
                     }}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a network" />
