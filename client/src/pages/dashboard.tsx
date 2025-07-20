@@ -766,16 +766,11 @@ export default function Dashboard() {
 
       case "add-token":
         return (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <h2 className="text-base font-semibold flex items-center gap-2">
-              <PlusIcon className="w-5 h-5" />
-              Add Token
-            </h2>
-            
-            {/* Custom Tokens List */}
-            {customTokens.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Added Tokens</h3>
+          <div className="grid grid-cols-2 gap-6">
+            {/* Left Column - Added Tokens List */}
+            <div className="space-y-4">
+              <h2 className="text-base font-semibold">Added Tokens</h2>
+              {customTokens.length > 0 ? (
                 <div className="space-y-2">
                   {customTokens.map((token) => (
                     <div 
@@ -840,16 +835,28 @@ export default function Dashboard() {
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-            <div>
-              <Label
-                htmlFor="token-address"
-                className="text-sm font-medium"
-              >
-                Token Contract Address
-              </Label>
-              <Input
+              ) : (
+                <div className="p-4 border border-border rounded bg-card/50 text-center">
+                  <p className="text-sm text-muted-foreground">No tokens added yet</p>
+                </div>
+              )}
+            </div>
+            
+            {/* Right Column - Add Token Form */}
+            <div className="space-y-6">
+              <h2 className="text-base font-semibold flex items-center gap-2">
+                <PlusIcon className="w-5 h-5" />
+                Add Token
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <Label
+                    htmlFor="token-address"
+                    className="text-sm font-medium"
+                  >
+                    Token Contract Address
+                  </Label>
+                  <Input
                 id="token-address"
                 placeholder="0x..."
                 value={tokenAddress}
@@ -887,6 +894,8 @@ export default function Dashboard() {
             >
               Add Token
             </Button>
+              </div>
+            </div>
           </div>
         );
 
