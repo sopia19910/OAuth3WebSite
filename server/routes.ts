@@ -146,12 +146,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: circuitInput.timestamp
       };
 
-      // Redirect back to demo page
-      res.redirect(`/demo?oauth=success&email=${encodeURIComponent(email)}&domain=${encodeURIComponent(emailDomain)}`);
+      // Redirect back to personal service page
+      res.redirect(`/personalservice?oauth=success&email=${encodeURIComponent(email)}&domain=${encodeURIComponent(emailDomain)}`);
 
     } catch (error) {
       console.error('❌ OAuth callback error:', error);
-      res.redirect('/demo?oauth=error&message=' + encodeURIComponent('Authentication failed'));
+      res.redirect('/personalservice?oauth=error&message=' + encodeURIComponent('Authentication failed'));
     }
   });
 

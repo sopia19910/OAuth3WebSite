@@ -193,7 +193,7 @@ export default function Dashboard() {
             "❌ Invalid or expired OAuth session. Redirecting to demo...",
           );
           alert("Session expired or invalid. Please login again.");
-          setLocation("/demo");
+          setLocation("/personalservice");
           return;
         }
 
@@ -755,7 +755,7 @@ export default function Dashboard() {
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Your ZKP Contract Account has not been created on the {networkName} network. 
-                      To create your ZKP CA, please go to the <a href="/demo" className="underline hover:text-foreground">Demo page</a> and complete the ZKP generation process.
+                      To create your ZKP CA, please go to the <a href="/personalservice" className="underline hover:text-foreground">Personal Service page</a> and complete the ZKP generation process.
                     </p>
                   </div>
                 </div>

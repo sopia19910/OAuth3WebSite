@@ -10,7 +10,7 @@ import Services from "@/pages/services";
 import Resources from "@/pages/resources";
 import Whitepaper from "@/pages/whitepaper";
 import Contact from "@/pages/contact";
-import Demo from "@/pages/demo";
+import PersonalService from "@/pages/personalservice";
 import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
 
@@ -24,7 +24,7 @@ function Router() {
       <Route path="/resources" component={Resources} />
       <Route path="/whitepaper" component={Whitepaper} />
       <Route path="/contact" component={Contact} />
-      <Route path="/demo" component={Demo} />
+      <Route path="/personalservice" component={PersonalService} />
       <Route path="/dashboard" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>

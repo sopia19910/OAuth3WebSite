@@ -183,7 +183,7 @@ export default function Services() {
                     </span>
                   ))}
                 </div>
-                <Link href="/demo">
+                <Link href="/personalservice">
                   <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                     Get Started
                   </Button>
