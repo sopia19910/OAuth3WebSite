@@ -127,12 +127,20 @@ export default function Dashboard() {
     }
   }, [zkAccountInfo]);
 
-  // Refresh balance when selected chain changes
+  // Refresh balance when selected chain changes with debouncing
   useEffect(() => {
-    if (wallet && selectedChainId && chains.length > 0) {
+    if (!wallet || !selectedChainId || chains.length === 0) return;
+    
+    // Add debouncing to prevent rapid chain switching issues
+    const timeoutId = setTimeout(() => {
       refreshAccountData();
-    }
-  }, [selectedChainId]);
+    }, 300); // 300ms debounce
+    
+    // Cleanup function to cancel pending refreshes
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [selectedChainId, wallet?.address, chains.length]);
 
   const loadChains = async () => {
     try {
@@ -221,9 +229,11 @@ export default function Dashboard() {
           setWalletBalance(balance.formatted);
         }
 
-        // Check for ZK Account on the selected chain
-        const zkInfo = await checkZKAccount(savedWallet.address, selectedChainId);
-        setZkAccountInfo(zkInfo);
+        // Check for ZK Account on the selected chain (only if chain is selected)
+        if (selectedChainId) {
+          const zkInfo = await checkZKAccount(savedWallet.address, selectedChainId);
+          setZkAccountInfo(zkInfo);
+        }
       }
 
       // Get network info and config
@@ -241,30 +251,62 @@ export default function Dashboard() {
   };
 
   const refreshAccountData = async () => {
-    if (!wallet) return;
+    if (!wallet || isRefreshing) return; // Prevent multiple concurrent refreshes
 
     setIsRefreshing(true);
     try {
       // Get the selected chain
       const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
-      if (selectedChain) {
-        // Create provider for the selected chain
-        const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
-        
-        // Refresh wallet balance using the selected chain's provider
-        const balance = await getWalletBalance(wallet.address, provider);
-        setWalletBalance(balance.formatted);
-        console.log(`💰 Balance on ${selectedChain.networkName}: ${balance.formatted} ETH`);
-      } else {
-        // Fallback to default provider
-        const balance = await getWalletBalance(wallet.address);
-        setWalletBalance(balance.formatted);
+      if (!selectedChain) {
+        console.error("Selected chain not found");
+        return;
       }
 
-      // Refresh ZK Account info for the selected chain
-      const zkInfo = await checkZKAccount(wallet.address, selectedChainId);
-      setZkAccountInfo(zkInfo);
-      console.log('✅ Account data refreshed');
+      // Create provider for the selected chain
+      const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+      
+      // Run balance and ZK account checks in parallel for better performance
+      try {
+        const [balance, zkInfo] = await Promise.all([
+          getWalletBalance(wallet.address, provider),
+          checkZKAccount(wallet.address, selectedChainId)
+        ]);
+        
+        // Update states only after both operations complete
+        setWalletBalance(balance.formatted);
+        setZkAccountInfo(zkInfo);
+        
+        console.log(`✅ Account data refreshed for ${selectedChain.networkName}`);
+        console.log(`💰 Balance: ${balance.formatted} ETH`);
+        console.log(`🔐 ZK Account: ${zkInfo.hasZKAccount ? 'Yes' : 'No'}`);
+      } catch (err) {
+        console.error("Error during parallel fetch:", err);
+        // Try sequential fetch as fallback
+        const balance = await getWalletBalance(wallet.address, provider);
+        setWalletBalance(balance.formatted);
+        
+        try {
+          const zkInfo = await checkZKAccount(wallet.address, selectedChainId);
+          setZkAccountInfo(zkInfo);
+        } catch (zkError) {
+          console.error("Failed to check ZK account:", zkError);
+          // Set default ZK info if check fails
+          setZkAccountInfo({
+            hasZKAccount: false,
+            zkAccountAddress: null,
+            currentOwner: null,
+            balance: '0',
+            tokenBalance: '0',
+            taikoBalance: '0',
+            requiresZKProof: false,
+            emailHash: '0',
+            domainHash: '0',
+            verifierContract: null,
+            accountNonce: '0',
+            factoryAddress: null
+          });
+        }
+      }
     } catch (error) {
       console.error("Failed to refresh account data:", error);
       toast({
@@ -1066,13 +1108,13 @@ export default function Dashboard() {
                 <span className="text-muted-foreground">Network:</span>
                 <Select
                   value={selectedChainId}
+                  disabled={isRefreshing}
                   onValueChange={(value) => {
                     setSelectedChainId(value);
                     const selected = chains.find(chain => chain.id.toString() === value);
                     if (selected) {
                       setNetworkName(selected.networkName);
-                      // Refresh account data for the new chain
-                      refreshAccountData();
+                      // The useEffect will handle refreshing account data with debouncing
                     }
                   }}
                 >

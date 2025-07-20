@@ -158,6 +158,23 @@
 
     } catch (error) {
       console.error('Error checking ZK account:', error);
+      // Handle rate limiting errors gracefully
+      if (error instanceof Error && error.message.includes('rate limit')) {
+        return {
+          hasZKAccount: false,
+          zkAccountAddress: null,
+          currentOwner: null,
+          balance: '0',
+          tokenBalance: '0',
+          taikoBalance: '0',
+          requiresZKProof: false,
+          emailHash: '0',
+          domainHash: '0',
+          verifierContract: null,
+          accountNonce: '0',
+          factoryAddress: null
+        };
+      }
       throw new Error(`Failed to check ZK account: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
