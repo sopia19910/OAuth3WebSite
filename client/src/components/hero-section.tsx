@@ -114,7 +114,7 @@ export default function HeroSection() {
               Experience next-generation authentication that bridges traditional and blockchain ecosystems.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/personalservice">
+              <Link href="/personalservice?fresh=true">
                 <Button 
                   size="lg" 
                   className="bg-primary hover:bg-primary/90 text-white px-8 py-3 font-semibold animate-pulse-glow"

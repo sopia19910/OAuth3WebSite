@@ -131,6 +131,7 @@ export default function Demo() {
         const email = params.get('email');
         const fromDashboard = params.get('from') === 'dashboard';
         const chainId = params.get('chainId');
+        const isFreshStart = params.get('fresh') === 'true';
         
         // Handle OAuth callback
         if (oauthSuccess === 'success' && email) {
@@ -147,8 +148,8 @@ export default function Demo() {
             duration: 3000,
           });
           window.history.replaceState({}, document.title, '/personalservice');
-        } else {
-          // Check for existing OAuth session
+        } else if (!isFreshStart) {
+          // Check for existing OAuth session only if not a fresh start
           try {
             const authResponse = await fetch('/api/auth/me');
             const authData = await authResponse.json();
@@ -190,8 +191,8 @@ export default function Demo() {
         const info = getNetworkInfo();
         setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
         
-        // Clear URL parameters if coming from dashboard
-        if (fromDashboard) {
+        // Clear URL parameters
+        if (fromDashboard || isFreshStart) {
           window.history.replaceState({}, document.title, '/personalservice');
         }
       } catch (error) {
