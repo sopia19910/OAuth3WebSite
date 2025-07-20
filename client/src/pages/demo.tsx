@@ -661,7 +661,12 @@ export default function Demo() {
                         onClick={() => {
                           if (wallet?.privateKey) {
                             copyToClipboard(wallet.privateKey, 'Private Key');
-                            alert('⚠️ Private key copied! Keep it secure and never share it with anyone.');
+                            toast({
+                              title: "⚠️ Private key copied!",
+                              description: "Keep it secure and never share it with anyone.",
+                              variant: "destructive",
+                              duration: 2000,
+                            });
                           }
                         }}
                         className="p-1 h-auto hover:bg-background"
