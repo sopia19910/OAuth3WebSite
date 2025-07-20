@@ -221,8 +221,8 @@ export default function Dashboard() {
           setWalletBalance(balance.formatted);
         }
 
-        // Check for ZK Account
-        const zkInfo = await checkZKAccount(savedWallet.address);
+        // Check for ZK Account on the selected chain
+        const zkInfo = await checkZKAccount(savedWallet.address, selectedChainId);
         setZkAccountInfo(zkInfo);
       }
 
@@ -261,8 +261,8 @@ export default function Dashboard() {
         setWalletBalance(balance.formatted);
       }
 
-      // Refresh ZK Account info
-      const zkInfo = await checkZKAccount(wallet.address);
+      // Refresh ZK Account info for the selected chain
+      const zkInfo = await checkZKAccount(wallet.address, selectedChainId);
       setZkAccountInfo(zkInfo);
       console.log('✅ Account data refreshed');
     } catch (error) {

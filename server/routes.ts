@@ -206,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Check ZK Account V3
   app.get('/api/zkaccount3/check', async (req, res) => {
     try {
-      const { walletAddress } = req.query;
+      const { walletAddress, chainId } = req.query;
 
       if (!walletAddress || !ethers.isAddress(walletAddress as string)) {
         return res.status(400).json({
@@ -215,7 +215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      console.log('🔍 Checking V3 ZK accounts for:', walletAddress);
+      console.log('🔍 Checking V3 ZK accounts for:', walletAddress, 'on chain:', chainId || 'active');
 
       // Contract addresses from environment or defaults
       const ZK_VERIFIER_V3_ADDRESS = process.env.ZK_VERIFIER_V3_ADDRESS || '0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd';
@@ -230,16 +230,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "function isZKAccount(address) external view returns (bool)"
       ];
 
-      // Connect to factory V3
-      // Get active chain RPC URL from database
-      const activeChain = await storage.getActiveChain();
-      if (!activeChain) {
-        return res.status(500).json({ 
-          success: false, 
-          error: 'No active chain configured in database' 
-        });
+      // Get chain RPC URL from database
+      let selectedChain;
+      if (chainId) {
+        // If chainId is provided, get that specific chain
+        const chains = await storage.getChains();
+        selectedChain = chains.find(chain => chain.id.toString() === chainId.toString());
+        if (!selectedChain) {
+          return res.status(400).json({ 
+            success: false, 
+            error: 'Invalid chain ID' 
+          });
+        }
+      } else {
+        // Otherwise use the active chain
+        selectedChain = await storage.getActiveChain();
+        if (!selectedChain) {
+          return res.status(500).json({ 
+            success: false, 
+            error: 'No active chain configured in database' 
+          });
+        }
       }
-      const provider = new ethers.JsonRpcProvider(activeChain.rpcUrl);
+      
+      console.log('📍 Using chain:', selectedChain.networkName, 'with RPC:', selectedChain.rpcUrl);
+      const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
       const zkAccountFactoryV3 = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, zkAccountFactoryV3ABI, provider);
 
       // Get user's ZK accounts from V3 factory

@@ -114,7 +114,7 @@
   }
 
   // Check if user has existing ZK Account using backend API
-  export async function checkZKAccount(walletAddress: string): Promise<ZKAccountInfo> {
+  export async function checkZKAccount(walletAddress: string, chainId?: string): Promise<ZKAccountInfo> {
     try {
       if (!ethers.isAddress(walletAddress)) {
         throw new Error('Invalid wallet address');
@@ -125,9 +125,14 @@
         await loadContractAddresses();
       }
 
-      console.log('🔍 Checking ZK Account for:', walletAddress);
+      console.log('🔍 Checking ZK Account for:', walletAddress, 'on chain:', chainId || 'active');
 
-      const response = await fetch(`/api/zkaccount3/check?walletAddress=${walletAddress}`);
+      let url = `/api/zkaccount3/check?walletAddress=${walletAddress}`;
+      if (chainId) {
+        url += `&chainId=${chainId}`;
+      }
+
+      const response = await fetch(url);
       const data = await response.json();
 
       if (!data.success) {
