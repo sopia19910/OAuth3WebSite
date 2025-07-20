@@ -258,9 +258,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const zkAccountFactoryV3 = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, zkAccountFactoryV3ABI, provider);
 
       // Get user's ZK accounts from V3 factory
-      const userAccounts = await zkAccountFactoryV3.getUserAccounts(walletAddress);
-
-      console.log('📱 Found', userAccounts.length, 'ZK Account V3(s) for:', walletAddress);
+      let userAccounts;
+      try {
+        userAccounts = await zkAccountFactoryV3.getUserAccounts(walletAddress);
+        console.log('📱 Found', userAccounts.length, 'ZK Account V3(s) for:', walletAddress);
+      } catch (error) {
+        // Contract not deployed on this chain
+        console.log(`⚠️ ZK Account Factory not deployed on ${selectedChain.networkName}`);
+        return res.json({
+          success: true,
+          hasZKAccount: false,
+          error: `ZK Account Factory not deployed on ${selectedChain.networkName}`,
+          factoryAddress: ZK_ACCOUNT_FACTORY_V3_ADDRESS
+        });
+      }
 
       if (userAccounts.length > 0) {
         const zkAccountAddress = userAccounts[0]; // Use first account
