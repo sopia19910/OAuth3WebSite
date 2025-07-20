@@ -121,6 +121,7 @@ export default function Demo() {
   // Chain state
   const [chains, setChains] = useState<any[]>([]);
   const [selectedChainId, setSelectedChainId] = useState<string>("");
+  const [urlChainId, setUrlChainId] = useState<string | null>(null);
 
   // Check for OAuth callback parameters and existing session
   useEffect(() => {
@@ -167,9 +168,10 @@ export default function Demo() {
                 // If user has both OAuth session and wallet, skip to balance step
                 setCurrentStep("balance");
                 
-                // If coming from dashboard with specific chain, set it
+                // If coming from dashboard with specific chain, save it
                 if (fromDashboard && chainId) {
-                  setSelectedChainId(chainId);
+                  setUrlChainId(chainId);
+                  console.log('📌 Chain ID from dashboard:', chainId);
                 }
               } else {
                 // Has OAuth but no wallet, go to web3 setup
@@ -211,11 +213,22 @@ export default function Demo() {
         const data = await response.json();
         if (data.success && data.chains) {
           setChains(data.chains);
-          // Set the active chain as selected by default
-          const activeChain = data.chains.find((chain: any) => chain.isActive);
-          if (activeChain) {
-            setSelectedChainId(activeChain.id.toString());
-            setNetworkName(activeChain.networkName);
+          
+          // If we have a chain ID from URL (dashboard), use it
+          if (urlChainId) {
+            const targetChain = data.chains.find((chain: any) => chain.id.toString() === urlChainId);
+            if (targetChain) {
+              setSelectedChainId(urlChainId);
+              setNetworkName(targetChain.networkName);
+              console.log('🎯 Using chain from dashboard:', targetChain.networkName);
+            }
+          } else {
+            // Otherwise, set the active chain as selected by default
+            const activeChain = data.chains.find((chain: any) => chain.isActive);
+            if (activeChain) {
+              setSelectedChainId(activeChain.id.toString());
+              setNetworkName(activeChain.networkName);
+            }
           }
         }
       } catch (error) {
@@ -223,7 +236,7 @@ export default function Demo() {
       }
     };
     fetchChains();
-  }, []);
+  }, [urlChainId]);
 
   // Auto-refresh balance when wallet or chain changes
   useEffect(() => {
