@@ -773,7 +773,7 @@ export default function Demo() {
                                   className="w-4 h-4 object-contain"
                                 />
                               )}
-                              <span>{chain.networkName} {chain.isActive && "(Active)"}</span>
+                              <span>{chain.networkName}</span>
                             </div>
                           </SelectItem>
                         ))}
