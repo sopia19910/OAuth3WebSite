@@ -108,11 +108,19 @@ export default function Dashboard() {
         // Load chains first, then wallet data
         const loadInitialData = async () => {
             await loadChains();
-            await loadWalletData();
-            await loadTokensFromDB();
+            // Don't load wallet data here - let it be triggered by selectedChainId change
         };
         loadInitialData();
     }, []);
+
+    // Load wallet data when chains are loaded and selectedChainId is set
+    useEffect(() => {
+        if (selectedChainId && chains.length > 0) {
+            console.log('🔄 Loading wallet data for chain:', selectedChainId);
+            loadWalletData();
+            loadTokensFromDB();
+        }
+    }, [selectedChainId, chains.length]);
 
     // Generate QR code when zkAccountInfo changes
     useEffect(() => {
