@@ -173,7 +173,7 @@ export default function Dashboard() {
     useEffect(() => {
         if (!wallet || !zkAccountInfo?.zkAccountAddress || customTokens.length === 0 || !selectedChainId || chains.length === 0) return;
         
-        const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+        const selectedChain = chains.find(chain => chain.chainId.toString() === selectedChainId);
         if (selectedChain) {
             loadTokenBalances(customTokens, selectedChain.chainId.toString());
         }
@@ -240,7 +240,7 @@ export default function Dashboard() {
         
         try {
             // Get the actual chain ID (not database ID)
-            const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+            const selectedChain = chains.find(chain => chain.chainId.toString() === selectedChainId);
             if (!selectedChain) return;
 
             const response = await fetch(`/api/tokens?chainId=${selectedChain.chainId}`, {
