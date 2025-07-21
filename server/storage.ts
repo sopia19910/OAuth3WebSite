@@ -8,7 +8,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   createContact(contact: InsertContact): Promise<Contact>;
-  getTokensByEmailAndChain(userEmail: string, chainId: number): Promise<Token[]>;
+  getTokensByChain(chainId: number): Promise<Token[]>;
   createToken(token: InsertToken): Promise<Token>;
   deleteToken(id: number, userEmail: string): Promise<boolean>;
   getChains(): Promise<Chain[]>;
@@ -62,9 +62,9 @@ export class MemStorage implements IStorage {
     return contact;
   }
 
-  async getTokensByEmailAndChain(userEmail: string, chainId: number): Promise<Token[]> {
+  async getTokensByChain(chainId: number): Promise<Token[]> {
     return Array.from(this.tokens.values()).filter(
-      (token) => token.userEmail === userEmail && token.chainId === chainId
+      (token) => token.chainId === chainId
     );
   }
 
@@ -172,16 +172,13 @@ export class DatabaseStorage implements IStorage {
     return contact;
   }
 
-  async getTokensByEmailAndChain(userEmail: string, chainId: number): Promise<Token[]> {
+  async getTokensByChain(chainId: number): Promise<Token[]> {
     const { db } = await import("./db");
     const { tokens } = await import("@shared/schema");
-    const { eq, and } = await import("drizzle-orm");
+    const { eq } = await import("drizzle-orm");
     
     return await db.select().from(tokens).where(
-      and(
-        eq(tokens.userEmail, userEmail),
-        eq(tokens.chainId, chainId)
-      )
+      eq(tokens.chainId, chainId)
     );
   }
 

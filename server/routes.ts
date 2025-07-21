@@ -487,14 +487,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Token Management APIs
   app.get('/api/tokens', requireAuth, async (req, res) => {
     try {
-      const userEmail = req.session.user?.email;
-      if (!userEmail) {
-        return res.status(401).json({
-          success: false,
-          error: 'Unauthorized'
-        });
-      }
-
       const { chainId } = req.query;
       if (!chainId) {
         return res.status(400).json({
@@ -503,8 +495,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      console.log('🔍 Getting tokens for email:', userEmail, 'chainId:', chainId, 'parsed:', parseInt(chainId as string));
-      const tokens = await storage.getTokensByEmailAndChain(userEmail, parseInt(chainId as string));
+      console.log('🔍 Getting tokens for chainId:', chainId, 'parsed:', parseInt(chainId as string));
+      const tokens = await storage.getTokensByChain(parseInt(chainId as string));
       console.log('📦 Found tokens:', tokens.length);
       
       res.json({
