@@ -162,17 +162,17 @@
       if (error instanceof Error && error.message.includes('rate limit')) {
         return {
           hasZKAccount: false,
-          zkAccountAddress: null,
-          currentOwner: null,
+          zkAccountAddress: undefined,
+          currentOwner: undefined,
           balance: '0',
           tokenBalance: '0',
           taikoBalance: '0',
           requiresZKProof: false,
           emailHash: '0',
           domainHash: '0',
-          verifierContract: null,
+          verifierContract: undefined,
           accountNonce: '0',
-          factoryAddress: null
+          factoryAddress: undefined
         };
       }
       throw new Error(`Failed to check ZK account: ${error instanceof Error ? error.message : 'Unknown error'}`);
