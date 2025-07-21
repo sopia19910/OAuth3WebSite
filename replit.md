@@ -28,6 +28,8 @@ Preferred communication style: Simple, everyday language.
 - **Database Tables**:
   - `users`: Stores user accounts (id, username, password)
   - `contacts`: Stores contact form submissions (id, first_name, last_name, email, company, message, created_at)
+  - `tokens`: Stores custom ERC20 tokens (id, user_email, address, symbol, name, created_at)
+  - `chains`: Stores blockchain network configurations (id, network_name, rpc_url, chain_id, explorer_url, is_active, created_at, updated_at)
 
 ### Key Components
 
@@ -118,6 +120,55 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Sepolia Gas Limit Fix (2025-01-21)**:
+  - Fixed "insufficient funds" error on Sepolia testnet during ZK Account creation
+  - Implemented network-specific gas limits:
+    - Sepolia (chainId: 11155111): 1,000,000 gas limit
+    - Other networks: 500,000 gas limit (default)
+  - Added detailed error logging for better debugging
+  - Added specific error handling for gas limit exceeded errors
+- **Smart Contract Deployment to Sepolia (2025-01-20)**:
+  - Successfully deployed all 3 contracts to Sepolia testnet:
+    - Groth16Verifier: 0x83f76458Ed154A34a9Ef071d1D08e31bb2E9E610
+    - ZKAccountV3 Implementation: 0x858b3ce1378451b4A1995fCB1ef46208Dc85456c
+    - ZKAccountFactoryV3: 0xE574f47Ad3D2fD2e60512CDB71d490FdacD2a56D
+  - Database updated with deployed contract addresses for Sepolia
+  - Application now shows ZK Account functionality only on Sepolia
+  - Holesky and other chains show appropriate warning messages
+- **Network Image Support in Database (2025-01-20)**:
+  - Added `network_image` column to `chains` table for displaying network logos
+  - Updated schema to support optional network image paths
+  - Added Ethereum logo (@assets/image_1752985874370.png) to all existing chains
+  - Ready for UI integration to display network logos in chain selector
+- **Dashboard Chain Selector and ZKP CA Warning (2025-01-20)**:
+  - Added chain network selector dropdown in Session Status Bar
+  - Users can now switch between available chains from dashboard
+  - Added warning message when ZKP CA is not created on selected network
+  - ZKP Smart Contract card highlights in red when CA not created
+  - Warning directs users to Personal Service page for ZKP generation
+- **Chain Configuration Database Migration (2025-01-20)**:
+  - Created `chains` table in PostgreSQL for network configuration storage
+  - Added API endpoints: GET /api/chains, POST /api/chains, PUT /api/chains/:id, DELETE /api/chains/:id
+  - Migrated from environment variables to database for chain configuration
+  - Added holesky chain as default active network with RPC URL and explorer
+  - Configuration endpoint now reads from database instead of environment variables
+  - Supports multiple chains with active/inactive status management
+  - Removed all hardcoded RPC URLs and chain IDs from codebase
+  - Updated ZK account check to use database RPC URL
+  - Removed fallback RPC URLs - now requires active chain in database
+- **ZKP Smart Contract Database Integration (2025-07-20)**:
+  - chains 테이블에 zkAccountFactory와 verifierAddress 컬럼 추가
+  - 각 체인별로 ZKP CA 작동을 위한 두 개의 스마트 컨트랙트 주소 저장
+  - Holesky Testnet ZKP 스마트 컨트랙트 추가:
+    - ZKAccountFactoryV3: 0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0
+    - Groth16Verifier: 0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd
+  - Sepolia Testnet ZKP 스마트 컨트랙트 업데이트:
+    - ZKAccountFactoryV3: 0x909d1bAf9547112b112c1d37ac8D9b5EaEb3DEd6
+    - Groth16Verifier: 0x9481E026034b2b1F96B9E080983079A1cBc082FA
+  - Ethereum Mainnet ZKP 스마트 컨트랙트 추가:
+    - ZKAccountFactoryV3: 0xDa12A4D2aeC349C8eE5ED77b7F2B38D0BE083bd0
+    - Groth16Verifier: 0x99ab99d09e3dD138035a827eEF741B8F6D7AC8cd
+  - 애플리케이션이 환경 변수 대신 데이터베이스에서 체인별 컨트랙트 주소 읽음
 - **Token Storage Migration to Database (2025-01-19)**:
   - Created `tokens` table in PostgreSQL for persistent token storage
   - Added API endpoints: GET /api/tokens, POST /api/tokens, DELETE /api/tokens/:id
@@ -139,7 +190,7 @@ The application is designed to be easily extensible for implementing the actual 
   - Ethereum address validation for token contracts
 - **Toast Notification System (2025-01-19)**:
   - Replaced alert messages with toast popups on Dashboard page
-  - Extended toast system to Demo page for copy operations
+  - Extended toast system to Personal Service page for copy operations
   - 2-second auto-dismiss with error variants for failures
 - **Dashboard UI Updates (2025-01-19)**: Made multiple refinements to the dashboard interface
   - Changed "Logout" button to "Disconnect" with gray border styling
@@ -160,6 +211,15 @@ The application is designed to be easily extensible for implementing the actual 
   - Added QR code generation for ZKP Contract Account address using qrcode library
   - Removed fallback to regular wallet address for clearer user experience
   - Made Refresh button in Account Overview section square (7x7) with centered icon
+- **Global Input Styling (2025-01-20)**:
+  - Added purple 1px border to all input, textarea, and select elements on focus
+  - Removed default focus ring styles from Input and Textarea components
+  - Applied consistent purple focus border (hsl(260, 100%, 70%)) across all pages
+  - Extended purple focus border to Select components (combo boxes) with 1px width
+- **Personal Service Page Private Key Warning (2025-01-20)**:
+  - Changed private key copy warning from alert dialog to toast popup message
+  - Added destructive variant toast with 2-second duration for better UX
+  - Made Balance Information refresh button icon-only matching dashboard style
 - **Home Page Restructure (2025-01-19)**: Replaced individual sections with summary overviews
   - Added About OAuth 3 summary section with key benefits
   - Added Technology summary section with core components (EOA, CA, ZKP)
@@ -169,9 +229,9 @@ The application is designed to be easily extensible for implementing the actual 
 - **Navigation Update (2025-01-19)**: Changed "Resources" to "Docs" in main menu
 - **Services Page Enhancement (2025-01-19)**: 
   - Added professional card designs with gradients and icons
-  - Individual Services: Added "Get Started" button linking to /demo
+  - Individual Services: Added "Get Started" button linking to /personalservice
   - Enterprise Services: Added "Coming Soon" label
-- **View Demo Page (2025-01-17)**: Added comprehensive interactive demo
+- **Personal Service Page (2025-01-17)**: Added comprehensive interactive personal service
   - 6-step authentication flow simulation
   - Google OAuth login, Web3 account connection, ZKP generation
   - Progress tracking and detailed account information display

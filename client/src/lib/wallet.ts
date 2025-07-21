@@ -33,10 +33,8 @@ async function getRpcUrl(): Promise<string> {
     console.error('Failed to fetch RPC URL:', error);
   }
 
-  // Fallback to Holesky testnet
-  const fallbackUrl = 'https://rpc-holesky.rockx.com';
-  console.log('Using fallback RPC URL:', fallbackUrl);
-  return fallbackUrl;
+  // No fallback - require active chain in database
+  throw new Error('No active chain configured in database');
 }
 
 // Create a new random wallet
@@ -91,10 +89,7 @@ export async function getWalletBalance(address: string, provider?: ethers.Provid
     };
   } catch (error) {
     console.error('Error getting balance:', error);
-    return {
-      eth: '0',
-      formatted: '0.0'
-    };
+    throw error;  // Re-throw to let caller handle the error
   }
 }
 

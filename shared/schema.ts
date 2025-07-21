@@ -27,6 +27,20 @@ export const tokens = pgTable("tokens", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const chains = pgTable("chains", {
+  id: serial("id").primaryKey(),
+  networkName: text("network_name").notNull().unique(),
+  rpcUrl: text("rpc_url").notNull(),
+  chainId: integer("chain_id").notNull().unique(),
+  explorerUrl: text("explorer_url").notNull(),
+  networkImage: text("network_image"),
+  zkAccountFactory: text("zk_account_factory"),
+  verifierAddress: text("verifier_address"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -56,9 +70,31 @@ export const insertTokenSchema = createInsertSchema(tokens).pick({
   name: z.string().min(1, "Name is required"),
 });
 
+export const insertChainSchema = createInsertSchema(chains).pick({
+  networkName: true,
+  rpcUrl: true,
+  chainId: true,
+  explorerUrl: true,
+  networkImage: true,
+  zkAccountFactory: true,
+  verifierAddress: true,
+  isActive: true,
+}).extend({
+  networkName: z.string().min(1, "Network name is required"),
+  rpcUrl: z.string().url("Invalid RPC URL"),
+  chainId: z.number().positive("Chain ID must be positive"),
+  explorerUrl: z.string().url("Invalid explorer URL"),
+  networkImage: z.string().optional(),
+  zkAccountFactory: z.string().optional(),
+  verifierAddress: z.string().optional(),
+  isActive: z.boolean().optional().default(true),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertContact = z.infer<typeof insertContactSchema>;
 export type Contact = typeof contacts.$inferSelect;
 export type InsertToken = z.infer<typeof insertTokenSchema>;
 export type Token = typeof tokens.$inferSelect;
+export type InsertChain = z.infer<typeof insertChainSchema>;
+export type Chain = typeof chains.$inferSelect;

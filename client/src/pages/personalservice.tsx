@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ShieldCheckIcon, 
   KeyIcon, 
@@ -25,6 +26,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
+import ethereumLogo from "@assets/image_1752985874370.png";
 import { 
   createWallet, 
   importWallet, 
@@ -34,6 +36,7 @@ import {
   getNetworkInfo,
   type WalletInfo 
 } from "@/lib/wallet";
+import { ethers } from "ethers";
 import { 
   createZKAccount, 
   checkZKAccount, 
@@ -114,55 +117,179 @@ export default function Demo() {
   // Wallet creation/import loading state
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
   const [walletCreationStatus, setWalletCreationStatus] = useState("");
+  
+  // Chain state
+  const [chains, setChains] = useState<any[]>([]);
+  const [selectedChainId, setSelectedChainId] = useState<string>("");
+  const [urlChainId, setUrlChainId] = useState<string | null>(null);
 
-  // Check for OAuth callback parameters
+  // Check for OAuth callback parameters and existing session
   useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const oauthSuccess = params.get('oauth');
-      const email = params.get('email');
-      
-      if (oauthSuccess === 'success' && email) {
-        setUserEmail(email);
-        setCurrentStep("web3-setup");
-        // Clear the URL parameters
-        window.history.replaceState({}, document.title, '/demo');
-      } else if (oauthSuccess === 'error') {
-        const message = params.get('message') || 'Authentication failed';
-        toast({
-          title: "Authentication Error",
-          description: message,
-          variant: "destructive",
-          duration: 3000,
-        });
-        window.history.replaceState({}, document.title, '/demo');
-      }
+    const initializeSession = async () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const oauthSuccess = params.get('oauth');
+        const email = params.get('email');
+        const fromDashboard = params.get('from') === 'dashboard';
+        const chainId = params.get('chainId');
+        const isFreshStart = params.get('fresh') === 'true';
+        
+        // Handle OAuth callback
+        if (oauthSuccess === 'success' && email) {
+          setUserEmail(email);
+          setCurrentStep("web3-setup");
+          // Clear the URL parameters
+          window.history.replaceState({}, document.title, '/personalservice');
+        } else if (oauthSuccess === 'error') {
+          const message = params.get('message') || 'Authentication failed';
+          toast({
+            title: "Authentication Error",
+            description: message,
+            variant: "destructive",
+            duration: 3000,
+          });
+          window.history.replaceState({}, document.title, '/personalservice');
+        } else if (!isFreshStart) {
+          // Check for existing OAuth session only if not a fresh start
+          try {
+            const authResponse = await fetch('/api/auth/me');
+            const authData = await authResponse.json();
+            
+            if (authData.success && authData.user && authData.user.email) {
+              console.log('✅ Found existing OAuth session:', authData.user.email);
+              setUserEmail(authData.user.email);
+              
+              // Check for existing wallet in storage
+              const savedWallet = getWalletFromStorage();
+              if (savedWallet) {
+                setWallet(savedWallet);
+                console.log('✅ Found existing wallet:', savedWallet.address);
+                
+                // If user has both OAuth session and wallet, skip to balance step
+                setCurrentStep("balance");
+                
+                // If coming from dashboard with specific chain, save it
+                if (fromDashboard && chainId) {
+                  setUrlChainId(chainId);
+                  console.log('📌 Chain ID from dashboard:', chainId);
+                  // Clear any existing ZK Account info when coming from dashboard
+                  setZkAccountInfo(null);
+                }
+              } else {
+                // Has OAuth but no wallet, go to web3 setup
+                setCurrentStep("web3-setup");
+              }
+            }
+          } catch (error) {
+            console.error('Error checking auth session:', error);
+          }
+        }
 
-      // Check for existing wallet in storage
-      const savedWallet = getWalletFromStorage();
-      if (savedWallet) {
-        setWallet(savedWallet);
-      }
+        // Check for existing wallet in storage (even without OAuth)
+        const savedWallet = getWalletFromStorage();
+        if (savedWallet && !wallet) {
+          setWallet(savedWallet);
+        }
 
-      // Get network info
-      const info = getNetworkInfo();
-      setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
-    } catch (error) {
-      console.error('Error during initialization:', error);
-    }
+        // Get network info
+        const info = getNetworkInfo();
+        setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
+        
+        // Clear URL parameters
+        if (fromDashboard || isFreshStart) {
+          window.history.replaceState({}, document.title, '/personalservice');
+        }
+      } catch (error) {
+        console.error('Error during initialization:', error);
+      }
+    };
+    
+    initializeSession();
   }, []);
 
-  // Auto-refresh balance when wallet changes
+  // Fetch available chains
   useEffect(() => {
-    if (wallet) {
+    const fetchChains = async () => {
+      try {
+        const response = await fetch('/api/chains');
+        const data = await response.json();
+        if (data.success && data.chains) {
+          setChains(data.chains);
+          
+          // If we have a chain ID from URL (dashboard), use it
+          if (urlChainId) {
+            const targetChain = data.chains.find((chain: any) => chain.id.toString() === urlChainId);
+            if (targetChain) {
+              setSelectedChainId(urlChainId);
+              setNetworkName(targetChain.networkName);
+              console.log('🎯 Using chain from dashboard:', targetChain.networkName);
+              // Clear ZK Account info when setting chain from URL
+              setZkAccountInfo(null);
+            }
+          } else {
+            // Otherwise, set the active chain as selected by default
+            const activeChain = data.chains.find((chain: any) => chain.isActive);
+            if (activeChain) {
+              setSelectedChainId(activeChain.id.toString());
+              setNetworkName(activeChain.networkName);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching chains:', error);
+      }
+    };
+    fetchChains();
+  }, [urlChainId]);
+
+  // Auto-refresh balance when wallet or chain changes
+  useEffect(() => {
+    if (wallet && selectedChainId) {
       // Create promise and handle errors properly
       const fetchBalance = async () => {
         setIsRefreshingBalance(true);
         setBalanceError("");
         try {
-          const balance = await getWalletBalance(wallet.address);
-          setWalletBalance(balance.formatted);
-          setBalanceError("");
+          // Find the selected chain
+          const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+          if (selectedChain) {
+            const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+            const balance = await getWalletBalance(wallet.address, provider);
+            setWalletBalance(balance.formatted);
+            setBalanceError("");
+            
+            // Check if ZK Account exists on this chain
+            if (userEmail && currentStep === "balance") {
+              console.log('🔍 Checking for ZK Account on chain:', selectedChain.networkName);
+              // Clear previous ZK Account info before checking new chain
+              setZkAccountInfo(null);
+              
+              try {
+                const zkInfo = await checkZKAccount(wallet.address, selectedChainId);
+                if (zkInfo.hasZKAccount) {
+                  setZkAccountInfo(zkInfo);
+                  console.log('✅ Found ZK Account on this chain:', zkInfo.zkAccountAddress);
+                  
+                  // Only redirect if not coming from dashboard
+                  if (!urlChainId) {
+                    toast({
+                      title: "ZK Account Found",
+                      description: "You already have a ZK Account on this network. Redirecting to dashboard...",
+                      duration: 2000,
+                    });
+                    setTimeout(() => {
+                      setLocation("/dashboard");
+                    }, 2000);
+                  }
+                } else {
+                  console.log('❌ No ZK Account on this chain');
+                }
+              } catch (error) {
+                console.error('Error checking ZK Account:', error);
+                setZkAccountInfo(null);
+              }
+            }
+          }
         } catch (error) {
           console.error('Failed to fetch balance:', error);
           setBalanceError('Failed to fetch balance. Please check your network connection.');
@@ -177,7 +304,7 @@ export default function Demo() {
         console.error('Balance fetch error:', err);
       });
     }
-  }, [wallet]);
+  }, [wallet, selectedChainId, chains, userEmail, currentStep, urlChainId]);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
@@ -238,9 +365,19 @@ export default function Demo() {
       // Get wallet balance
       setWalletCreationStatus("Fetching balance...");
       try {
-        const balance = await getWalletBalance(walletInfo.address);
-        setWalletBalance(balance.formatted);
-        setBalanceError("");
+        if (selectedChainId) {
+          const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+          if (selectedChain) {
+            const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+            const balance = await getWalletBalance(walletInfo.address, provider);
+            setWalletBalance(balance.formatted);
+            setBalanceError("");
+          }
+        } else {
+          const balance = await getWalletBalance(walletInfo.address);
+          setWalletBalance(balance.formatted);
+          setBalanceError("");
+        }
       } catch (error) {
         console.error('Failed to fetch initial balance:', error);
         setBalanceError('Failed to fetch balance. You can try refreshing later.');
@@ -248,10 +385,10 @@ export default function Demo() {
       }
 
       // Check for existing ZK Account
-      if (userEmail) {
+      if (userEmail && selectedChainId) {
         setWalletCreationStatus("Checking for existing ZK Account...");
         try {
-          const existingAccount = await checkZKAccount(walletInfo.address);
+          const existingAccount = await checkZKAccount(walletInfo.address, selectedChainId);
           if (existingAccount.hasZKAccount) {
             setZkAccountInfo(existingAccount);
             console.log('✅ Found existing ZK Account during wallet setup:', existingAccount.zkAccountAddress);
@@ -283,15 +420,24 @@ export default function Demo() {
   };
 
   const refreshBalance = async () => {
-    if (!wallet) return;
+    if (!wallet || !selectedChainId) return;
     
     setIsRefreshingBalance(true);
     setBalanceError("");
     try {
-      const balance = await getWalletBalance(wallet.address);
-      setWalletBalance(balance.formatted);
-      setBalanceError("");
-      console.log('✅ Balance refreshed:', balance.formatted, 'ETH');
+      // Find the selected chain
+      const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+      if (selectedChain) {
+        console.log('🌐 Refreshing balance on chain:', selectedChain.networkName);
+        console.log('🔗 Using RPC URL:', selectedChain.rpcUrl);
+        const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+        const balance = await getWalletBalance(wallet.address, provider);
+        setWalletBalance(balance.formatted);
+        setBalanceError("");
+        console.log('✅ Balance refreshed:', balance.formatted, 'ETH');
+      } else {
+        throw new Error('No chain selected');
+      }
     } catch (error) {
       console.error('Failed to refresh balance:', error);
       setBalanceError('Failed to fetch balance. Please check your network connection and try again.');
@@ -661,7 +807,12 @@ export default function Demo() {
                         onClick={() => {
                           if (wallet?.privateKey) {
                             copyToClipboard(wallet.privateKey, 'Private Key');
-                            alert('⚠️ Private key copied! Keep it secure and never share it with anyone.');
+                            toast({
+                              title: "⚠️ Private key copied!",
+                              description: "Keep it secure and never share it with anyone.",
+                              variant: "destructive",
+                              duration: 2000,
+                            });
                           }
                         }}
                         className="p-1 h-auto hover:bg-background"
@@ -686,16 +837,43 @@ export default function Demo() {
                     size="sm"
                     onClick={refreshBalance}
                     disabled={isRefreshingBalance}
-                    className="flex items-center gap-2"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted/10 border border-gray-500 w-7 h-7 p-0 flex items-center justify-center"
                   >
                     <ArrowPathIcon className={`w-4 h-4 ${isRefreshingBalance ? 'animate-spin' : ''}`} />
-                    Refresh
                   </Button>
                 </div>
                 <div className="text-center space-y-4">
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Network</h4>
-                    <p className="text-foreground">{networkName}</p>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-2">Network</h4>
+                    <Select value={selectedChainId} onValueChange={(value) => {
+                      setSelectedChainId(value);
+                      const chain = chains.find(c => c.id.toString() === value);
+                      if (chain) {
+                        setNetworkName(chain.networkName);
+                      }
+                      // Clear ZK Account info when chain changes
+                      setZkAccountInfo(null);
+                    }}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a network" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {chains.map((chain) => (
+                          <SelectItem key={chain.id} value={chain.id.toString()}>
+                            <div className="flex items-center gap-2">
+                              {chain.networkImage && (
+                                <img 
+                                  src={ethereumLogo} 
+                                  alt={chain.networkName}
+                                  className="w-4 h-4 object-contain"
+                                />
+                              )}
+                              <span>{chain.networkName}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <h4 className="text-md font-medium text-foreground mb-2">ETH Balance</h4>

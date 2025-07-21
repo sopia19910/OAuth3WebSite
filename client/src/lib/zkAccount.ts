@@ -114,7 +114,7 @@
   }
 
   // Check if user has existing ZK Account using backend API
-  export async function checkZKAccount(walletAddress: string): Promise<ZKAccountInfo> {
+  export async function checkZKAccount(walletAddress: string, chainId?: string): Promise<ZKAccountInfo> {
     try {
       if (!ethers.isAddress(walletAddress)) {
         throw new Error('Invalid wallet address');
@@ -125,9 +125,14 @@
         await loadContractAddresses();
       }
 
-      console.log('🔍 Checking ZK Account for:', walletAddress);
+      console.log('🔍 Checking ZK Account for:', walletAddress, 'on chain:', chainId || 'active');
 
-      const response = await fetch(`/api/zkaccount3/check?walletAddress=${walletAddress}`);
+      let url = `/api/zkaccount3/check?walletAddress=${walletAddress}`;
+      if (chainId) {
+        url += `&chainId=${chainId}`;
+      }
+
+      const response = await fetch(url);
       const data = await response.json();
 
       if (!data.success) {
@@ -153,6 +158,23 @@
 
     } catch (error) {
       console.error('Error checking ZK account:', error);
+      // Handle rate limiting errors gracefully
+      if (error instanceof Error && error.message.includes('rate limit')) {
+        return {
+          hasZKAccount: false,
+          zkAccountAddress: null,
+          currentOwner: null,
+          balance: '0',
+          tokenBalance: '0',
+          taikoBalance: '0',
+          requiresZKProof: false,
+          emailHash: '0',
+          domainHash: '0',
+          verifierContract: null,
+          accountNonce: '0',
+          factoryAddress: null
+        };
+      }
       throw new Error(`Failed to check ZK account: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -177,6 +199,47 @@
         throw new Error('Private key does not match wallet address');
       }
 
+      // Get network info for chain-specific gas limits
+      const configResponse = await fetch('/api/config');
+      const config = await configResponse.json();
+      const chainId = config.chainId ? parseInt(config.chainId) : 17000;
+      
+      // Set higher gas limit for Sepolia (chainId: 11155111)
+      const gasLimit = chainId === 11155111 ? 1000000 : 500000;
+
+      // Check wallet balance before proceeding
+      const network = await provider.getNetwork();
+      const balance = await provider.getBalance(walletAddress);
+      const balanceInEth = ethers.formatEther(balance);
+      
+      // Try alternative balance check if balance shows 0
+      if (balance === 0n) {
+        try {
+          const response = await fetch(config.rpcUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              method: 'eth_getBalance',
+              params: [walletAddress, 'latest'],
+              id: 1
+            })
+          });
+          const result = await response.json();
+          if (result.result) {
+            const hexBalance = result.result;
+            const alternativeBalance = BigInt(hexBalance);
+            if (alternativeBalance > 0n) {
+              // Use alternative balance if it's greater than 0
+              const altBalanceInEth = ethers.formatEther(alternativeBalance);
+              console.error(`Balance discrepancy detected. Provider shows 0, but direct RPC shows ${altBalanceInEth} ETH`);
+            }
+          }
+        } catch (e) {
+          // Silent fail for direct RPC
+        }
+      }
+
       const factory = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, ZK_ACCOUNT_FACTORY_V3_ABI, signer);
 
       // Check if account already exists
@@ -190,18 +253,40 @@
       }
 
       // Get correct hashes from OAuth session (same as circuit)
-      console.log('🔍 Getting OAuth hashes from session...');
       const { emailHash, domainHash } = await getOAuthHashesFromSession();
       const salt = generateSalt(userEmail, walletAddress);
 
-      console.log('🏭 Creating ZK Account with:');
-      console.log('📧 Email hash (from OAuth):', emailHash.toString());
-      console.log('🌐 Domain hash (from OAuth):', domainHash.toString());
-      console.log('🔑 Salt:', salt);
-
       // Get counterfactual address
       const counterfactualAddress = await factory.predictZKAccountAddress(walletAddress, salt);
-      console.log('📍 Counterfactual address:', counterfactualAddress);
+
+      // Estimate gas and check if wallet has enough
+      try {
+        const estimatedGas = await factory.createZKAccount.estimateGas(
+          true, // requiresZKProof
+          emailHash,
+          domainHash, 
+          salt
+        );
+        console.log(`📊 Estimated gas: ${estimatedGas.toString()}`);
+        
+        const gasPrice = await provider.getFeeData();
+        console.log(`⛽ Gas price: ${ethers.formatUnits(gasPrice.gasPrice || 0n, 'gwei')} gwei`);
+        
+        const estimatedCost = estimatedGas * (gasPrice.gasPrice || 0n);
+        const estimatedCostInEth = ethers.formatEther(estimatedCost);
+        console.log(`💸 Estimated transaction cost: ${estimatedCostInEth} ETH`);
+        
+        if (balance < estimatedCost) {
+          console.error(`❌ Insufficient balance. Have: ${balanceInEth} ETH, Need: ${estimatedCostInEth} ETH`);
+          return {
+            success: false,
+            error: `Insufficient balance. You have ${balanceInEth} ETH but need approximately ${estimatedCostInEth} ETH for this transaction.`
+          };
+        }
+      } catch (estimateError) {
+        console.error('⚠️ Gas estimation failed:', estimateError);
+        console.log('Proceeding with fixed gas limit...');
+      }
 
       // Create the ZK Account
       const createTx = await factory.createZKAccount(
@@ -210,17 +295,13 @@
         domainHash, 
         salt,
         {
-          gasLimit: 500000
+          gasLimit: gasLimit
         }
       );
 
       const txHash = createTx.hash;
-      console.log('✅ ZK Account creation transaction sent!');
-      console.log('🔗 Transaction hash:', txHash);
 
-      // Get explorer URL from config
-      const configResponse = await fetch('/api/config');
-      const config = await configResponse.json();
+      // Use the already fetched config for explorer URL
       const explorerUrl = config.success ? `${config.explorerUrl}/tx/${txHash}` : `https://holesky.etherscan.io/tx/${txHash}`;
 
       return {
@@ -235,16 +316,22 @@
 
     } catch (error) {
       console.error('ZK Account creation error:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
 
       let errorMessage = 'Failed to create ZK Account: ';
 
       if (error instanceof Error) {
+        // Log the full error for debugging
+        console.error('Full error message:', error.message);
+        
         if (error.message.includes('insufficient funds')) {
           errorMessage = 'Insufficient funds for transaction. Please ensure your wallet has enough ETH for gas fees.';
         } else if (error.message.includes('user rejected') || error.message.includes('denied')) {
           errorMessage = 'Transaction was rejected by user.';
         } else if (error.message.includes('nonce')) {
           errorMessage = 'Transaction nonce error. Please try again.';
+        } else if (error.message.includes('gas required exceeds allowance')) {
+          errorMessage = 'Gas limit too low. The transaction requires more gas than the limit allows.';
         } else {
           errorMessage += error.message;
         }

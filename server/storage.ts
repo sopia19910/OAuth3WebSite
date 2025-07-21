@@ -1,4 +1,4 @@
-import { users, contacts, tokens, type User, type InsertUser, type Contact, type InsertContact, type Token, type InsertToken } from "@shared/schema";
+import { users, contacts, tokens, chains, type User, type InsertUser, type Contact, type InsertContact, type Token, type InsertToken, type Chain, type InsertChain } from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -11,16 +11,24 @@ export interface IStorage {
   getTokensByEmail(userEmail: string): Promise<Token[]>;
   createToken(token: InsertToken): Promise<Token>;
   deleteToken(id: number, userEmail: string): Promise<boolean>;
+  getChains(): Promise<Chain[]>;
+  getActiveChain(): Promise<Chain | undefined>;
+  getChainByNetworkName(networkName: string): Promise<Chain | undefined>;
+  createChain(chain: InsertChain): Promise<Chain>;
+  updateChain(id: number, chain: Partial<InsertChain>): Promise<Chain | undefined>;
+  deleteChain(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private tokens: Map<number, Token>;
+  private chains: Map<number, Chain>;
   currentId: number;
 
   constructor() {
     this.users = new Map();
     this.tokens = new Map();
+    this.chains = new Map();
     this.currentId = 1;
   }
 
@@ -78,6 +86,45 @@ export class MemStorage implements IStorage {
       return true;
     }
     return false;
+  }
+
+  async getChains(): Promise<Chain[]> {
+    return Array.from(this.chains.values());
+  }
+
+  async getActiveChain(): Promise<Chain | undefined> {
+    return Array.from(this.chains.values()).find(chain => chain.isActive);
+  }
+
+  async getChainByNetworkName(networkName: string): Promise<Chain | undefined> {
+    return Array.from(this.chains.values()).find(chain => chain.networkName === networkName);
+  }
+
+  async createChain(insertChain: InsertChain): Promise<Chain> {
+    const id = this.currentId++;
+    const chain: Chain = {
+      ...insertChain,
+      id,
+      isActive: insertChain.isActive ?? true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.chains.set(id, chain);
+    return chain;
+  }
+
+  async updateChain(id: number, insertChain: Partial<InsertChain>): Promise<Chain | undefined> {
+    const chain = this.chains.get(id);
+    if (chain) {
+      const updated = { ...chain, ...insertChain, updatedAt: new Date() };
+      this.chains.set(id, updated);
+      return updated;
+    }
+    return undefined;
+  }
+
+  async deleteChain(id: number): Promise<boolean> {
+    return this.chains.delete(id);
   }
 }
 
@@ -149,6 +196,67 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(tokens)
       .where(and(eq(tokens.id, id), eq(tokens.userEmail, userEmail)));
+    
+    return !!result;
+  }
+
+  async getChains(): Promise<Chain[]> {
+    const { db } = await import("./db");
+    const { chains } = await import("@shared/schema");
+    
+    return await db.select().from(chains);
+  }
+
+  async getActiveChain(): Promise<Chain | undefined> {
+    const { db } = await import("./db");
+    const { chains } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [chain] = await db.select().from(chains).where(eq(chains.isActive, true));
+    return chain || undefined;
+  }
+
+  async getChainByNetworkName(networkName: string): Promise<Chain | undefined> {
+    const { db } = await import("./db");
+    const { chains } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [chain] = await db.select().from(chains).where(eq(chains.networkName, networkName));
+    return chain || undefined;
+  }
+
+  async createChain(insertChain: InsertChain): Promise<Chain> {
+    const { db } = await import("./db");
+    const { chains } = await import("@shared/schema");
+    
+    const [chain] = await db
+      .insert(chains)
+      .values(insertChain)
+      .returning();
+    return chain;
+  }
+
+  async updateChain(id: number, insertChain: Partial<InsertChain>): Promise<Chain | undefined> {
+    const { db } = await import("./db");
+    const { chains } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [chain] = await db
+      .update(chains)
+      .set({ ...insertChain, updatedAt: new Date() })
+      .where(eq(chains.id, id))
+      .returning();
+    return chain || undefined;
+  }
+
+  async deleteChain(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const { chains } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const result = await db
+      .delete(chains)
+      .where(eq(chains.id, id));
     
     return !!result;
   }

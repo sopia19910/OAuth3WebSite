@@ -25,16 +25,19 @@ import {
   ArrowDownIcon,
   ArrowPathIcon,
   XMarkIcon,
+  Bars3Icon,
 } from "@heroicons/react/24/outline";
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
 import QRCode from 'qrcode';
+import ethereumLogo from "@assets/image_1752985874370.png";
 import {
   getWalletFromStorage,
   getWalletBalance,
   getNetworkInfo,
   type WalletInfo,
 } from "@/lib/wallet";
+import { ethers } from "ethers";
 import {
   checkZKAccount,
   waitForTransaction,
@@ -72,6 +75,7 @@ export default function Dashboard() {
   );
   const [networkName, setNetworkName] = useState("Loading...");
   const [userEmail, setUserEmail] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Send transaction state
   const [isSending, setIsSending] = useState(false);
@@ -91,10 +95,19 @@ export default function Dashboard() {
   
   // QR Code state
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  
+  // Chain state
+  const [chains, setChains] = useState<any[]>([]);
+  const [selectedChainId, setSelectedChainId] = useState<string>("");
   // Load wallet and account data on component mount
   useEffect(() => {
-    loadWalletData();
-    loadTokensFromDB();
+    // Load chains first, then wallet data
+    const loadInitialData = async () => {
+      await loadChains();
+      await loadWalletData();
+      await loadTokensFromDB();
+    };
+    loadInitialData();
   }, []);
 
   // Generate QR code when zkAccountInfo changes
@@ -116,6 +129,39 @@ export default function Dashboard() {
       });
     }
   }, [zkAccountInfo]);
+
+  // Refresh balance when selected chain changes with debouncing
+  useEffect(() => {
+    if (!wallet || !selectedChainId || chains.length === 0) return;
+    
+    // Add debouncing to prevent rapid chain switching issues
+    const timeoutId = setTimeout(() => {
+      refreshAccountData();
+    }, 300); // 300ms debounce
+    
+    // Cleanup function to cancel pending refreshes
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [selectedChainId, wallet?.address, chains.length]);
+
+  const loadChains = async () => {
+    try {
+      const response = await fetch('/api/chains');
+      if (response.ok) {
+        const data = await response.json();
+        setChains(data.chains || []);
+        // Find the active chain and set it as selected
+        const activeChain = data.chains?.find((chain: any) => chain.isActive);
+        if (activeChain) {
+          setSelectedChainId(activeChain.id.toString());
+          setNetworkName(activeChain.networkName);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load chains:', error);
+    }
+  };
 
   const loadTokensFromDB = async () => {
     try {
@@ -150,7 +196,7 @@ export default function Dashboard() {
             "❌ Invalid or expired OAuth session. Redirecting to demo...",
           );
           alert("Session expired or invalid. Please login again.");
-          setLocation("/demo");
+          setLocation("/personalservice");
           return;
         }
 
@@ -161,7 +207,7 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Failed to validate OAuth session:", error);
         alert("Failed to validate session. Please login again.");
-        setLocation("/demo");
+        setLocation("/personalservice");
         return;
       }
 
@@ -170,13 +216,27 @@ export default function Dashboard() {
       if (savedWallet) {
         setWallet(savedWallet);
 
-        // Get wallet balance
-        const balance = await getWalletBalance(savedWallet.address);
-        setWalletBalance(balance.formatted);
+        // Get wallet balance using active chain if available
+        if (selectedChainId && chains.length > 0) {
+          const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+          if (selectedChain) {
+            const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+            const balance = await getWalletBalance(savedWallet.address, provider);
+            setWalletBalance(balance.formatted);
+          } else {
+            const balance = await getWalletBalance(savedWallet.address);
+            setWalletBalance(balance.formatted);
+          }
+        } else {
+          const balance = await getWalletBalance(savedWallet.address);
+          setWalletBalance(balance.formatted);
+        }
 
-        // Check for ZK Account
-        const zkInfo = await checkZKAccount(savedWallet.address);
-        setZkAccountInfo(zkInfo);
+        // Check for ZK Account on the selected chain (only if chain is selected)
+        if (selectedChainId) {
+          const zkInfo = await checkZKAccount(savedWallet.address, selectedChainId);
+          setZkAccountInfo(zkInfo);
+        }
       }
 
       // Get network info and config
@@ -194,20 +254,70 @@ export default function Dashboard() {
   };
 
   const refreshAccountData = async () => {
-    if (!wallet) return;
+    if (!wallet || isRefreshing) return; // Prevent multiple concurrent refreshes
 
     setIsRefreshing(true);
     try {
-      // Refresh wallet balance
-      const balance = await getWalletBalance(wallet.address);
-      setWalletBalance(balance.formatted);
+      // Get the selected chain
+      const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+      if (!selectedChain) {
+        console.error("Selected chain not found");
+        return;
+      }
 
-      // Refresh ZK Account info
-      const zkInfo = await checkZKAccount(wallet.address);
-      setZkAccountInfo(zkInfo);
-      console.log('✅ Account data refreshed');
+      // Create provider for the selected chain
+      const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
+      
+      // Run balance and ZK account checks in parallel for better performance
+      try {
+        const [balance, zkInfo] = await Promise.all([
+          getWalletBalance(wallet.address, provider),
+          checkZKAccount(wallet.address, selectedChainId)
+        ]);
+        
+        // Update states only after both operations complete
+        setWalletBalance(balance.formatted);
+        setZkAccountInfo(zkInfo);
+        
+        console.log(`✅ Account data refreshed for ${selectedChain.networkName}`);
+        console.log(`💰 Balance: ${balance.formatted} ETH`);
+        console.log(`🔐 ZK Account: ${zkInfo.hasZKAccount ? 'Yes' : 'No'}`);
+      } catch (err) {
+        console.error("Error during parallel fetch:", err);
+        // Try sequential fetch as fallback
+        const balance = await getWalletBalance(wallet.address, provider);
+        setWalletBalance(balance.formatted);
+        
+        try {
+          const zkInfo = await checkZKAccount(wallet.address, selectedChainId);
+          setZkAccountInfo(zkInfo);
+        } catch (zkError) {
+          console.error("Failed to check ZK account:", zkError);
+          // Set default ZK info if check fails
+          setZkAccountInfo({
+            hasZKAccount: false,
+            zkAccountAddress: null,
+            currentOwner: null,
+            balance: '0',
+            tokenBalance: '0',
+            taikoBalance: '0',
+            requiresZKProof: false,
+            emailHash: '0',
+            domainHash: '0',
+            verifierContract: null,
+            accountNonce: '0',
+            factoryAddress: null
+          });
+        }
+      }
     } catch (error) {
       console.error("Failed to refresh account data:", error);
+      toast({
+        title: "Failed to refresh",
+        description: "Could not refresh account data. Please try again.",
+        variant: "destructive",
+        duration: 2000,
+      });
     } finally {
       setIsRefreshing(false);
     }
@@ -494,7 +604,7 @@ export default function Dashboard() {
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               {/* Web2 OAuth Account */}
               <Card className="bg-card border-border rounded-none">
                 <CardHeader className="pb-3">
@@ -571,7 +681,7 @@ export default function Dashboard() {
               </Card>
 
               {/* ZKP Smart Contract */}
-              <Card className="bg-card border-border rounded-none">
+              <Card className={`bg-card border-border rounded-none ${!zkAccountInfo?.hasZKAccount ? 'border-destructive/50 bg-destructive/5' : ''}`}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">
                     ZKP Smart Contract (CA)
@@ -632,21 +742,38 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+            
+            {/* ZKP CA Creation Warning */}
+            {!zkAccountInfo?.hasZKAccount && (
+              <div className="mt-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                    <svg className="w-5 h-5 text-destructive" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-medium text-destructive">
+                      ZKP Contract Account Not Created
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Your ZKP Contract Account has not been created on the {networkName} network. 
+                      To create your ZKP CA, please go to the <a href={`/personalservice?from=dashboard&chainId=${selectedChainId}`} className="underline hover:text-foreground">Personal Service page</a> and complete the ZKP generation process.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         );
 
       case "add-token":
         return (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <h2 className="text-base font-semibold flex items-center gap-2">
-              <PlusIcon className="w-5 h-5" />
-              Add Token
-            </h2>
-            
-            {/* Custom Tokens List */}
-            {customTokens.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Added Tokens</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {/* Left Column - Added Tokens List */}
+            <div className="space-y-4">
+              <h2 className="text-base font-semibold">Added Tokens</h2>
+              {customTokens.length > 0 ? (
                 <div className="space-y-2">
                   {customTokens.map((token) => (
                     <div 
@@ -711,16 +838,28 @@ export default function Dashboard() {
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-            <div>
-              <Label
-                htmlFor="token-address"
-                className="text-sm font-medium"
-              >
-                Token Contract Address
-              </Label>
-              <Input
+              ) : (
+                <div className="p-4 border border-border rounded bg-card/50 text-center">
+                  <p className="text-sm text-muted-foreground">No tokens added yet</p>
+                </div>
+              )}
+            </div>
+            
+            {/* Right Column - Add Token Form */}
+            <div className="space-y-6">
+              <h2 className="text-base font-semibold flex items-center gap-2">
+                <PlusIcon className="w-5 h-5" />
+                Add Token
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <Label
+                    htmlFor="token-address"
+                    className="text-sm font-medium"
+                  >
+                    Token Contract Address
+                  </Label>
+                  <Input
                 id="token-address"
                 placeholder="0x..."
                 value={tokenAddress}
@@ -758,6 +897,8 @@ export default function Dashboard() {
             >
               Add Token
             </Button>
+              </div>
+            </div>
           </div>
         );
 
@@ -962,7 +1103,8 @@ export default function Dashboard() {
       {/* Session Status Bar */}
       <div className="fixed top-16 left-0 right-0 bg-muted/50 backdrop-blur-sm border-b border-border z-[60]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-12">
+          {/* Desktop Layout */}
+          <div className="hidden md:flex items-center justify-between h-12">
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium text-muted-foreground">
                 Current Session:
@@ -972,14 +1114,54 @@ export default function Dashboard() {
                 <span className="text-sm font-semibold text-foreground">
                   {userEmail}
                 </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 text-xs py-1 h-7 ml-2"
+                >
+                  {isLoggingOut ? "Disconnecting..." : "Disconnect"}
+                </Button>
               </div>
             </div>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">Network:</span>
-                <span className="font-medium text-foreground">
-                  {networkName}
-                </span>
+                <span className="text-muted-foreground">Chain Network:</span>
+                <Select
+                  value={selectedChainId}
+                  disabled={isRefreshing}
+                  onValueChange={(value) => {
+                    setSelectedChainId(value);
+                    const selected = chains.find(chain => chain.id.toString() === value);
+                    if (selected) {
+                      setNetworkName(selected.networkName);
+                      // Switch to Overview when chain changes
+                      setActiveMenu("overview");
+                      // The useEffect will handle refreshing account data with debouncing
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-32 h-7 text-xs bg-background">
+                    <SelectValue placeholder="Select network" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {chains.map((chain) => (
+                      <SelectItem key={chain.id} value={chain.id.toString()}>
+                        <div className="flex items-center gap-2">
+                          {chain.networkImage && (
+                            <img 
+                              src={ethereumLogo} 
+                              alt={chain.networkName}
+                              className="w-4 h-4 object-contain"
+                            />
+                          )}
+                          <span>{chain.networkName}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">Owner:</span>
@@ -1036,7 +1218,25 @@ export default function Dashboard() {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+          
+          {/* Mobile Layout */}
+          <div className="md:hidden py-2">
+            <div className="flex items-center justify-between mb-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-1"
+              >
+                <Bars3Icon className="w-6 h-6" />
+              </Button>
               <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs font-semibold text-foreground truncate max-w-[150px]">
+                  {userEmail}
+                </span>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -1044,16 +1244,71 @@ export default function Dashboard() {
                   disabled={isLoggingOut}
                   className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:border-destructive/20 border border-gray-500 text-xs py-1 h-7"
                 >
-                  {isLoggingOut ? "Disconnecting..." : "Disconnect"}
+                  {isLoggingOut ? "..." : "Disconnect"}
                 </Button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Network:</span>
+                <Select
+                  value={selectedChainId}
+                  disabled={isRefreshing}
+                  onValueChange={(value) => {
+                    setSelectedChainId(value);
+                    const selected = chains.find(chain => chain.id.toString() === value);
+                    if (selected) {
+                      setNetworkName(selected.networkName);
+                      setActiveMenu("overview");
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-32 h-6 text-xs bg-background">
+                    <SelectValue placeholder="Select network" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {chains.map((chain) => (
+                      <SelectItem key={chain.id} value={chain.id.toString()}>
+                        <div className="flex items-center gap-2">
+                          {chain.networkImage && (
+                            <img 
+                              src={ethereumLogo} 
+                              alt={chain.networkName}
+                              className="w-4 h-4 object-contain"
+                            />
+                          )}
+                          <span>{chain.networkName}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Owner:</span>
+                  <span className="font-mono text-xs text-foreground">
+                    {wallet?.address
+                      ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`
+                      : "No wallet"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">ZKP:</span>
+                  <span className="font-mono text-xs text-foreground">
+                    {zkAccountInfo?.zkAccountAddress
+                      ? `${zkAccountInfo.zkAccountAddress.slice(0, 6)}...${zkAccountInfo.zkAccountAddress.slice(-4)}`
+                      : "Not created"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="pt-28 flex">
-        {/* Left Sidebar */}
-        <div className="w-56 bg-background border-r border-border/50 min-h-screen">
+      <div className="pt-32 md:pt-28 flex relative">
+        {/* Left Sidebar - Desktop */}
+        <div className="hidden md:block w-56 bg-background border-r border-border/50 min-h-screen">
           <div className="p-6">
             <nav className="space-y-1">
               <button
@@ -1067,9 +1322,12 @@ export default function Dashboard() {
                 Overview
               </button>
               <button
-                onClick={() => setActiveMenu("add-token")}
+                onClick={() => !zkAccountInfo?.hasZKAccount ? null : setActiveMenu("add-token")}
+                disabled={!zkAccountInfo?.hasZKAccount}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeMenu === "add-token"
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-gray-400"
+                    : activeMenu === "add-token"
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
@@ -1077,9 +1335,12 @@ export default function Dashboard() {
                 Add Token
               </button>
               <button
-                onClick={() => setActiveMenu("send")}
+                onClick={() => !zkAccountInfo?.hasZKAccount ? null : setActiveMenu("send")}
+                disabled={!zkAccountInfo?.hasZKAccount}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeMenu === "send"
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-gray-400"
+                    : activeMenu === "send"
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
@@ -1087,9 +1348,100 @@ export default function Dashboard() {
                 Send
               </button>
               <button
-                onClick={() => setActiveMenu("receive")}
+                onClick={() => !zkAccountInfo?.hasZKAccount ? null : setActiveMenu("receive")}
+                disabled={!zkAccountInfo?.hasZKAccount}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeMenu === "receive"
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-gray-400"
+                    : activeMenu === "receive"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                Receive
+              </button>
+            </nav>
+          </div>
+        </div>
+        
+        {/* Mobile Sidebar */}
+        <div className={`md:hidden fixed inset-0 z-[70] bg-background transition-transform duration-300 ease-in-out pt-32 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold">Menu</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-1"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </Button>
+            </div>
+            <nav className="space-y-2">
+              <button
+                onClick={() => {
+                  setActiveMenu("overview");
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                  activeMenu === "overview"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => {
+                  if (zkAccountInfo?.hasZKAccount) {
+                    setActiveMenu("add-token");
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+                disabled={!zkAccountInfo?.hasZKAccount}
+                className={`w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-gray-400"
+                    : activeMenu === "add-token"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                Add Token
+              </button>
+              <button
+                onClick={() => {
+                  if (zkAccountInfo?.hasZKAccount) {
+                    setActiveMenu("send");
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+                disabled={!zkAccountInfo?.hasZKAccount}
+                className={`w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-gray-400"
+                    : activeMenu === "send"
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                Send
+              </button>
+              <button
+                onClick={() => {
+                  if (zkAccountInfo?.hasZKAccount) {
+                    setActiveMenu("receive");
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+                disabled={!zkAccountInfo?.hasZKAccount}
+                className={`w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                  !zkAccountInfo?.hasZKAccount
+                    ? "text-gray-400"
+                    : activeMenu === "receive"
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
@@ -1101,7 +1453,7 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8">
           {/* Selected Content */}
           {renderMainContent()}
         </div>
