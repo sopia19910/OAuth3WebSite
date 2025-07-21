@@ -408,17 +408,17 @@ export default function Dashboard() {
                     // Set default ZK info if check fails
                     setZkAccountInfo({
                         hasZKAccount: false,
-                        zkAccountAddress: null,
-                        currentOwner: null,
+                        zkAccountAddress: undefined,
+                        currentOwner: undefined,
                         balance: '0',
                         tokenBalance: '0',
                         taikoBalance: '0',
                         requiresZKProof: false,
                         emailHash: '0',
                         domainHash: '0',
-                        verifierContract: null,
+                        verifierContract: undefined,
                         accountNonce: '0',
-                        factoryAddress: null
+                        factoryAddress: undefined
                     });
                 }
             }
@@ -1359,7 +1359,7 @@ export default function Dashboard() {
                                             size="sm"
                                             onClick={() =>
                                                 copyToClipboard(
-                                                    zkAccountInfo.zkAccountAddress,
+                                                    zkAccountInfo.zkAccountAddress || "",
                                                     "ZKP Contract Address",
                                                 )
                                             }
