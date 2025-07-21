@@ -211,36 +211,49 @@
       // Set higher gas limit for Sepolia (chainId: 11155111)
       const gasLimit = networkChainId === 11155111 ? 1000000 : 500000;
 
-      // Check wallet balance before proceeding
+      // Check wallet balance before proceeding with retries
       const network = await provider.getNetwork();
-      const balance = await provider.getBalance(walletAddress);
-      const balanceInEth = ethers.formatEther(balance);
+      let balance = await provider.getBalance(walletAddress);
+      let balanceInEth = ethers.formatEther(balance);
       
-      // Try alternative balance check if balance shows 0
+      console.log(`🔍 Initial balance check for ${walletAddress}: ${balanceInEth} ETH`);
+      
+      // Try multiple methods to get the correct balance
       if (balance === 0n) {
-        try {
-          const response = await fetch(config.rpcUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              method: 'eth_getBalance',
-              params: [walletAddress, 'latest'],
-              id: 1
-            })
-          });
-          const result = await response.json();
-          if (result.result) {
-            const hexBalance = result.result;
-            const alternativeBalance = BigInt(hexBalance);
-            if (alternativeBalance > 0n) {
-              // Use alternative balance if it's greater than 0
-              const altBalanceInEth = ethers.formatEther(alternativeBalance);
-              console.error(`Balance discrepancy detected. Provider shows 0, but direct RPC shows ${altBalanceInEth} ETH`);
+        // Wait a bit and retry
+        console.log(`⏳ Balance shows 0, waiting and retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Retry with provider
+        balance = await provider.getBalance(walletAddress);
+        balanceInEth = ethers.formatEther(balance);
+        console.log(`🔄 Retry balance: ${balanceInEth} ETH`);
+        
+        // If still 0, try direct RPC call
+        if (balance === 0n) {
+          try {
+            console.log(`⚠️ Still 0, trying direct RPC call to ${config.rpcUrl}`);
+            const response = await fetch(config.rpcUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'eth_getBalance',
+                params: [walletAddress, 'latest'],
+                id: 1
+              })
+            });
+            const result = await response.json();
+            if (result.result) {
+              const hexBalance = result.result;
+              const alternativeBalance = BigInt(hexBalance);
+              balance = alternativeBalance;
+              balanceInEth = ethers.formatEther(alternativeBalance);
+              console.log(`✅ Direct RPC balance: ${balanceInEth} ETH (hex: ${hexBalance})`);
             }
+          } catch (e) {
+            console.error('❌ Failed to check balance via direct RPC:', e);
           }
-        } catch (e) {
-          // Silent fail for direct RPC
         }
       }
 
