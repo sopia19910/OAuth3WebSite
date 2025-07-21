@@ -179,11 +179,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (chainId) {
         // If chainId is provided, get that specific chain
         const chains = await storage.getChains();
-        // Try to find by database ID first, then by actual chain ID
+        // Prioritize actual chain ID over database ID to avoid conflicts
         selectedChain = chains.find(chain =>
-          chain.id.toString() === chainId.toString() ||
           chain.chainId.toString() === chainId.toString()
         );
+        // If not found by chainId, try database ID as fallback
+        if (!selectedChain) {
+          selectedChain = chains.find(chain =>
+            chain.id.toString() === chainId.toString()
+          );
+        }
         if (!selectedChain) {
           return res.status(400).json({
             success: false,
@@ -248,11 +253,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (chainId) {
         // If chainId is provided, get that specific chain
         const chains = await storage.getChains();
-        // Try to find by database ID first, then by actual chain ID
+        // Prioritize actual chain ID over database ID to avoid conflicts
         selectedChain = chains.find(chain =>
-          chain.id.toString() === chainId.toString() ||
           chain.chainId.toString() === chainId.toString()
         );
+        // If not found by chainId, try database ID as fallback
+        if (!selectedChain) {
+          selectedChain = chains.find(chain =>
+            chain.id.toString() === chainId.toString()
+          );
+        }
         if (!selectedChain) {
           return res.status(400).json({
             success: false,
