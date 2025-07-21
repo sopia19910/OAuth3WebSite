@@ -172,24 +172,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get configuration (including RPC URL and contract addresses) - now uses database
   app.get('/api/config', async (req, res) => {
     try {
-      const activeChain = await storage.getActiveChain();
+      const { chainId } = req.query;
+      let selectedChain;
       
-      if (!activeChain) {
-        // If no active chain in database, return error
-        return res.status(500).json({
-          success: false,
-          error: 'No active chain configured in database'
-        });
+      if (chainId) {
+        // If chainId is provided, get that specific chain
+        const chains = await storage.getChains();
+        selectedChain = chains.find(chain => chain.chainId.toString() === chainId.toString());
+        if (!selectedChain) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid chain ID'
+          });
+        }
+      } else {
+        // Otherwise use the active chain
+        selectedChain = await storage.getActiveChain();
+        if (!selectedChain) {
+          // If no active chain in database, return error
+          return res.status(500).json({
+            success: false,
+            error: 'No active chain configured in database'
+          });
+        }
       }
       
       res.json({
         success: true,
-        rpcUrl: activeChain.rpcUrl,
-        networkName: activeChain.networkName,
-        chainId: activeChain.chainId.toString(),
-        explorerUrl: activeChain.explorerUrl,
-        zkVerifierV3Address: activeChain.verifierAddress,
-        zkAccountFactoryV3Address: activeChain.zkAccountFactory,
+        rpcUrl: selectedChain.rpcUrl,
+        networkName: selectedChain.networkName,
+        chainId: selectedChain.chainId.toString(),
+        explorerUrl: selectedChain.explorerUrl,
+        zkVerifierV3Address: selectedChain.verifierAddress,
+        zkAccountFactoryV3Address: selectedChain.zkAccountFactory,
         oa3TokenAddress: process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea',
         taikoTokenAddress: process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890'
       });

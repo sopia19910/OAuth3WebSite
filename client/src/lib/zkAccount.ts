@@ -199,10 +199,14 @@
         throw new Error('Private key does not match wallet address');
       }
 
+      // Get current chain ID from dashboard state
+      const dashboardState = JSON.parse(localStorage.getItem('dashboardChainId') || '1');
+      const selectedChainId = dashboardState;
+      
       // Get network info for chain-specific gas limits
-      const configResponse = await fetch('/api/config');
+      const configResponse = await fetch(`/api/config?chainId=${selectedChainId}`);
       const config = await configResponse.json();
-      const chainId = config.chainId ? parseInt(config.chainId) : 17000;
+      const chainId = config.chainId ? parseInt(config.chainId) : selectedChainId;
       
       // Set higher gas limit for Sepolia (chainId: 11155111)
       const gasLimit = chainId === 11155111 ? 1000000 : 500000;
