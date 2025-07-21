@@ -452,7 +452,7 @@ export default function Demo() {
     
     setIsRefreshingZkAccount(true);
     try {
-      const refreshedInfo = await checkZKAccount(wallet.address);
+      const refreshedInfo = await checkZKAccount(wallet.address, selectedChainId);
       setZkAccountInfo(refreshedInfo);
       console.log('✅ ZK Account info refreshed:', {
         ethBalance: refreshedInfo.balance,
@@ -480,7 +480,7 @@ export default function Demo() {
       setZkProgress(25);
       setZkStatus("Checking for existing ZK Account...");
       
-      const existingAccount = await checkZKAccount(wallet.address);
+      const existingAccount = await checkZKAccount(wallet.address, selectedChainId);
       if (existingAccount.hasZKAccount) {
         setZkAccountInfo(existingAccount);
         setZkProgress(100);
@@ -520,7 +520,7 @@ export default function Demo() {
           setZkStatus("ZK Account created successfully!");
           
           // Fetch the created account info
-          const accountInfo = await checkZKAccount(wallet.address);
+          const accountInfo = await checkZKAccount(wallet.address, selectedChainId);
           setZkAccountInfo(accountInfo);
         } else {
           setZkProgress(100);
