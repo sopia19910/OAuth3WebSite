@@ -209,9 +209,11 @@
       console.log(`⛽ Using gas limit: ${gasLimit} for chainId: ${chainId}`);
 
       // Check wallet balance before proceeding
+      console.log(`🔍 Checking balance for ${walletAddress} on ${config.networkName} (chainId: ${chainId})`);
+      console.log(`📡 Using RPC: ${config.rpcUrl}`);
       const balance = await provider.getBalance(walletAddress);
       const balanceInEth = ethers.formatEther(balance);
-      console.log(`💰 Wallet balance: ${balanceInEth} ETH`);
+      console.log(`💰 Wallet balance: ${balanceInEth} ETH (${balance.toString()} wei)`);
 
       const factory = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, ZK_ACCOUNT_FACTORY_V3_ABI, signer);
 
