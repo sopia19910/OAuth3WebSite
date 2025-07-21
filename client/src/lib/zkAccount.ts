@@ -211,9 +211,39 @@
       // Check wallet balance before proceeding
       console.log(`🔍 Checking balance for ${walletAddress} on ${config.networkName} (chainId: ${chainId})`);
       console.log(`📡 Using RPC: ${config.rpcUrl}`);
+      
+      // Double check the network
+      const network = await provider.getNetwork();
+      console.log(`🌐 Connected to network: ${network.name} (chainId: ${network.chainId})`);
+      
       const balance = await provider.getBalance(walletAddress);
       const balanceInEth = ethers.formatEther(balance);
       console.log(`💰 Wallet balance: ${balanceInEth} ETH (${balance.toString()} wei)`);
+      
+      // Try alternative balance check
+      if (balance === 0n) {
+        console.log(`⚠️ Balance shows 0, trying direct RPC call...`);
+        try {
+          const response = await fetch(config.rpcUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              method: 'eth_getBalance',
+              params: [walletAddress, 'latest'],
+              id: 1
+            })
+          });
+          const result = await response.json();
+          if (result.result) {
+            const hexBalance = result.result;
+            const alternativeBalance = BigInt(hexBalance);
+            console.log(`📊 Direct RPC balance check: ${ethers.formatEther(alternativeBalance)} ETH (${hexBalance})`);
+          }
+        } catch (e) {
+          console.error('Direct RPC call failed:', e);
+        }
+      }
 
       const factory = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, ZK_ACCOUNT_FACTORY_V3_ABI, signer);
 
