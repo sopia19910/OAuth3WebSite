@@ -120,6 +120,15 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Chain Selection Fix (2025-01-21)**:
+  - Fixed double API calls when navigating from dashboard to personalservice page
+  - Fixed wrong chain being used (Holesky called when Sepolia selected)
+  - Updated personalservice page to properly respect selected chain ID from dashboard
+  - Added chainId parameter to `waitForTransaction` function for correct RPC usage
+  - Updated `getProvider` and `getRpcUrl` functions to accept optional chainId parameter
+  - Fixed balance detection to use retry mechanism and direct RPC calls for Sepolia
+  - Only performs single ZK Account check when needed, preventing redundant API calls
+  - Chain-specific RPC URLs now properly used throughout the transaction flow
 - **Sepolia Gas Limit Fix (2025-01-21)**:
   - Fixed "insufficient funds" error on Sepolia testnet during ZK Account creation
   - Implemented network-specific gas limits:

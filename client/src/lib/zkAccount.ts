@@ -7,15 +7,24 @@
   let OA3_TOKEN_ADDRESS: string;
 
   // Load contract addresses from backend config
-  async function loadContractAddresses() {
+  async function loadContractAddresses(chainId?: string) {
     try {
-      const response = await fetch('/api/config');
+      const url = chainId ? `/api/config?chainId=${chainId}` : '/api/config';
+      console.log('🔧 Loading contract addresses from:', url);
+      
+      const response = await fetch(url);
       const config = await response.json();
 
       if (config.success) {
         ZK_VERIFIER_V3_ADDRESS = config.zkVerifierV3Address;
         ZK_ACCOUNT_FACTORY_V3_ADDRESS = config.zkAccountFactoryV3Address;
         OA3_TOKEN_ADDRESS = config.oa3TokenAddress;
+        
+        console.log('✅ Contract addresses loaded:');
+        console.log('  Chain ID:', config.chainId);
+        console.log('  Network Name:', config.networkName);
+        console.log('  Factory:', ZK_ACCOUNT_FACTORY_V3_ADDRESS);
+        console.log('  Verifier:', ZK_VERIFIER_V3_ADDRESS);
       } else {
         throw new Error('Failed to load contract addresses from config');
       }
@@ -162,17 +171,17 @@
       if (error instanceof Error && error.message.includes('rate limit')) {
         return {
           hasZKAccount: false,
-          zkAccountAddress: null,
-          currentOwner: null,
+          zkAccountAddress: undefined,
+          currentOwner: undefined,
           balance: '0',
           tokenBalance: '0',
           taikoBalance: '0',
           requiresZKProof: false,
           emailHash: '0',
           domainHash: '0',
-          verifierContract: null,
+          verifierContract: undefined,
           accountNonce: '0',
-          factoryAddress: null
+          factoryAddress: undefined
         };
       }
       throw new Error(`Failed to check ZK account: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -183,66 +192,91 @@
   export async function createZKAccount(
     privateKey: string, 
     walletAddress: string, 
-    userEmail: string
+    userEmail: string,
+    chainId?: string
   ): Promise<ZKAccountCreationResult> {
     try {
-      // Ensure contract addresses are loaded
-      if (!ZK_ACCOUNT_FACTORY_V3_ADDRESS) {
-        await loadContractAddresses();
-      }
+      // Get current chain ID - use parameter if provided, otherwise from localStorage
+      const selectedChainId = chainId || JSON.parse(localStorage.getItem('dashboardChainId') || '1');
+      
+      // Always reload contract addresses for the specific chain
+      await loadContractAddresses(selectedChainId);
 
-      const provider = await getProvider();
+      console.log('📝 Contract Addresses for chain', selectedChainId, ':');
+      console.log('  🏭 ZK Account Factory V3:', ZK_ACCOUNT_FACTORY_V3_ADDRESS);
+      console.log('  ✅ ZK Verifier V3:', ZK_VERIFIER_V3_ADDRESS);
+      console.log('  🪙 OA3 Token:', OA3_TOKEN_ADDRESS);
+
+      const provider = await getProvider(chainId);
       const signer = new ethers.Wallet(privateKey, provider);
 
       // Verify signer address matches wallet address
       if (signer.address.toLowerCase() !== walletAddress.toLowerCase()) {
         throw new Error('Private key does not match wallet address');
       }
-
+      
       // Get network info for chain-specific gas limits
-      const configResponse = await fetch('/api/config');
+      const configResponse = await fetch(`/api/config?chainId=${selectedChainId}`);
       const config = await configResponse.json();
-      const chainId = config.chainId ? parseInt(config.chainId) : 17000;
+      const networkChainId = config.chainId ? parseInt(config.chainId) : parseInt(selectedChainId);
       
       // Set higher gas limit for Sepolia (chainId: 11155111)
-      const gasLimit = chainId === 11155111 ? 1000000 : 500000;
+      const gasLimit = networkChainId === 11155111 ? 1000000 : 500000;
 
-      // Check wallet balance before proceeding
+      // Check wallet balance before proceeding with retries
       const network = await provider.getNetwork();
-      const balance = await provider.getBalance(walletAddress);
-      const balanceInEth = ethers.formatEther(balance);
+      let balance = await provider.getBalance(walletAddress);
+      let balanceInEth = ethers.formatEther(balance);
       
-      // Try alternative balance check if balance shows 0
+      console.log(`🔍 Initial balance check for ${walletAddress}: ${balanceInEth} ETH`);
+      
+      // Try multiple methods to get the correct balance
       if (balance === 0n) {
-        try {
-          const response = await fetch(config.rpcUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              method: 'eth_getBalance',
-              params: [walletAddress, 'latest'],
-              id: 1
-            })
-          });
-          const result = await response.json();
-          if (result.result) {
-            const hexBalance = result.result;
-            const alternativeBalance = BigInt(hexBalance);
-            if (alternativeBalance > 0n) {
-              // Use alternative balance if it's greater than 0
-              const altBalanceInEth = ethers.formatEther(alternativeBalance);
-              console.error(`Balance discrepancy detected. Provider shows 0, but direct RPC shows ${altBalanceInEth} ETH`);
+        // Wait a bit and retry
+        console.log(`⏳ Balance shows 0, waiting and retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Retry with provider
+        balance = await provider.getBalance(walletAddress);
+        balanceInEth = ethers.formatEther(balance);
+        console.log(`🔄 Retry balance: ${balanceInEth} ETH`);
+        
+        // If still 0, try direct RPC call
+        if (balance === 0n) {
+          try {
+            console.log(`⚠️ Still 0, trying direct RPC call to ${config.rpcUrl}`);
+            const response = await fetch(config.rpcUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'eth_getBalance',
+                params: [walletAddress, 'latest'],
+                id: 1
+              })
+            });
+            const result = await response.json();
+            if (result.result) {
+              const hexBalance = result.result;
+              const alternativeBalance = BigInt(hexBalance);
+              balance = alternativeBalance;
+              balanceInEth = ethers.formatEther(alternativeBalance);
+              console.log(`✅ Direct RPC balance: ${balanceInEth} ETH (hex: ${hexBalance})`);
             }
+          } catch (e) {
+            console.error('❌ Failed to check balance via direct RPC:', e);
           }
-        } catch (e) {
-          // Silent fail for direct RPC
         }
       }
 
+      console.log(`📝 Creating ZK Account on chain ${selectedChainId}...`);
+      console.log(`📝 Factory contract address: ${ZK_ACCOUNT_FACTORY_V3_ADDRESS}`);
+      console.log(`📝 Verifier contract address: ${ZK_VERIFIER_V3_ADDRESS}`);
+      
       const factory = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, ZK_ACCOUNT_FACTORY_V3_ABI, signer);
 
       // Check if account already exists
+      console.log(`🔍 Checking existing accounts for ${walletAddress}...`);
       const userAccounts = await factory.getUserAccounts(walletAddress);
       if (userAccounts.length > 0) {
         return {
@@ -345,9 +379,24 @@
   }
 
   // Wait for transaction confirmation
-  export async function waitForTransaction(txHash: string): Promise<ethers.TransactionReceipt | null> {
+  export async function waitForTransaction(txHash: string, chainId?: string): Promise<ethers.TransactionReceipt | null> {
     try {
-      const provider = await getProvider();
+      let provider: ethers.JsonRpcProvider;
+      
+      if (chainId) {
+        // Get chain-specific RPC URL
+        const configResponse = await fetch(`/api/config?chainId=${chainId}`);
+        const config = await configResponse.json();
+        if (config.success && config.rpcUrl) {
+          provider = new ethers.JsonRpcProvider(config.rpcUrl);
+          console.log(`⏳ Waiting for transaction on chain ${chainId} using RPC: ${config.rpcUrl}`);
+        } else {
+          provider = await getProvider();
+        }
+      } else {
+        provider = await getProvider();
+      }
+      
       return await provider.waitForTransaction(txHash, 1, 30000); // Wait up to 30 seconds
     } catch (error) {
       console.error('Error waiting for transaction:', error);

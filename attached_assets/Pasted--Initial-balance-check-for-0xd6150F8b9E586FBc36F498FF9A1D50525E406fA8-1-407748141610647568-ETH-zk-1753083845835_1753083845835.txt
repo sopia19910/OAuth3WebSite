@@ -1,0 +1,119 @@
+🔍 Initial balance check for 0xd6150F8b9E586FBc36F498FF9A1D50525E406fA8: 1.407748141610647568 ETH
+zkAccount.ts:335 ZK Account creation error: Error: could not decode result data (value="0x", info={ "method": "getUserAccounts", "signature": "getUserAccounts(address)" }, code=BAD_DATA, version=6.15.0)
+    at makeError (ethers.js?v=8c3a027a:337:15)
+    at assert (ethers.js?v=8c3a027a:350:11)
+    at _Interface.decodeFunctionResult (ethers.js?v=8c3a027a:12734:5)
+    at staticCallResult (ethers.js?v=8c3a027a:14841:31)
+    at async staticCall (ethers.js?v=8c3a027a:14809:20)
+    at async Proxy.getUserAccounts (ethers.js?v=8c3a027a:14846:14)
+    at async createZKAccount (zkAccount.ts:263:28)
+    at async handleRequestGasFee (personalservice.tsx:500:22)
+createZKAccount @ zkAccount.ts:335
+await in createZKAccount
+handleRequestGasFee @ personalservice.tsx:500
+await in handleRequestGasFee
+callCallback2 @ chunk-RPCDYKBN.js?v=8c3a027a:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=8c3a027a:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=8c3a027a:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=8c3a027a:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=8c3a027a:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=8c3a027a:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=8c3a027a:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=8c3a027a:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=8c3a027a:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=8c3a027a:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=8c3a027a:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=8c3a027a:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=8c3a027a:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=8c3a027a:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=8c3a027a:5449Understand this error
+zkAccount.ts:336 Error details: {
+  "code": "BAD_DATA",
+  "value": "0x",
+  "info": {
+    "method": "getUserAccounts",
+    "signature": "getUserAccounts(address)"
+  },
+  "shortMessage": "could not decode result data"
+}
+createZKAccount @ zkAccount.ts:336
+await in createZKAccount
+handleRequestGasFee @ personalservice.tsx:500
+await in handleRequestGasFee
+callCallback2 @ chunk-RPCDYKBN.js?v=8c3a027a:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=8c3a027a:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=8c3a027a:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=8c3a027a:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=8c3a027a:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=8c3a027a:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=8c3a027a:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=8c3a027a:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=8c3a027a:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=8c3a027a:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=8c3a027a:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=8c3a027a:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=8c3a027a:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=8c3a027a:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=8c3a027a:5449Understand this error
+zkAccount.ts:342 Full error message: could not decode result data (value="0x", info={ "method": "getUserAccounts", "signature": "getUserAccounts(address)" }, code=BAD_DATA, version=6.15.0)
+createZKAccount @ zkAccount.ts:342
+await in createZKAccount
+handleRequestGasFee @ personalservice.tsx:500
+await in handleRequestGasFee
+callCallback2 @ chunk-RPCDYKBN.js?v=8c3a027a:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=8c3a027a:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=8c3a027a:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=8c3a027a:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=8c3a027a:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=8c3a027a:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=8c3a027a:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=8c3a027a:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=8c3a027a:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=8c3a027a:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=8c3a027a:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=8c3a027a:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=8c3a027a:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=8c3a027a:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=8c3a027a:5449Understand this error
+personalservice.tsx:535 ZK Account creation error: Error: Failed to create ZK Account: could not decode result data (value="0x", info={ "method": "getUserAccounts", "signature": "getUserAccounts(address)" }, code=BAD_DATA, version=6.15.0)
+    at handleRequestGasFee (personalservice.tsx:503:15)
+handleRequestGasFee @ personalservice.tsx:535
+await in handleRequestGasFee
+callCallback2 @ chunk-RPCDYKBN.js?v=8c3a027a:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=8c3a027a:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=8c3a027a:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=8c3a027a:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=8c3a027a:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=8c3a027a:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=8c3a027a:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=8c3a027a:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=8c3a027a:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=8c3a027a:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=8c3a027a:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=8c3a027a:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=8c3a027a:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=8c3a027a:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=8c3a027a:5449Understand this error
+wallet.ts:89 💰 Balance for 0xd6150F8b9E586FBc36F498FF9A1D50525E406fA8: 1.407748141610647568 ETH
+personalservice.tsx:264 🔍 Single ZK Account check on chain: Sepolia Testnet
+zkAccount.ts:128 🔍 Checking ZK Account for: 0xd6150F8b9E586FBc36F498FF9A1D50525E406fA8 on chain: 11155111
+zkAccount.ts:142 📋 ZK Account check result: {success: true, hasZKAccount: false, zkAccountAddress: null, factoryAddress: '0x909d1bAf9547112b112c1d37ac8D9b5EaEb3DEd6'}
+personalservice.tsx:286 ❌ No ZK Account on this chain
+VM342:1 Uncaught (in promise) SyntaxError: "[object Object]" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at l._storageChangeDispatcher (content.js:2:898238)
+    at _storageChangeDispatcherCallback (content.js:2:897686)
+_storageChangeDispatcher @ content.js:2
+_storageChangeDispatcherCallback @ content.js:2Understand this error
+VM343:1 Uncaught (in promise) SyntaxError: "[object Object]" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at l._storageChangeDispatcher (content.js:2:898238)
+    at _storageChangeDispatcherCallback (content.js:2:897686)
+_storageChangeDispatcher @ content.js:2
+_storageChangeDispatcherCallback @ content.js:2Understand this error
+VM344:1 Uncaught (in promise) SyntaxError: "[object Object]" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at l._storageChangeDispatcher (content.js:2:898238)
+    at _storageChangeDispatcherCallback (content.js:2:897686)
+_storageChangeDispatcher @ content.js:2
+_storageChangeDispatcherCallback @ content.js:2Understand this error

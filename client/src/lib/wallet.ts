@@ -10,15 +10,28 @@ export interface WalletBalance {
   formatted: string;
 }
 
+// Cache for RPC URL
+let cachedRpcUrl: string | null = null;
+
 // Get RPC URL from backend
-async function getRpcUrl(): Promise<string> {
+async function getRpcUrl(chainId?: string): Promise<string> {
+  // Don't use cache if a specific chainId is requested
+  if (!chainId && cachedRpcUrl) {
+    return cachedRpcUrl;
+  }
+
   try {
-    const response = await fetch('/api/config');
+    const url = chainId ? `/api/config?chainId=${chainId}` : '/api/config';
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Failed to fetch config: ${response.status}`);
     }
     const data = await response.json();
     if (data.success && data.rpcUrl) {
+      // Only cache if no specific chainId was requested
+      if (!chainId) {
+        cachedRpcUrl = data.rpcUrl;
+      }
       return data.rpcUrl;
     }
   } catch (error) {
@@ -111,8 +124,8 @@ export function clearWalletFromStorage(): void {
 }
 
 // Get an Ethereum provider instance
-export async function getProvider(): Promise<ethers.JsonRpcProvider> {
-  const rpcUrl = await getRpcUrl();
+export async function getProvider(chainId?: string): Promise<ethers.JsonRpcProvider> {
+  const rpcUrl = await getRpcUrl(chainId);
   return new ethers.JsonRpcProvider(rpcUrl);
 }
 
