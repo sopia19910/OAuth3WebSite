@@ -206,23 +206,14 @@
       
       // Set higher gas limit for Sepolia (chainId: 11155111)
       const gasLimit = chainId === 11155111 ? 1000000 : 500000;
-      console.log(`⛽ Using gas limit: ${gasLimit} for chainId: ${chainId}`);
 
       // Check wallet balance before proceeding
-      console.log(`🔍 Checking balance for ${walletAddress} on ${config.networkName} (chainId: ${chainId})`);
-      console.log(`📡 Using RPC: ${config.rpcUrl}`);
-      
-      // Double check the network
       const network = await provider.getNetwork();
-      console.log(`🌐 Connected to network: ${network.name} (chainId: ${network.chainId})`);
-      
       const balance = await provider.getBalance(walletAddress);
       const balanceInEth = ethers.formatEther(balance);
-      console.log(`💰 Wallet balance: ${balanceInEth} ETH (${balance.toString()} wei)`);
       
-      // Try alternative balance check
+      // Try alternative balance check if balance shows 0
       if (balance === 0n) {
-        console.log(`⚠️ Balance shows 0, trying direct RPC call...`);
         try {
           const response = await fetch(config.rpcUrl, {
             method: 'POST',
@@ -238,10 +229,14 @@
           if (result.result) {
             const hexBalance = result.result;
             const alternativeBalance = BigInt(hexBalance);
-            console.log(`📊 Direct RPC balance check: ${ethers.formatEther(alternativeBalance)} ETH (${hexBalance})`);
+            if (alternativeBalance > 0n) {
+              // Use alternative balance if it's greater than 0
+              const altBalanceInEth = ethers.formatEther(alternativeBalance);
+              console.error(`Balance discrepancy detected. Provider shows 0, but direct RPC shows ${altBalanceInEth} ETH`);
+            }
           }
         } catch (e) {
-          console.error('Direct RPC call failed:', e);
+          // Silent fail for direct RPC
         }
       }
 
@@ -258,18 +253,11 @@
       }
 
       // Get correct hashes from OAuth session (same as circuit)
-      console.log('🔍 Getting OAuth hashes from session...');
       const { emailHash, domainHash } = await getOAuthHashesFromSession();
       const salt = generateSalt(userEmail, walletAddress);
 
-      console.log('🏭 Creating ZK Account with:');
-      console.log('📧 Email hash (from OAuth):', emailHash.toString());
-      console.log('🌐 Domain hash (from OAuth):', domainHash.toString());
-      console.log('🔑 Salt:', salt);
-
       // Get counterfactual address
       const counterfactualAddress = await factory.predictZKAccountAddress(walletAddress, salt);
-      console.log('📍 Counterfactual address:', counterfactualAddress);
 
       // Estimate gas and check if wallet has enough
       try {
@@ -312,8 +300,6 @@
       );
 
       const txHash = createTx.hash;
-      console.log('✅ ZK Account creation transaction sent!');
-      console.log('🔗 Transaction hash:', txHash);
 
       // Use the already fetched config for explorer URL
       const explorerUrl = config.success ? `${config.explorerUrl}/tx/${txHash}` : `https://holesky.etherscan.io/tx/${txHash}`;
