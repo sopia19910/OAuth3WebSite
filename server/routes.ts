@@ -236,10 +236,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🔍 Checking V3 ZK accounts for:', walletAddress, 'on chain:', chainId || 'active');
 
-      // Contract addresses from environment or defaults
-      const OA3_TOKEN_ADDRESS = process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea';
-      const TAIKO_TOKEN_ADDRESS = process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890';
-
       // ZKAccountFactoryV3 ABI
       const zkAccountFactoryV3ABI = [
         "function getUserAccounts(address user) external view returns (address[])",
@@ -334,16 +330,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const accountBalance = await provider.getBalance(zkAccountAddress);
         const balanceETH = ethers.formatEther(accountBalance);
 
-        // Get OA3 token balance
+        // Get OA3 token balance from chain-specific tokens
         const erc20ABI = [
           "function balanceOf(address account) external view returns (uint256)",
           "function decimals() external view returns (uint8)"
         ];
 
+        // Get tokens for this chain from database
+        const chainTokens = await storage.getTokensByChain(selectedChain.chainId);
+        const oa3Token = chainTokens.find(token => token.symbol === 'OA3');
+
         let tokenBalanceFormatted = '0';
         try {
-          if (OA3_TOKEN_ADDRESS && OA3_TOKEN_ADDRESS !== '0x0000000000000000000000000000000000000000') {
-            const tokenContract = new ethers.Contract(OA3_TOKEN_ADDRESS, erc20ABI, provider);
+          if (oa3Token && oa3Token.address && oa3Token.address !== '0x0000000000000000000000000000000000000000') {
+            const tokenContract = new ethers.Contract(oa3Token.address, erc20ABI, provider);
             const tokenBalance = await tokenContract.balanceOf(zkAccountAddress);
             const decimals = await tokenContract.decimals();
             tokenBalanceFormatted = ethers.formatUnits(tokenBalance, decimals);
@@ -353,11 +353,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tokenBalanceFormatted = '0';
         }
 
-        // Get TAIKO token balance
+        // Get TAIKO token balance (if exists in database)
+        const taikoToken = chainTokens.find(token => token.symbol === 'TAIKO');
         let taikoBalanceFormatted = '0';
         try {
-          if (TAIKO_TOKEN_ADDRESS && TAIKO_TOKEN_ADDRESS !== '0x0000000000000000000000000000000000000000' && TAIKO_TOKEN_ADDRESS !== '0x1234567890123456789012345678901234567890') {
-            const taikoContract = new ethers.Contract(TAIKO_TOKEN_ADDRESS, erc20ABI, provider);
+          if (taikoToken && taikoToken.address && taikoToken.address !== '0x0000000000000000000000000000000000000000') {
+            const taikoContract = new ethers.Contract(taikoToken.address, erc20ABI, provider);
             const taikoBalance = await taikoContract.balanceOf(zkAccountAddress);
             const taikoDecimals = await taikoContract.decimals();
             taikoBalanceFormatted = ethers.formatUnits(taikoBalance, taikoDecimals);
