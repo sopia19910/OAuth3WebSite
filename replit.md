@@ -120,6 +120,13 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Sepolia Gas Limit Fix (2025-01-21)**:
+  - Fixed "insufficient funds" error on Sepolia testnet during ZK Account creation
+  - Implemented network-specific gas limits:
+    - Sepolia (chainId: 11155111): 1,000,000 gas limit
+    - Other networks: 500,000 gas limit (default)
+  - Added detailed error logging for better debugging
+  - Added specific error handling for gas limit exceeded errors
 - **Smart Contract Deployment to Sepolia (2025-01-20)**:
   - Successfully deployed all 3 contracts to Sepolia testnet:
     - Groth16Verifier: 0x83f76458Ed154A34a9Ef071d1D08e31bb2E9E610

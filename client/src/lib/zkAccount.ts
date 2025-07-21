@@ -199,6 +199,15 @@
         throw new Error('Private key does not match wallet address');
       }
 
+      // Get network info for chain-specific gas limits
+      const configResponse = await fetch('/api/config');
+      const config = await configResponse.json();
+      const chainId = config.chainId ? parseInt(config.chainId) : 17000;
+      
+      // Set higher gas limit for Sepolia (chainId: 11155111)
+      const gasLimit = chainId === 11155111 ? 1000000 : 500000;
+      console.log(`⛽ Using gas limit: ${gasLimit} for chainId: ${chainId}`);
+
       const factory = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, ZK_ACCOUNT_FACTORY_V3_ABI, signer);
 
       // Check if account already exists
@@ -232,7 +241,7 @@
         domainHash, 
         salt,
         {
-          gasLimit: 500000
+          gasLimit: gasLimit
         }
       );
 
@@ -240,9 +249,7 @@
       console.log('✅ ZK Account creation transaction sent!');
       console.log('🔗 Transaction hash:', txHash);
 
-      // Get explorer URL from config
-      const configResponse = await fetch('/api/config');
-      const config = await configResponse.json();
+      // Use the already fetched config for explorer URL
       const explorerUrl = config.success ? `${config.explorerUrl}/tx/${txHash}` : `https://holesky.etherscan.io/tx/${txHash}`;
 
       return {
@@ -257,16 +264,22 @@
 
     } catch (error) {
       console.error('ZK Account creation error:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
 
       let errorMessage = 'Failed to create ZK Account: ';
 
       if (error instanceof Error) {
+        // Log the full error for debugging
+        console.error('Full error message:', error.message);
+        
         if (error.message.includes('insufficient funds')) {
           errorMessage = 'Insufficient funds for transaction. Please ensure your wallet has enough ETH for gas fees.';
         } else if (error.message.includes('user rejected') || error.message.includes('denied')) {
           errorMessage = 'Transaction was rejected by user.';
         } else if (error.message.includes('nonce')) {
           errorMessage = 'Transaction nonce error. Please try again.';
+        } else if (error.message.includes('gas required exceeds allowance')) {
+          errorMessage = 'Gas limit too low. The transaction requires more gas than the limit allows.';
         } else {
           errorMessage += error.message;
         }
