@@ -138,6 +138,9 @@ export default function Dashboard() {
     useEffect(() => {
         if (!wallet || !selectedChainId || chains.length === 0) return;
 
+        // Reset selected token to ETH when chain changes
+        setSelectedToken('ETH');
+        
         // Add debouncing to prevent rapid chain switching issues
         const timeoutId = setTimeout(() => {
             refreshAccountData();
