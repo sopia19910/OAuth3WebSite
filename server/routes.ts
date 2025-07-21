@@ -178,7 +178,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (chainId) {
         // If chainId is provided, get that specific chain
         const chains = await storage.getChains();
-        selectedChain = chains.find(chain => chain.chainId.toString() === chainId.toString());
+        // Try to find by database ID first, then by actual chain ID
+        selectedChain = chains.find(chain => 
+          chain.id.toString() === chainId.toString() || 
+          chain.chainId.toString() === chainId.toString()
+        );
         if (!selectedChain) {
           return res.status(400).json({
             success: false,
