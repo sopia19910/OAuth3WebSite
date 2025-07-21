@@ -120,6 +120,14 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Dashboard ZK Account Detection Fix (2025-01-21)**:
+  - Fixed issue where zkaccount3/check API wasn't being called on dashboard initial load
+  - Resolved race condition between chain selection and wallet data loading
+  - Dashboard now waits for chains to load and selectedChainId to be set before loading wallet data
+  - Added multi-chain ZK Account detection that checks all available chains
+  - Dashboard warning now shows which chains have existing ZK Accounts when current chain doesn't have one
+  - Example: "💡 You have ZKP accounts on: Holesky Testnet, Sepolia Testnet"
+  - This helps users understand where their ZK Accounts exist across different networks
 - **Balance Display Architecture Update (2025-01-21)**:
   - Clear separation of balance displays:
     - ETH balance: Shows only for Web3 wallet address (regular Ethereum account)

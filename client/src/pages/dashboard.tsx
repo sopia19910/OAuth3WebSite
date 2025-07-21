@@ -103,6 +103,7 @@ export default function Dashboard() {
     // Chain state
     const [chains, setChains] = useState<any[]>([]);
     const [selectedChainId, setSelectedChainId] = useState<string>("");
+    const [zkAccountsOnChains, setZkAccountsOnChains] = useState<Record<string, boolean>>({});
     // Load wallet and account data on component mount
     useEffect(() => {
         // Load chains first, then wallet data
@@ -121,6 +122,13 @@ export default function Dashboard() {
             loadTokensFromDB();
         }
     }, [selectedChainId, chains.length]);
+
+    // Check for ZK Accounts on all chains when wallet is loaded
+    useEffect(() => {
+        if (wallet && chains.length > 0) {
+            checkZKAccountsOnAllChains();
+        }
+    }, [wallet, chains]);
 
     // Generate QR code when zkAccountInfo changes
     useEffect(() => {
@@ -189,6 +197,44 @@ export default function Dashboard() {
         }
     };
 
+    const checkZKAccountsOnAllChains = async () => {
+        if (!wallet) return;
+        
+        const zkAccounts: Record<string, boolean> = {};
+        
+        // Check each chain in parallel
+        const checkPromises = chains.map(async (chain) => {
+            try {
+                const zkInfo = await checkZKAccount(wallet.address, chain.id.toString());
+                return { chainId: chain.id.toString(), hasZKAccount: zkInfo.hasZKAccount };
+            } catch (error) {
+                console.error(`Failed to check ZK account on ${chain.networkName}:`, error);
+                return { chainId: chain.id.toString(), hasZKAccount: false };
+            }
+        });
+        
+        const results = await Promise.all(checkPromises);
+        
+        // Update state with results
+        results.forEach(result => {
+            zkAccounts[result.chainId] = result.hasZKAccount;
+        });
+        
+        setZkAccountsOnChains(zkAccounts);
+        
+        // If current chain doesn't have ZK Account but another does, suggest switching
+        const currentHasZKAccount = zkAccounts[selectedChainId];
+        const chainWithZKAccount = Object.entries(zkAccounts).find(([_, hasZK]) => hasZK);
+        
+        if (!currentHasZKAccount && chainWithZKAccount) {
+            const chainId = chainWithZKAccount[0];
+            const chain = chains.find(c => c.id.toString() === chainId);
+            if (chain) {
+                console.log(`💡 ZK Account found on ${chain.networkName}. Consider switching to that chain.`);
+            }
+        }
+    };
+
     const loadTokensFromDB = async () => {
         if (!selectedChainId || chains.length === 0) return;
         
@@ -228,7 +274,7 @@ export default function Dashboard() {
         const balancePromises = tokens.map(async (token) => {
             try {
                 // Use ZK Account address instead of wallet address
-                const result = await getTokenBalance(token.address, zkAccountInfo.zkAccountAddress, chainId);
+                const result = await getTokenBalance(token.address, zkAccountInfo.zkAccountAddress!, chainId);
                 return { address: token.address, balance: result.balance, formatted: result.formatted };
             } catch (error) {
                 console.error(`Failed to get balance for ${token.symbol}:`, error);
@@ -854,7 +900,18 @@ export default function Dashboard() {
                                         </h3>
                                         <p className="mt-1 text-sm text-muted-foreground">
                                             Your ZKP Contract Account has not been created on the {networkName} network.
-                                            To create your ZKP CA, please go to the <a
+                                            {Object.entries(zkAccountsOnChains).filter(([chainId, hasZK]) => hasZK && chainId !== selectedChainId).length > 0 && (
+                                                <span className="block mt-2 text-xs text-primary">
+                                                    💡 You have ZKP accounts on: {Object.entries(zkAccountsOnChains)
+                                                        .filter(([chainId, hasZK]) => hasZK && chainId !== selectedChainId)
+                                                        .map(([chainId]) => {
+                                                            const chain = chains.find(c => c.id.toString() === chainId);
+                                                            return chain?.networkName || 'Unknown';
+                                                        })
+                                                        .join(', ')}
+                                                </span>
+                                            )}
+                                            To create your ZKP CA on this network, please go to the <a
                                             href={`/personalservice?from=dashboard&chainId=${selectedChainId}`}
                                             className="underline hover:text-foreground">Personal Service page</a> and
                                             complete the ZKP generation process.
