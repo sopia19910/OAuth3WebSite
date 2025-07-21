@@ -220,7 +220,7 @@ export default function Demo() {
           if (urlChainId) {
             const targetChain = data.chains.find((chain: any) => chain.id.toString() === urlChainId);
             if (targetChain) {
-              setSelectedChainId(urlChainId);
+              setSelectedChainId(targetChain.chainId.toString());
               setNetworkName(targetChain.networkName);
               console.log('🎯 Using chain from dashboard:', targetChain.networkName);
               // Clear ZK Account info when setting chain from URL
@@ -230,7 +230,7 @@ export default function Demo() {
             // Otherwise, set the active chain as selected by default
             const activeChain = data.chains.find((chain: any) => chain.isActive);
             if (activeChain) {
-              setSelectedChainId(activeChain.id.toString());
+              setSelectedChainId(activeChain.chainId.toString());
               setNetworkName(activeChain.networkName);
             }
           }
@@ -251,7 +251,7 @@ export default function Demo() {
         setBalanceError("");
         try {
           // Find the selected chain
-          const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+          const selectedChain = chains.find(chain => chain.chainId.toString() === selectedChainId);
           if (selectedChain) {
             const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
             const balance = await getWalletBalance(wallet.address, provider);
@@ -847,7 +847,7 @@ export default function Demo() {
                     <h4 className="text-sm font-medium text-muted-foreground mb-2">Network</h4>
                     <Select value={selectedChainId} onValueChange={(value) => {
                       setSelectedChainId(value);
-                      const chain = chains.find(c => c.id.toString() === value);
+                      const chain = chains.find(c => c.chainId.toString() === value);
                       if (chain) {
                         setNetworkName(chain.networkName);
                       }
@@ -859,7 +859,7 @@ export default function Demo() {
                       </SelectTrigger>
                       <SelectContent>
                         {chains.map((chain) => (
-                          <SelectItem key={chain.id} value={chain.id.toString()}>
+                          <SelectItem key={chain.id} value={chain.chainId.toString()}>
                             <div className="flex items-center gap-2">
                               {chain.networkImage && (
                                 <img 
