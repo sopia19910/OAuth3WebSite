@@ -8,9 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  ShieldCheckIcon, 
-  KeyIcon, 
+import {
+  ShieldCheckIcon,
+  KeyIcon,
   GlobeAltIcon,
   WalletIcon,
   DocumentIcon,
@@ -27,22 +27,22 @@ import {
 import { SiGoogle } from "react-icons/si";
 import Navbar from "@/components/navbar";
 import ethereumLogo from "@assets/image_1752985874370.png";
-import { 
-  createWallet, 
-  importWallet, 
-  getWalletBalance, 
-  saveWalletToStorage, 
+import {
+  createWallet,
+  importWallet,
+  getWalletBalance,
+  saveWalletToStorage,
   getWalletFromStorage,
   getNetworkInfo,
-  type WalletInfo 
+  type WalletInfo
 } from "@/lib/wallet";
 import { ethers } from "ethers";
-import { 
-  createZKAccount, 
-  checkZKAccount, 
+import {
+  createZKAccount,
+  checkZKAccount,
   waitForTransaction,
   type ZKAccountInfo,
-  type ZKAccountCreationResult 
+  type ZKAccountCreationResult
 } from "@/lib/zkAccount";
 
 type DemoStep = "login" | "web3-setup" | "balance" | "zkp-generation" | "zkp-display" | "complete";
@@ -113,11 +113,11 @@ export default function Demo() {
   const [zkProgress, setZkProgress] = useState(0);
   const [zkStatus, setZkStatus] = useState("");
   const [isRefreshingZkAccount, setIsRefreshingZkAccount] = useState(false);
-  
+
   // Wallet creation/import loading state
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
   const [walletCreationStatus, setWalletCreationStatus] = useState("");
-  
+
   // Chain state
   const [chains, setChains] = useState<any[]>([]);
   const [selectedChainId, setSelectedChainId] = useState<string>("");
@@ -131,9 +131,7 @@ export default function Demo() {
         const oauthSuccess = params.get('oauth');
         const email = params.get('email');
         const fromDashboard = params.get('from') === 'dashboard';
-        const chainId = params.get('chainId');
         const isFreshStart = params.get('fresh') === 'true';
-        
         // Handle OAuth callback
         if (oauthSuccess === 'success' && email) {
           setUserEmail(email);
@@ -154,27 +152,27 @@ export default function Demo() {
           try {
             const authResponse = await fetch('/api/auth/me');
             const authData = await authResponse.json();
-            
+
             if (authData.success && authData.user && authData.user.email) {
               console.log('✅ Found existing OAuth session:', authData.user.email);
               setUserEmail(authData.user.email);
-              
+
               // Check for existing wallet in storage
               const savedWallet = getWalletFromStorage();
               if (savedWallet) {
                 setWallet(savedWallet);
                 console.log('✅ Found existing wallet:', savedWallet.address);
-                
+
                 // If user has both OAuth session and wallet, skip to balance step
                 setCurrentStep("balance");
-                
-                // If coming from dashboard with specific chain, save it
-                if (fromDashboard && chainId) {
-                  setUrlChainId(chainId);
-                  console.log('📌 Chain ID from dashboard:', chainId);
-                  // Clear any existing ZK Account info when coming from dashboard
-                  setZkAccountInfo(null);
-                }
+                //
+                // // If coming from dashboard with specific chain, save it
+                // if (fromDashboard && chainId) {
+                //   setUrlChainId(chainId);
+                //   console.log('📌 Chain ID from dashboard:', chainId);
+                //   // Clear any existing ZK Account info when coming from dashboard
+                //   setZkAccountInfo(null);
+                // }
               } else {
                 // Has OAuth but no wallet, go to web3 setup
                 setCurrentStep("web3-setup");
@@ -194,7 +192,7 @@ export default function Demo() {
         // Get network info
         const info = await getNetworkInfo();
         setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
-        
+
         // Clear URL parameters
         if (fromDashboard || isFreshStart) {
           window.history.replaceState({}, document.title, '/personalservice');
@@ -203,7 +201,7 @@ export default function Demo() {
         console.error('Error during initialization:', error);
       }
     };
-    
+
     initializeSession();
   }, []);
 
@@ -215,24 +213,11 @@ export default function Demo() {
         const data = await response.json();
         if (data.success && data.chains) {
           setChains(data.chains);
-          
-          // If we have a chain ID from URL (dashboard), use it
-          if (urlChainId) {
-            const targetChain = data.chains.find((chain: any) => chain.id.toString() === urlChainId);
-            if (targetChain) {
-              setSelectedChainId(targetChain.chainId.toString());
-              setNetworkName(targetChain.networkName);
-              console.log('🎯 Using chain from dashboard:', targetChain.networkName);
-              // Clear ZK Account info when setting chain from URL
-              setZkAccountInfo(null);
-            }
-          } else {
-            // Otherwise, set the active chain as selected by default
-            const activeChain = data.chains.find((chain: any) => chain.isActive);
-            if (activeChain) {
-              setSelectedChainId(activeChain.chainId.toString());
-              setNetworkName(activeChain.networkName);
-            }
+          // Otherwise, set the active chain as selected by default
+          const activeChain = data.chains.find((chain: any) => chain.isActive);
+          if (activeChain) {
+            setSelectedChainId(activeChain.chainId.toString());
+            setNetworkName(activeChain.networkName);
           }
         }
       } catch (error) {
@@ -240,7 +225,7 @@ export default function Demo() {
       }
     };
     fetchChains();
-  }, [urlChainId]);
+  }, []);
 
   // Auto-refresh balance when wallet or chain changes
   useEffect(() => {
@@ -257,20 +242,20 @@ export default function Demo() {
             const balance = await getWalletBalance(wallet.address, provider);
             setWalletBalance(balance.formatted);
             setBalanceError("");
-            
+
             // Only check ZK Account if we're in the balance step
             // This prevents double API calls when navigating from dashboard
             if (userEmail && currentStep === "balance" && !isRefreshingZkAccount) {
               console.log('🔍 Single ZK Account check on chain:', selectedChain.networkName);
               // Clear previous ZK Account info before checking new chain
               setZkAccountInfo(null);
-              
+
               try {
                 const zkInfo = await checkZKAccount(wallet.address, selectedChainId);
                 if (zkInfo.hasZKAccount) {
                   setZkAccountInfo(zkInfo);
                   console.log('✅ Found ZK Account on this chain:', zkInfo.zkAccountAddress);
-                  
+
                   // Only redirect if not coming from dashboard
                   if (!urlChainId) {
                     toast({
@@ -278,9 +263,9 @@ export default function Demo() {
                       description: "You already have a ZK Account on this network. Redirecting to dashboard...",
                       duration: 2000,
                     });
-                    setTimeout(() => {
-                      setLocation("/dashboard");
-                    }, 2000);
+                    // setTimeout(() => {
+                    //   setLocation("/dashboard");
+                    // }, 2000);
                   }
                 } else {
                   console.log('❌ No ZK Account on this chain');
@@ -299,20 +284,20 @@ export default function Demo() {
           setIsRefreshingBalance(false);
         }
       };
-      
+
       // Call with proper error handling
       fetchBalance().catch(err => {
         console.error('Balance fetch error:', err);
       });
     }
-  }, [wallet, selectedChainId, chains, userEmail, currentStep, urlChainId]);
+  }, [selectedChainId]);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/auth/google');
       const data = await response.json();
-      
+
       if (data.success && data.authUrl) {
         // Redirect to Google OAuth
         window.location.href = data.authUrl;
@@ -330,10 +315,10 @@ export default function Demo() {
   const handleWeb3Setup = async () => {
     setIsCreatingWallet(true);
     setWalletCreationStatus("Initializing wallet...");
-    
+
     try {
       let walletInfo: WalletInfo;
-      
+
       if (web3Option === "new") {
         // Create new wallet
         setWalletCreationStatus("Creating new wallet...");
@@ -346,7 +331,7 @@ export default function Demo() {
           setIsCreatingWallet(false);
           return;
         }
-        
+
         setWalletCreationStatus("Importing wallet...");
         try {
           walletInfo = importWallet(privateKey);
@@ -357,12 +342,12 @@ export default function Demo() {
           return;
         }
       }
-      
+
       // Save wallet to storage
       setWalletCreationStatus("Saving wallet...");
       setWallet(walletInfo);
       saveWalletToStorage(walletInfo);
-      
+
       // Get wallet balance
       setWalletCreationStatus("Fetching balance...");
       try {
@@ -393,11 +378,11 @@ export default function Demo() {
           if (existingAccount.hasZKAccount) {
             setZkAccountInfo(existingAccount);
             console.log('✅ Found existing ZK Account during wallet setup:', existingAccount.zkAccountAddress);
-            
+
             // If wallet has ZK Account, skip to dashboard
             setWalletCreationStatus("ZK Account found! Redirecting to dashboard...");
             await new Promise(resolve => setTimeout(resolve, 1500)); // Brief pause to show message
-            
+
             console.log('🚀 Wallet has existing ZK Account, redirecting to dashboard');
             setLocation("/dashboard");
             return;
@@ -406,10 +391,10 @@ export default function Demo() {
           console.warn('Failed to check ZK account during wallet setup:', error);
         }
       }
-      
+
       setWalletCreationStatus("Setup complete!");
       await new Promise(resolve => setTimeout(resolve, 500)); // Brief pause to show completion
-      
+
       setCurrentStep("balance");
     } catch (error) {
       console.error('Wallet setup error:', error);
@@ -422,12 +407,15 @@ export default function Demo() {
 
   const refreshBalance = async () => {
     if (!wallet || !selectedChainId) return;
-    
+
     setIsRefreshingBalance(true);
     setBalanceError("");
     try {
+      console.log("chains:", chains);
+      console.log("selectedChainId:", selectedChainId);
       // Find the selected chain
-      const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+      const selectedChain = chains.find(chain => chain.chainId === parseInt(selectedChainId));
+      console.log("selectedChain:", selectedChain);
       if (selectedChain) {
         console.log('🌐 Refreshing balance on chain:', selectedChain.networkName);
         console.log('🔗 Using RPC URL:', selectedChain.rpcUrl);
@@ -450,7 +438,7 @@ export default function Demo() {
 
   const refreshZkAccountInfo = async () => {
     if (!wallet) return;
-    
+
     setIsRefreshingZkAccount(true);
     try {
       const refreshedInfo = await checkZKAccount(wallet.address, selectedChainId);
@@ -480,7 +468,7 @@ export default function Demo() {
       // Step 1: Check if ZK account already exists (25%)
       setZkProgress(25);
       setZkStatus("Checking for existing ZK Account...");
-      
+
       const existingAccount = await checkZKAccount(wallet.address, selectedChainId);
       if (existingAccount.hasZKAccount) {
         setZkAccountInfo(existingAccount);
@@ -496,15 +484,15 @@ export default function Demo() {
       // Step 2: Create ZK Account transaction (50%)
       setZkProgress(50);
       setZkStatus("Creating ZK Account transaction...");
-      
+
       const result = await createZKAccount(wallet.privateKey, wallet.address, userEmail, selectedChainId);
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Failed to create ZK Account');
       }
 
       setZkCreationResult(result);
-      
+
       // Step 3: Transaction sent (75%)
       setZkProgress(75);
       setZkStatus(`Transaction sent! Hash: ${result.transactionHash?.slice(0, 10)}...`);
@@ -512,14 +500,14 @@ export default function Demo() {
       // Step 4: Wait for confirmation (100%)
       if (result.transactionHash) {
         setZkStatus("Waiting for transaction confirmation...");
-        
+
         // Wait for transaction with timeout
         const receipt = await waitForTransaction(result.transactionHash, selectedChainId);
-        
+
         if (receipt) {
           setZkProgress(100);
           setZkStatus("ZK Account created successfully!");
-          
+
           // Fetch the created account info
           const accountInfo = await checkZKAccount(wallet.address, selectedChainId);
           setZkAccountInfo(accountInfo);
@@ -528,7 +516,7 @@ export default function Demo() {
           setZkStatus("Transaction sent but confirmation timed out. Check explorer for status.");
         }
       }
-      
+
       setTimeout(() => setCurrentStep("zkp-display"), 1500);
 
     } catch (error) {
@@ -592,21 +580,21 @@ export default function Demo() {
         <div className="flex items-start justify-between relative">
           {/* Background connection line */}
           <div className="absolute top-6 left-6 right-6 h-0.5 bg-muted" />
-          
+
           {/* Progress line */}
-          <div 
+          <div
             className="absolute top-6 left-6 h-0.5 bg-green-500 transition-all duration-1000 ease-in-out"
-            style={{ 
+            style={{
               width: `${(getCurrentStepIndex() / (stepConfig.length - 1)) * 100}%`,
               maxWidth: 'calc(100% - 3rem)'
             }}
           />
-          
+
           {stepConfig.map((step, index) => {
             const IconComponent = step.icon;
             const isCompleted = isStepCompleted(step.id);
             const isCurrent = isCurrentStep(step.id);
-            
+
             return (
               <div key={step.id} className="flex flex-col items-center relative z-10 flex-1">
                 {/* Step circle */}
@@ -625,7 +613,7 @@ export default function Demo() {
                     <IconComponent className="w-6 h-6" />
                   )}
                 </div>
-                
+
                 {/* Step number */}
                 <div className={`
                   w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mt-1 transition-all duration-300
@@ -638,7 +626,7 @@ export default function Demo() {
                 `}>
                   {index + 1}
                 </div>
-                
+
                 {/* Step info */}
                 <div className="mt-2 text-center max-w-24">
                   <h4 className={`text-sm font-medium transition-colors duration-300 ${
@@ -667,7 +655,7 @@ export default function Demo() {
             <p className="text-muted-foreground text-center mb-8">
               Connect your account to continue with OAuth 3 authentication
             </p>
-            <Button 
+            <Button
               onClick={handleGoogleLogin}
               disabled={isLoading}
               className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg disabled:opacity-50"
@@ -689,7 +677,7 @@ export default function Demo() {
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
             <h2 className="text-2xl font-bold text-foreground mb-6">Connect your Web3 account</h2>
-            
+
             {/* Google Account Info */}
             <div className="w-full bg-card rounded-lg p-4 mb-6">
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Connected Google Account</h3>
@@ -707,7 +695,7 @@ export default function Demo() {
                 </Button>
               </div>
             </div>
-            
+
             <RadioGroup value={web3Option} onValueChange={setWeb3Option} className="w-full mb-6">
               <div className="flex items-center space-x-4 border rounded-lg p-4">
                 <RadioGroupItem value="new" id="new" />
@@ -745,14 +733,14 @@ export default function Demo() {
               </div>
             )}
 
-            <Button 
+            <Button
               onClick={handleWeb3Setup}
               disabled={isCreatingWallet}
               className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg disabled:opacity-50"
             >
               {isCreatingWallet ? 'Processing...' : 'Next'}
             </Button>
-            
+
             {/* Loading overlay */}
             {isCreatingWallet && (
               <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
@@ -772,12 +760,12 @@ export default function Demo() {
         return (
           <div className="flex flex-col items-center max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold text-foreground mb-8">Web3 Account & Balance Information</h2>
-            
+
             <div className="w-full space-y-6">
               {/* Web3 Account Info */}
               <div className="bg-card rounded-lg p-6 space-y-4">
                 <h3 className="text-lg font-semibold text-foreground mb-4">Web3 Account Information</h3>
-                
+
                 <div className="space-y-3">
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Public Address</Label>
@@ -795,7 +783,7 @@ export default function Demo() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Private Key</Label>
                     <div className="mt-1 p-3 bg-muted rounded-md flex items-center justify-between">
@@ -828,7 +816,7 @@ export default function Demo() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Balance Info */}
               <div className="bg-card rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -863,8 +851,8 @@ export default function Demo() {
                           <SelectItem key={chain.id} value={chain.chainId.toString()}>
                             <div className="flex items-center gap-2">
                               {chain.networkImage && (
-                                <img 
-                                  src={ethereumLogo} 
+                                <img
+                                  src={ethereumLogo}
                                   alt={chain.networkName}
                                   className="w-4 h-4 object-contain"
                                 />
@@ -889,7 +877,7 @@ export default function Demo() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="text-center py-4 space-y-3">
                 {balanceError ? (
                   <p className="text-destructive text-sm">
@@ -909,7 +897,7 @@ export default function Demo() {
                     ✅ Sufficient balance available for ZK Account operations.
                   </p>
                 )}
-                
+
                 {zkAccountInfo?.hasZKAccount && (
                   <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-green-700 text-sm font-medium">
@@ -926,15 +914,15 @@ export default function Demo() {
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={handleRequestGasFee}
               disabled={!!balanceError || parseFloat(walletBalance) === 0}
               className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {balanceError 
-                ? 'Connection Error - Cannot Create ZK Account' 
-                : parseFloat(walletBalance) === 0 
-                  ? 'Insufficient Balance - Cannot Create ZK Account' 
+              {balanceError
+                ? 'Connection Error - Cannot Create ZK Account'
+                : parseFloat(walletBalance) === 0
+                  ? 'Insufficient Balance - Cannot Create ZK Account'
                   : zkAccountInfo?.hasZKAccount
                     ? 'View Existing ZK Account'
                     : 'Create ZK Account Contract'
@@ -949,16 +937,16 @@ export default function Demo() {
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
               Creating ZK Account Contract
             </h2>
-            
+
             <div className="w-full mb-8 space-y-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-foreground">{zkProgress}%</span>
               </div>
               <Progress value={zkProgress} className="w-full" />
-              
+
               <div className="text-center space-y-2">
                 <p className="text-sm text-muted-foreground">{zkStatus}</p>
-                
+
                 {zkCreationResult?.transactionHash && (
                   <div className="space-y-2">
                     <div className="p-3 bg-muted rounded-lg">
@@ -977,7 +965,7 @@ export default function Demo() {
                         </Button>
                       </div>
                     </div>
-                    
+
                     {zkCreationResult.explorerUrl && (
                       <Button
                         variant="outline"
@@ -993,7 +981,7 @@ export default function Demo() {
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={handleViewZKP}
               disabled={zkProgress < 100}
               className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg disabled:opacity-50"
@@ -1019,16 +1007,16 @@ export default function Demo() {
                 Refresh Balances
               </Button>
             </div>
-            
+
             <div className="mb-6 p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground text-center">
-                {zkAccountInfo?.hasZKAccount 
+                {zkAccountInfo?.hasZKAccount
                   ? 'ZK Account contract has been successfully created to link your Web2 OAuth account with your Web3 wallet.'
                   : 'ZK Account contract creation is in progress. Below are the generated account details and cryptographic information.'
                 }
               </p>
             </div>
-            
+
             {/* Email Information */}
             <div className="mb-6 w-full bg-card rounded-lg p-4">
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Connected Email Account</h3>
@@ -1046,7 +1034,7 @@ export default function Demo() {
                 </Button>
               </div>
             </div>
-            
+
             <Card className="bg-card">
               <CardContent className="p-6">
                 <div className="space-y-4">
@@ -1069,7 +1057,7 @@ export default function Demo() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
                     <div className="space-y-1">
                       <span className="text-sm font-medium text-muted-foreground">Owner (EOA)</span>
@@ -1089,7 +1077,7 @@ export default function Demo() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
                     <div className="space-y-1">
                       <span className="text-sm font-medium text-muted-foreground">ETH Balance</span>
@@ -1097,7 +1085,7 @@ export default function Demo() {
                     </div>
                     <span className="text-sm text-foreground md:col-span-2">{zkAccountInfo?.balance || '0'} ETH</span>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
                     <div className="space-y-1">
                       <span className="text-sm font-medium text-muted-foreground">OA3 Token Balance</span>
@@ -1105,7 +1093,7 @@ export default function Demo() {
                     </div>
                     <span className="text-sm text-foreground md:col-span-2">{zkAccountInfo?.tokenBalance || '0'} OA3</span>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
                     <div className="space-y-1">
                       <span className="text-sm font-medium text-muted-foreground">Requires ZK Proof</span>
@@ -1113,7 +1101,7 @@ export default function Demo() {
                     </div>
                     <span className="text-sm text-foreground md:col-span-2">Yes</span>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-border">
                     <div className="space-y-1">
                       <span className="text-sm font-medium text-muted-foreground">Email Hash (Poseidon)</span>
@@ -1133,7 +1121,7 @@ export default function Demo() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
                     <div className="space-y-1">
                       <span className="text-sm font-medium text-muted-foreground">Domain Hash (Poseidon)</span>
@@ -1157,7 +1145,7 @@ export default function Demo() {
               </CardContent>
             </Card>
             <div className="flex justify-end mt-6">
-              <Button 
+              <Button
                 onClick={handleViewZKP}
                 className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
               >
@@ -1171,7 +1159,7 @@ export default function Demo() {
         return (
           <div className="flex flex-col items-center max-w-md mx-auto">
             <h2 className="text-2xl font-bold text-foreground mb-8">Account Connections</h2>
-            
+
             <div className="w-full space-y-4 mb-8">
               <div className="flex items-center gap-4 p-4 bg-card rounded-lg">
                 <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
@@ -1179,14 +1167,14 @@ export default function Demo() {
                 </div>
                 <span className="text-foreground">Web2 OAuth Account</span>
               </div>
-              
+
               <div className="flex items-center gap-4 p-4 bg-card rounded-lg">
                 <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
                   <WalletIcon className="w-5 h-5 text-muted-foreground" strokeWidth={1} />
                 </div>
                 <span className="text-foreground">Web3 Account</span>
               </div>
-              
+
               <div className="flex items-center gap-4 p-4 bg-card rounded-lg">
                 <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
                   <DocumentIcon className="w-5 h-5 text-muted-foreground" strokeWidth={1} />
@@ -1194,12 +1182,12 @@ export default function Demo() {
                 <span className="text-foreground">ZKP Smart Contract Information (CA)</span>
               </div>
             </div>
-            
+
             <p className="text-center text-muted-foreground mb-8">
               All account connections and ZKP generation are completed.
             </p>
 
-            <Button 
+            <Button
               onClick={handleGoToDashboard}
               className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
             >
@@ -1216,7 +1204,7 @@ export default function Demo() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Demo Content - Full Height */}
       <div className="pt-16 min-h-screen flex flex-col items-center justify-center gradient-bg">
         <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -1224,7 +1212,7 @@ export default function Demo() {
           {/* <div className="mb-12">
             {renderStepProgress()}
           </div> */}
-          
+
           {/* Current Step Content */}
           <div className="w-full max-w-4xl mx-auto">
             {renderStep()}
