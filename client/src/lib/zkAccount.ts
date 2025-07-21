@@ -183,7 +183,8 @@
   export async function createZKAccount(
     privateKey: string, 
     walletAddress: string, 
-    userEmail: string
+    userEmail: string,
+    chainId?: string
   ): Promise<ZKAccountCreationResult> {
     try {
       // Ensure contract addresses are loaded
@@ -199,17 +200,16 @@
         throw new Error('Private key does not match wallet address');
       }
 
-      // Get current chain ID from dashboard state
-      const dashboardState = JSON.parse(localStorage.getItem('dashboardChainId') || '1');
-      const selectedChainId = dashboardState;
+      // Get current chain ID - use parameter if provided, otherwise from localStorage
+      const selectedChainId = chainId || JSON.parse(localStorage.getItem('dashboardChainId') || '1');
       
       // Get network info for chain-specific gas limits
       const configResponse = await fetch(`/api/config?chainId=${selectedChainId}`);
       const config = await configResponse.json();
-      const chainId = config.chainId ? parseInt(config.chainId) : selectedChainId;
+      const networkChainId = config.chainId ? parseInt(config.chainId) : parseInt(selectedChainId);
       
       // Set higher gas limit for Sepolia (chainId: 11155111)
-      const gasLimit = chainId === 11155111 ? 1000000 : 500000;
+      const gasLimit = networkChainId === 11155111 ? 1000000 : 500000;
 
       // Check wallet balance before proceeding
       const network = await provider.getNetwork();

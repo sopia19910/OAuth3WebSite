@@ -496,7 +496,7 @@ export default function Demo() {
       setZkProgress(50);
       setZkStatus("Creating ZK Account transaction...");
       
-      const result = await createZKAccount(wallet.privateKey, wallet.address, userEmail);
+      const result = await createZKAccount(wallet.privateKey, wallet.address, userEmail, selectedChainId);
       
       if (!result.success) {
         throw new Error(result.error || 'Failed to create ZK Account');
