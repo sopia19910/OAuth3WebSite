@@ -192,7 +192,7 @@ export default function Demo() {
         }
 
         // Get network info
-        const info = getNetworkInfo();
+        const info = await getNetworkInfo();
         setNetworkName(info.name === 'unknown' ? 'Holesky Testnet' : info.name);
         
         // Clear URL parameters
@@ -244,7 +244,7 @@ export default function Demo() {
 
   // Auto-refresh balance when wallet or chain changes
   useEffect(() => {
-    if (wallet && selectedChainId) {
+    if (wallet && selectedChainId && chains.length > 0) {
       // Create promise and handle errors properly
       const fetchBalance = async () => {
         setIsRefreshingBalance(true);
@@ -258,9 +258,10 @@ export default function Demo() {
             setWalletBalance(balance.formatted);
             setBalanceError("");
             
-            // Check if ZK Account exists on this chain
-            if (userEmail && currentStep === "balance") {
-              console.log('🔍 Checking for ZK Account on chain:', selectedChain.networkName);
+            // Only check ZK Account if we're in the balance step
+            // This prevents double API calls when navigating from dashboard
+            if (userEmail && currentStep === "balance" && !isRefreshingZkAccount) {
+              console.log('🔍 Single ZK Account check on chain:', selectedChain.networkName);
               // Clear previous ZK Account info before checking new chain
               setZkAccountInfo(null);
               
@@ -513,7 +514,7 @@ export default function Demo() {
         setZkStatus("Waiting for transaction confirmation...");
         
         // Wait for transaction with timeout
-        const receipt = await waitForTransaction(result.transactionHash);
+        const receipt = await waitForTransaction(result.transactionHash, selectedChainId);
         
         if (receipt) {
           setZkProgress(100);

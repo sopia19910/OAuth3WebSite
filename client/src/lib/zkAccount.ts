@@ -192,7 +192,7 @@
         await loadContractAddresses();
       }
 
-      const provider = await getProvider();
+      const provider = await getProvider(chainId);
       const signer = new ethers.Wallet(privateKey, provider);
 
       // Verify signer address matches wallet address
@@ -362,9 +362,24 @@
   }
 
   // Wait for transaction confirmation
-  export async function waitForTransaction(txHash: string): Promise<ethers.TransactionReceipt | null> {
+  export async function waitForTransaction(txHash: string, chainId?: string): Promise<ethers.TransactionReceipt | null> {
     try {
-      const provider = await getProvider();
+      let provider: ethers.JsonRpcProvider;
+      
+      if (chainId) {
+        // Get chain-specific RPC URL
+        const configResponse = await fetch(`/api/config?chainId=${chainId}`);
+        const config = await configResponse.json();
+        if (config.success && config.rpcUrl) {
+          provider = new ethers.JsonRpcProvider(config.rpcUrl);
+          console.log(`⏳ Waiting for transaction on chain ${chainId} using RPC: ${config.rpcUrl}`);
+        } else {
+          provider = await getProvider();
+        }
+      } else {
+        provider = await getProvider();
+      }
+      
       return await provider.waitForTransaction(txHash, 1, 30000); // Wait up to 30 seconds
     } catch (error) {
       console.error('Error waiting for transaction:', error);
