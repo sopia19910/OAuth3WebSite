@@ -18,9 +18,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' && !process.env.GOOGLE_REDIRECT_URI?.includes('localhost'),
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax'
     }
   }));
   // Contact form submission endpoint
@@ -28,15 +29,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertContactSchema.parse(req.body);
       const contact = await storage.createContact(validatedData);
-      
-      res.json({ 
-        success: true, 
+
+      res.json({
+        success: true,
         message: "Thank you for your message! We'll get back to you soon.",
-        id: contact.id 
+        id: contact.id
       });
     } catch (error) {
       console.error("Contact form error:", error);
-      
+
       if (error instanceof Error && 'issues' in error) {
         // Zod validation error
         res.status(400).json({
@@ -173,7 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/config', async (req, res) => {
     try {
       const activeChain = await storage.getActiveChain();
-      
+
       if (!activeChain) {
         // If no active chain in database, return error
         return res.status(500).json({
@@ -181,7 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           error: 'No active chain configured in database'
         });
       }
-      
+
       res.json({
         success: true,
         rpcUrl: activeChain.rpcUrl,
@@ -234,24 +235,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const chains = await storage.getChains();
         selectedChain = chains.find(chain => chain.id.toString() === chainId.toString());
         if (!selectedChain) {
-          return res.status(400).json({ 
-            success: false, 
-            error: 'Invalid chain ID' 
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid chain ID'
           });
         }
       } else {
         // Otherwise use the active chain
-        selectedChain = await storage.getActiveChain();
-        if (!selectedChain) {
-          return res.status(500).json({ 
-            success: false, 
-            error: 'No active chain configured in database' 
-          });
-        }
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid chain ID'
+        });
       }
-      
       console.log('📍 Using chain:', selectedChain.networkName, 'with RPC:', selectedChain.rpcUrl);
-      
       // Check if ZK Account Factory is deployed on this chain
       if (!selectedChain.zkAccountFactory || !selectedChain.verifierAddress) {
         console.log(`⚠️ ZK Account Factory not deployed on ${selectedChain.networkName}`);
@@ -272,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           error: `ZK Account Factory not deployed on ${selectedChain.networkName}`
         });
       }
-      
+
       const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
       const zkAccountFactoryV3 = new ethers.Contract(selectedChain.zkAccountFactory, zkAccountFactoryV3ABI, provider);
 
@@ -428,17 +424,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { circuitInput } = req.session.zkpData;
-      
+
       console.log('🔒 Generating ZK proof for user:', req.session.user?.email);
-      
+
       // Generate the ZK proof
       const { proof, publicSignals } = await generateSecureZKProof(circuitInput);
-      
+
       // Extract meaningful data from public signals
       const emailHash = publicSignals[0];
       const domainHash = publicSignals[1];
       const nullifier = publicSignals[2];
-      
+
       res.json({
         success: true,
         proof,
@@ -581,7 +577,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/chains', async (req, res) => {
     try {
       const validatedData = insertChainSchema.parse(req.body);
-      
+
       // If this chain should be active, deactivate all others first
       if (validatedData.isActive) {
         const existingChains = await storage.getChains();
@@ -591,7 +587,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       }
-      
+
       const chain = await storage.createChain(validatedData);
       res.json({
         success: true,
@@ -624,7 +620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const validatedData = insertChainSchema.partial().parse(req.body);
-      
+
       // If setting this chain as active, deactivate all others first
       if (validatedData.isActive) {
         const existingChains = await storage.getChains();
@@ -634,7 +630,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       }
-      
+
       const chain = await storage.updateChain(chainId, validatedData);
       if (!chain) {
         return res.status(404).json({
@@ -642,7 +638,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           error: 'Chain not found'
         });
       }
-      
+
       res.json({
         success: true,
         chain

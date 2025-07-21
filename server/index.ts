@@ -1,6 +1,11 @@
 import dotenv from "dotenv";
 // Load environment variables FIRST, before any other imports
+// Don't override NODE_ENV if it's already set by command line
+const nodeEnv = process.env.NODE_ENV;
 dotenv.config({ override: true });
+if (nodeEnv) {
+  process.env.NODE_ENV = nodeEnv;
+}
 
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";

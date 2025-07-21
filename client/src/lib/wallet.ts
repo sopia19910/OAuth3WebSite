@@ -10,15 +10,8 @@ export interface WalletBalance {
   formatted: string;
 }
 
-// Cache for RPC URL
-let cachedRpcUrl: string | null = null;
-
 // Get RPC URL from backend
 async function getRpcUrl(): Promise<string> {
-  if (cachedRpcUrl) {
-    return cachedRpcUrl;
-  }
-
   try {
     const response = await fetch('/api/config');
     if (!response.ok) {
@@ -26,7 +19,6 @@ async function getRpcUrl(): Promise<string> {
     }
     const data = await response.json();
     if (data.success && data.rpcUrl) {
-      cachedRpcUrl = data.rpcUrl;
       return data.rpcUrl;
     }
   } catch (error) {
