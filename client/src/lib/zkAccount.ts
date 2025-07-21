@@ -7,15 +7,24 @@
   let OA3_TOKEN_ADDRESS: string;
 
   // Load contract addresses from backend config
-  async function loadContractAddresses() {
+  async function loadContractAddresses(chainId?: string) {
     try {
-      const response = await fetch('/api/config');
+      const url = chainId ? `/api/config?chainId=${chainId}` : '/api/config';
+      console.log('🔧 Loading contract addresses from:', url);
+      
+      const response = await fetch(url);
       const config = await response.json();
 
       if (config.success) {
         ZK_VERIFIER_V3_ADDRESS = config.zkVerifierV3Address;
         ZK_ACCOUNT_FACTORY_V3_ADDRESS = config.zkAccountFactoryV3Address;
         OA3_TOKEN_ADDRESS = config.oa3TokenAddress;
+        
+        console.log('✅ Contract addresses loaded:');
+        console.log('  Chain ID:', config.chainId);
+        console.log('  Network Name:', config.networkName);
+        console.log('  Factory:', ZK_ACCOUNT_FACTORY_V3_ADDRESS);
+        console.log('  Verifier:', ZK_VERIFIER_V3_ADDRESS);
       } else {
         throw new Error('Failed to load contract addresses from config');
       }
@@ -187,10 +196,16 @@
     chainId?: string
   ): Promise<ZKAccountCreationResult> {
     try {
-      // Ensure contract addresses are loaded
-      if (!ZK_ACCOUNT_FACTORY_V3_ADDRESS) {
-        await loadContractAddresses();
-      }
+      // Get current chain ID - use parameter if provided, otherwise from localStorage
+      const selectedChainId = chainId || JSON.parse(localStorage.getItem('dashboardChainId') || '1');
+      
+      // Always reload contract addresses for the specific chain
+      await loadContractAddresses(selectedChainId);
+
+      console.log('📝 Contract Addresses for chain', selectedChainId, ':');
+      console.log('  🏭 ZK Account Factory V3:', ZK_ACCOUNT_FACTORY_V3_ADDRESS);
+      console.log('  ✅ ZK Verifier V3:', ZK_VERIFIER_V3_ADDRESS);
+      console.log('  🪙 OA3 Token:', OA3_TOKEN_ADDRESS);
 
       const provider = await getProvider(chainId);
       const signer = new ethers.Wallet(privateKey, provider);
@@ -199,9 +214,6 @@
       if (signer.address.toLowerCase() !== walletAddress.toLowerCase()) {
         throw new Error('Private key does not match wallet address');
       }
-
-      // Get current chain ID - use parameter if provided, otherwise from localStorage
-      const selectedChainId = chainId || JSON.parse(localStorage.getItem('dashboardChainId') || '1');
       
       // Get network info for chain-specific gas limits
       const configResponse = await fetch(`/api/config?chainId=${selectedChainId}`);
@@ -257,9 +269,14 @@
         }
       }
 
+      console.log(`📝 Creating ZK Account on chain ${selectedChainId}...`);
+      console.log(`📝 Factory contract address: ${ZK_ACCOUNT_FACTORY_V3_ADDRESS}`);
+      console.log(`📝 Verifier contract address: ${ZK_VERIFIER_V3_ADDRESS}`);
+      
       const factory = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, ZK_ACCOUNT_FACTORY_V3_ABI, signer);
 
       // Check if account already exists
+      console.log(`🔍 Checking existing accounts for ${walletAddress}...`);
       const userAccounts = await factory.getUserAccounts(walletAddress);
       if (userAccounts.length > 0) {
         return {
