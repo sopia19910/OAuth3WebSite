@@ -208,6 +208,11 @@
       const gasLimit = chainId === 11155111 ? 1000000 : 500000;
       console.log(`⛽ Using gas limit: ${gasLimit} for chainId: ${chainId}`);
 
+      // Check wallet balance before proceeding
+      const balance = await provider.getBalance(walletAddress);
+      const balanceInEth = ethers.formatEther(balance);
+      console.log(`💰 Wallet balance: ${balanceInEth} ETH`);
+
       const factory = new ethers.Contract(ZK_ACCOUNT_FACTORY_V3_ADDRESS, ZK_ACCOUNT_FACTORY_V3_ABI, signer);
 
       // Check if account already exists
@@ -233,6 +238,35 @@
       // Get counterfactual address
       const counterfactualAddress = await factory.predictZKAccountAddress(walletAddress, salt);
       console.log('📍 Counterfactual address:', counterfactualAddress);
+
+      // Estimate gas and check if wallet has enough
+      try {
+        const estimatedGas = await factory.createZKAccount.estimateGas(
+          true, // requiresZKProof
+          emailHash,
+          domainHash, 
+          salt
+        );
+        console.log(`📊 Estimated gas: ${estimatedGas.toString()}`);
+        
+        const gasPrice = await provider.getFeeData();
+        console.log(`⛽ Gas price: ${ethers.formatUnits(gasPrice.gasPrice || 0n, 'gwei')} gwei`);
+        
+        const estimatedCost = estimatedGas * (gasPrice.gasPrice || 0n);
+        const estimatedCostInEth = ethers.formatEther(estimatedCost);
+        console.log(`💸 Estimated transaction cost: ${estimatedCostInEth} ETH`);
+        
+        if (balance < estimatedCost) {
+          console.error(`❌ Insufficient balance. Have: ${balanceInEth} ETH, Need: ${estimatedCostInEth} ETH`);
+          return {
+            success: false,
+            error: `Insufficient balance. You have ${balanceInEth} ETH but need approximately ${estimatedCostInEth} ETH for this transaction.`
+          };
+        }
+      } catch (estimateError) {
+        console.error('⚠️ Gas estimation failed:', estimateError);
+        console.log('Proceeding with fixed gas limit...');
+      }
 
       // Create the ZK Account
       const createTx = await factory.createZKAccount(
