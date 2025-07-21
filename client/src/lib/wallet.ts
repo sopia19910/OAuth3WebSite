@@ -146,3 +146,43 @@ export async function getNetworkInfo(): Promise<{ name: string; chainId: number 
     };
   }
 }
+
+// Get ERC20 token balance
+export async function getTokenBalance(
+  tokenAddress: string, 
+  walletAddress: string, 
+  chainId?: string
+): Promise<{ balance: string; formatted: string; decimals: number }> {
+  try {
+    const provider = await getProvider(chainId);
+    
+    // ERC20 ABI for balanceOf and decimals
+    const abi = [
+      'function balanceOf(address owner) view returns (uint256)',
+      'function decimals() view returns (uint8)'
+    ];
+    
+    const tokenContract = new ethers.Contract(tokenAddress, abi, provider);
+    
+    const [balance, decimals] = await Promise.all([
+      tokenContract.balanceOf(walletAddress),
+      tokenContract.decimals()
+    ]);
+    
+    const formatted = ethers.formatUnits(balance, decimals);
+    
+    return {
+      balance: balance.toString(),
+      formatted,
+      decimals
+    };
+  } catch (error) {
+    console.error('Error getting token balance:', error);
+    // Return zero balance on error
+    return {
+      balance: '0',
+      formatted: '0',
+      decimals: 18
+    };
+  }
+}

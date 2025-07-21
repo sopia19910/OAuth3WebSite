@@ -120,6 +120,15 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Chain-Specific Token Management (2025-01-21)**:
+  - Added chainId column to tokens table in database
+  - Tokens are now stored and retrieved per blockchain network
+  - Updated API routes to accept chainId parameter for token operations
+  - Dashboard displays tokens specific to the selected chain
+  - Added ERC20 token balance functionality with getTokenBalance in wallet.ts
+  - Token balances are displayed in the Web3 Account card in Account Overview
+  - Token balances update automatically when switching chains
+  - Added sample USDC tokens for Ethereum Mainnet, Sepolia, and Holesky testnets
 - **Chain Selection Fix (2025-01-21)**:
   - Fixed double API calls when navigating from dashboard to personalservice page
   - Fixed wrong chain being used (Holesky called when Sepolia selected)

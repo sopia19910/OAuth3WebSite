@@ -8,7 +8,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   createContact(contact: InsertContact): Promise<Contact>;
-  getTokensByEmail(userEmail: string): Promise<Token[]>;
+  getTokensByEmailAndChain(userEmail: string, chainId: number): Promise<Token[]>;
   createToken(token: InsertToken): Promise<Token>;
   deleteToken(id: number, userEmail: string): Promise<boolean>;
   getChains(): Promise<Chain[]>;
@@ -62,9 +62,9 @@ export class MemStorage implements IStorage {
     return contact;
   }
 
-  async getTokensByEmail(userEmail: string): Promise<Token[]> {
+  async getTokensByEmailAndChain(userEmail: string, chainId: number): Promise<Token[]> {
     return Array.from(this.tokens.values()).filter(
-      (token) => token.userEmail === userEmail
+      (token) => token.userEmail === userEmail && token.chainId === chainId
     );
   }
 
@@ -106,6 +106,9 @@ export class MemStorage implements IStorage {
       ...insertChain,
       id,
       isActive: insertChain.isActive ?? true,
+      networkImage: insertChain.networkImage ?? null,
+      zkAccountFactory: insertChain.zkAccountFactory ?? null,
+      verifierAddress: insertChain.verifierAddress ?? null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -169,12 +172,17 @@ export class DatabaseStorage implements IStorage {
     return contact;
   }
 
-  async getTokensByEmail(userEmail: string): Promise<Token[]> {
+  async getTokensByEmailAndChain(userEmail: string, chainId: number): Promise<Token[]> {
     const { db } = await import("./db");
     const { tokens } = await import("@shared/schema");
-    const { eq } = await import("drizzle-orm");
+    const { eq, and } = await import("drizzle-orm");
     
-    return await db.select().from(tokens).where(eq(tokens.userEmail, userEmail));
+    return await db.select().from(tokens).where(
+      and(
+        eq(tokens.userEmail, userEmail),
+        eq(tokens.chainId, chainId)
+      )
+    );
   }
 
   async createToken(insertToken: InsertToken): Promise<Token> {

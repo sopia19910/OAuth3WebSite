@@ -495,7 +495,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const tokens = await storage.getTokensByEmail(userEmail);
+      const { chainId } = req.query;
+      if (!chainId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Chain ID is required'
+        });
+      }
+
+      const tokens = await storage.getTokensByEmailAndChain(userEmail, parseInt(chainId as string));
       res.json({
         success: true,
         tokens
@@ -522,7 +530,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { insertTokenSchema } = await import('@shared/schema');
       const validatedData = insertTokenSchema.parse({
         ...req.body,
-        userEmail
+        userEmail,
+        chainId: parseInt(req.body.chainId)
       });
 
       const token = await storage.createToken(validatedData);

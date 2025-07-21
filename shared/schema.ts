@@ -21,6 +21,7 @@ export const contacts = pgTable("contacts", {
 export const tokens = pgTable("tokens", {
   id: serial("id").primaryKey(),
   userEmail: text("user_email").notNull(),
+  chainId: integer("chain_id").notNull(),
   address: text("address").notNull(),
   symbol: text("symbol").notNull(),
   name: text("name").notNull(),
@@ -61,10 +62,12 @@ export const insertContactSchema = createInsertSchema(contacts).pick({
 
 export const insertTokenSchema = createInsertSchema(tokens).pick({
   userEmail: true,
+  chainId: true,
   address: true,
   symbol: true,
   name: true,
 }).extend({
+  chainId: z.number().positive("Chain ID must be positive"),
   address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid Ethereum address"),
   symbol: z.string().min(1, "Symbol is required").max(10, "Symbol too long"),
   name: z.string().min(1, "Name is required"),

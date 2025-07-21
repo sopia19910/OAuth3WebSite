@@ -35,6 +35,7 @@ import {
     getWalletFromStorage,
     getWalletBalance,
     getNetworkInfo,
+    getTokenBalance,
     type WalletInfo,
 } from "@/lib/wallet";
 import {ethers} from "ethers";
@@ -76,6 +77,9 @@ export default function Dashboard() {
     const [networkName, setNetworkName] = useState("Loading...");
     const [userEmail, setUserEmail] = useState("");
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    
+    // Token balances state
+    const [tokenBalances, setTokenBalances] = useState<Record<string, { balance: string; formatted: string }>>({});
 
     // Send transaction state
     const [isSending, setIsSending] = useState(false);
@@ -137,6 +141,7 @@ export default function Dashboard() {
         // Add debouncing to prevent rapid chain switching issues
         const timeoutId = setTimeout(() => {
             refreshAccountData();
+            loadTokensFromDB(); // Also reload tokens for the new chain
         }, 300); // 300ms debounce
 
         // Cleanup function to cancel pending refreshes
@@ -144,6 +149,16 @@ export default function Dashboard() {
             clearTimeout(timeoutId);
         };
     }, [selectedChainId, wallet?.address, chains.length]);
+    
+    // Load token balances when wallet or tokens change
+    useEffect(() => {
+        if (!wallet || customTokens.length === 0 || !selectedChainId || chains.length === 0) return;
+        
+        const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+        if (selectedChain) {
+            loadTokenBalances(customTokens, selectedChain.chainId.toString());
+        }
+    }, [wallet?.address, customTokens, selectedChainId]);
 
     const loadChains = async () => {
         try {
@@ -164,8 +179,14 @@ export default function Dashboard() {
     };
 
     const loadTokensFromDB = async () => {
+        if (!selectedChainId || chains.length === 0) return;
+        
         try {
-            const response = await fetch('/api/tokens', {
+            // Get the actual chain ID (not database ID)
+            const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+            if (!selectedChain) return;
+
+            const response = await fetch(`/api/tokens?chainId=${selectedChain.chainId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -176,11 +197,41 @@ export default function Dashboard() {
                 const data = await response.json();
                 if (data.success) {
                     setCustomTokens(data.tokens);
+                    // Load balances for the tokens
+                    if (wallet) {
+                        loadTokenBalances(data.tokens, selectedChain.chainId.toString());
+                    }
                 }
             }
         } catch (error) {
             console.error('Failed to load tokens from DB:', error);
         }
+    };
+    
+    const loadTokenBalances = async (tokens: typeof customTokens, chainId: string) => {
+        if (!wallet) return;
+        
+        const balances: Record<string, { balance: string; formatted: string }> = {};
+        
+        // Load balances for all tokens in parallel
+        const balancePromises = tokens.map(async (token) => {
+            try {
+                const result = await getTokenBalance(token.address, wallet.address, chainId);
+                return { address: token.address, balance: result.balance, formatted: result.formatted };
+            } catch (error) {
+                console.error(`Failed to get balance for ${token.symbol}:`, error);
+                return { address: token.address, balance: '0', formatted: '0' };
+            }
+        });
+        
+        const results = await Promise.all(balancePromises);
+        
+        // Update state with all balances
+        results.forEach(result => {
+            balances[result.address] = { balance: result.balance, formatted: result.formatted };
+        });
+        
+        setTokenBalances(balances);
     };
 
     const loadWalletData = async () => {
@@ -282,6 +333,9 @@ export default function Dashboard() {
                 console.log(`✅ Account data refreshed for ${selectedChain.networkName}`);
                 console.log(`💰 Balance: ${balance.formatted} ETH`);
                 console.log(`🔐 ZK Account: ${zkInfo.hasZKAccount ? 'Yes' : 'No'}`);
+                
+                // Also reload tokens for the selected chain and their balances
+                await loadTokensFromDB();
             } catch (err) {
                 console.error("Error during parallel fetch:", err);
                 // Try sequential fetch as fallback
@@ -381,6 +435,18 @@ export default function Dashboard() {
         }
 
         try {
+            // Get the actual chain ID (not database ID)
+            const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+            if (!selectedChain) {
+                toast({
+                    title: "No Chain Selected",
+                    description: "Please select a chain first",
+                    variant: "destructive",
+                    duration: 2000,
+                });
+                return;
+            }
+
             // Save to database
             const response = await fetch('/api/tokens', {
                 method: 'POST',
@@ -390,7 +456,8 @@ export default function Dashboard() {
                 body: JSON.stringify({
                     address: tokenAddress,
                     symbol: tokenSymbol.toUpperCase(),
-                    name: tokenName
+                    name: tokenName,
+                    chainId: selectedChain.chainId
                 })
             });
 
@@ -649,6 +716,23 @@ export default function Dashboard() {
                                             className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">ETH</span>
                                         </p>
                                     </div>
+                                    
+                                    {/* Token Balances */}
+                                    {customTokens.length > 0 && (
+                                        <div>
+                                            <Label className="text-xs font-medium text-muted-foreground">
+                                                Token Balances
+                                            </Label>
+                                            <div className="mt-1 space-y-1">
+                                                {customTokens.map((token) => (
+                                                    <p key={token.address} className="text-sm text-foreground">
+                                                        {tokenBalances[token.address]?.formatted || '0'} <span
+                                                        className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">{token.symbol}</span>
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                     <div>
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             Network
