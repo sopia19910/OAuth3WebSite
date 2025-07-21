@@ -503,7 +503,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      console.log('🔍 Getting tokens for email:', userEmail, 'chainId:', chainId, 'parsed:', parseInt(chainId as string));
       const tokens = await storage.getTokensByEmailAndChain(userEmail, parseInt(chainId as string));
+      console.log('📦 Found tokens:', tokens.length);
+      
       res.json({
         success: true,
         tokens
