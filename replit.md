@@ -120,13 +120,21 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Balance Display Architecture Update (2025-01-21)**:
+  - Clear separation of balance displays:
+    - ETH balance: Shows only for Web3 wallet address (regular Ethereum account)
+    - Token balances: Shows only for ZKP Smart Contract (CA) address
+  - Updated dashboard UI to reflect this architecture:
+    - Web3 Account card displays only ETH balance
+    - ZKP Smart Contract card displays all ERC20 token balances
+  - Token balance fetching now uses zkAccountInfo.zkAccountAddress instead of wallet.address
+  - This aligns with OAuth 3's security model where assets are held in smart contract accounts
 - **Chain-Specific Token Management (2025-01-21)**:
   - Added chainId column to tokens table in database
   - Tokens are now stored and retrieved per blockchain network
   - Updated API routes to accept chainId parameter for token operations
   - Dashboard displays tokens specific to the selected chain
   - Added ERC20 token balance functionality with getTokenBalance in wallet.ts
-  - Token balances are displayed in the Web3 Account card in Account Overview
   - Token balances update automatically when switching chains
   - Added sample USDC tokens for Ethereum Mainnet, Sepolia, and Holesky testnets
 - **Chain Selection Fix (2025-01-21)**:

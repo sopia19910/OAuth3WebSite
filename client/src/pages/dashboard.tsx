@@ -150,15 +150,15 @@ export default function Dashboard() {
         };
     }, [selectedChainId, wallet?.address, chains.length]);
     
-    // Load token balances when wallet or tokens change
+    // Load token balances when zkAccount, tokens or chain changes
     useEffect(() => {
-        if (!wallet || customTokens.length === 0 || !selectedChainId || chains.length === 0) return;
+        if (!wallet || !zkAccountInfo?.zkAccountAddress || customTokens.length === 0 || !selectedChainId || chains.length === 0) return;
         
         const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
         if (selectedChain) {
             loadTokenBalances(customTokens, selectedChain.chainId.toString());
         }
-    }, [wallet?.address, customTokens, selectedChainId]);
+    }, [zkAccountInfo?.zkAccountAddress, customTokens, selectedChainId]);
 
     const loadChains = async () => {
         try {
@@ -198,7 +198,7 @@ export default function Dashboard() {
                 if (data.success) {
                     setCustomTokens(data.tokens);
                     // Load balances for the tokens
-                    if (wallet) {
+                    if (wallet && zkAccountInfo?.zkAccountAddress) {
                         loadTokenBalances(data.tokens, selectedChain.chainId.toString());
                     }
                 }
@@ -209,14 +209,15 @@ export default function Dashboard() {
     };
     
     const loadTokenBalances = async (tokens: typeof customTokens, chainId: string) => {
-        if (!wallet) return;
+        if (!wallet || !zkAccountInfo?.zkAccountAddress) return;
         
         const balances: Record<string, { balance: string; formatted: string }> = {};
         
-        // Load balances for all tokens in parallel
+        // Load balances for all tokens in parallel using ZK Account address
         const balancePromises = tokens.map(async (token) => {
             try {
-                const result = await getTokenBalance(token.address, wallet.address, chainId);
+                // Use ZK Account address instead of wallet address
+                const result = await getTokenBalance(token.address, zkAccountInfo.zkAccountAddress, chainId);
                 return { address: token.address, balance: result.balance, formatted: result.formatted };
             } catch (error) {
                 console.error(`Failed to get balance for ${token.symbol}:`, error);
@@ -709,30 +710,13 @@ export default function Dashboard() {
                                 <CardContent className="space-y-3">
                                     <div>
                                         <Label className="text-xs font-medium text-muted-foreground">
-                                            Owner ETH (Gas Fee)
+                                            ETH Balance
                                         </Label>
                                         <p className="text-sm text-foreground mt-1">
                                             {walletBalance} <span
                                             className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">ETH</span>
                                         </p>
                                     </div>
-                                    
-                                    {/* Token Balances */}
-                                    {customTokens.length > 0 && (
-                                        <div>
-                                            <Label className="text-xs font-medium text-muted-foreground">
-                                                Token Balances
-                                            </Label>
-                                            <div className="mt-1 space-y-1">
-                                                {customTokens.map((token) => (
-                                                    <p key={token.address} className="text-sm text-foreground">
-                                                        {tokenBalances[token.address]?.formatted || '0'} <span
-                                                        className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">{token.symbol}</span>
-                                                    </p>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
                                     <div>
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             Network
@@ -785,15 +769,23 @@ export default function Dashboard() {
                                             className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">ETH</span>
                                         </p>
                                     </div>
-                                    <div>
-                                        <Label className="text-xs font-medium text-muted-foreground">
-                                            OA3 Token Balance
-                                        </Label>
-                                        <p className="text-sm text-foreground mt-1">
-                                            {zkAccountInfo?.tokenBalance || "0"} <span
-                                            className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">OA3</span>
-                                        </p>
-                                    </div>
+                                    
+                                    {/* Token Balances from ZK Account */}
+                                    {customTokens.length > 0 && zkAccountInfo?.hasZKAccount && (
+                                        <div>
+                                            <Label className="text-xs font-medium text-muted-foreground">
+                                                Token Balances
+                                            </Label>
+                                            <div className="mt-1 space-y-1">
+                                                {customTokens.map((token) => (
+                                                    <p key={token.address} className="text-sm text-foreground">
+                                                        {tokenBalances[token.address]?.formatted || '0'} <span
+                                                        className="text-xs text-muted-foreground border border-gray-500 px-1 rounded">{token.symbol}</span>
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                     <div>
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             ZKP Status
