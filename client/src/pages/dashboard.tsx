@@ -188,7 +188,7 @@ export default function Dashboard() {
                 // Find the active chain and set it as selected
                 const activeChain = data.chains?.find((chain: any) => chain.isActive);
                 if (activeChain) {
-                    setSelectedChainId(activeChain.id.toString());
+                    setSelectedChainId(activeChain.chainId.toString());
                     setNetworkName(activeChain.networkName);
                 }
             }
@@ -205,11 +205,11 @@ export default function Dashboard() {
         // Check each chain in parallel
         const checkPromises = chains.map(async (chain) => {
             try {
-                const zkInfo = await checkZKAccount(wallet.address, chain.id.toString());
-                return { chainId: chain.id.toString(), hasZKAccount: zkInfo.hasZKAccount };
+                const zkInfo = await checkZKAccount(wallet.address, chain.chainId.toString());
+                return { chainId: chain.chainId.toString(), hasZKAccount: zkInfo.hasZKAccount };
             } catch (error) {
                 console.error(`Failed to check ZK account on ${chain.networkName}:`, error);
-                return { chainId: chain.id.toString(), hasZKAccount: false };
+                return { chainId: chain.chainId.toString(), hasZKAccount: false };
             }
         });
         
@@ -228,7 +228,7 @@ export default function Dashboard() {
         
         if (!currentHasZKAccount && chainWithZKAccount) {
             const chainId = chainWithZKAccount[0];
-            const chain = chains.find(c => c.id.toString() === chainId);
+            const chain = chains.find(c => c.chainId.toString() === chainId);
             if (chain) {
                 console.log(`💡 ZK Account found on ${chain.networkName}. Consider switching to that chain.`);
             }
@@ -327,7 +327,7 @@ export default function Dashboard() {
 
                 // Get wallet balance using active chain if available
                 if (selectedChainId && chains.length > 0) {
-                    const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+                    const selectedChain = chains.find(chain => chain.chainId.toString() === selectedChainId);
                     if (selectedChain) {
                         const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
                         const balance = await getWalletBalance(savedWallet.address, provider);
@@ -368,7 +368,7 @@ export default function Dashboard() {
         setIsRefreshing(true);
         try {
             // Get the selected chain
-            const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+            const selectedChain = chains.find(chain => chain.chainId.toString() === selectedChainId);
             if (!selectedChain) {
                 console.error("Selected chain not found");
                 return;
@@ -494,7 +494,7 @@ export default function Dashboard() {
 
         try {
             // Get the actual chain ID (not database ID)
-            const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+            const selectedChain = chains.find(chain => chain.chainId.toString() === selectedChainId);
             if (!selectedChain) {
                 toast({
                     title: "No Chain Selected",
@@ -1154,7 +1154,7 @@ export default function Dashboard() {
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => {
-                                                    const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+                                                    const selectedChain = chains.find(chain => chain.chainId.toString() === selectedChainId);
                                                     const explorerUrl = selectedChain?.explorerUrl || "https://etherscan.io";
                                                     window.open(
                                                         `${explorerUrl}/tx/${transactionHash}`,
@@ -1288,7 +1288,7 @@ export default function Dashboard() {
                                     disabled={isRefreshing}
                                     onValueChange={(value) => {
                                         setSelectedChainId(value);
-                                        const selected = chains.find(chain => chain.id.toString() === value);
+                                        const selected = chains.find(chain => chain.chainId.toString() === value);
                                         if (selected) {
                                             setNetworkName(selected.networkName);
                                             // Switch to Overview when chain changes
@@ -1302,7 +1302,7 @@ export default function Dashboard() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {chains.map((chain) => (
-                                            <SelectItem key={chain.id} value={chain.id.toString()}>
+                                            <SelectItem key={chain.chainId} value={chain.chainId.toString()}>
                                                 <div className="flex items-center gap-2">
                                                     {chain.networkImage && (
                                                         <img
@@ -1411,7 +1411,7 @@ export default function Dashboard() {
                                     disabled={isRefreshing}
                                     onValueChange={(value) => {
                                         setSelectedChainId(value);
-                                        const selected = chains.find(chain => chain.id.toString() === value);
+                                        const selected = chains.find(chain => chain.chainId.toString() === value);
                                         if (selected) {
                                             setNetworkName(selected.networkName);
                                             setActiveMenu("overview");
@@ -1423,7 +1423,7 @@ export default function Dashboard() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {chains.map((chain) => (
-                                            <SelectItem key={chain.id} value={chain.id.toString()}>
+                                            <SelectItem key={chain.chainId} value={chain.chainId.toString()}>
                                                 <div className="flex items-center gap-2">
                                                     {chain.networkImage && (
                                                         <img
