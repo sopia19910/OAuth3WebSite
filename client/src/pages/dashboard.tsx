@@ -1086,9 +1086,8 @@ export default function Dashboard() {
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => {
-                                                    const explorerUrl =
-                                                        config?.explorerUrl ||
-                                                        "https://holesky.etherscan.io";
+                                                    const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+                                                    const explorerUrl = selectedChain?.explorerUrl || "https://etherscan.io";
                                                     window.open(
                                                         `${explorerUrl}/tx/${transactionHash}`,
                                                         "_blank",
