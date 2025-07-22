@@ -101,7 +101,7 @@ export default function ContactSection() {
     {
       icon: <Mail className="text-white" />,
       title: "Email",
-      description: "contact@oauth3.dev"
+      description: "support@oauth3.io"
     },
     {
       icon: <MessageSquare className="text-white" />,
