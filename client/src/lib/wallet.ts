@@ -74,28 +74,48 @@ export function importWallet(privateKey: string): WalletInfo {
 
 // Get wallet balance (requires provider)
 export async function getWalletBalance(address: string, provider?: ethers.Provider): Promise<WalletBalance> {
-  try {
-    // Use provided provider or create one with RPC URL
-    let ethProvider = provider;
-    if (!ethProvider) {
-      const rpcUrl = await getRpcUrl();
-      console.log('🌐 Using RPC URL:', rpcUrl);
-      ethProvider = new ethers.JsonRpcProvider(rpcUrl);
+  let retries = 3;
+  let lastError: any;
+  
+  while (retries > 0) {
+    try {
+      // Use provided provider or create one with RPC URL
+      let ethProvider = provider;
+      if (!ethProvider) {
+        const rpcUrl = await getRpcUrl();
+        console.log('🌐 Using RPC URL:', rpcUrl);
+        ethProvider = new ethers.JsonRpcProvider(rpcUrl);
+      }
+
+      // Set a timeout for the balance request
+      const balancePromise = ethProvider.getBalance(address);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Balance request timeout')), 10000)
+      );
+      
+      const balance = await Promise.race([balancePromise, timeoutPromise]) as bigint;
+      const formatted = ethers.formatEther(balance);
+
+      console.log(`💰 Balance for ${address}: ${formatted} ETH`);
+
+      return {
+        eth: balance.toString(),
+        formatted: formatted
+      };
+    } catch (error: any) {
+      lastError = error;
+      retries--;
+      
+      if (retries > 0) {
+        console.warn(`Balance fetch attempt failed, ${retries} retries left:`, error.message);
+        // Wait a bit before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     }
-
-    const balance = await ethProvider.getBalance(address);
-    const formatted = ethers.formatEther(balance);
-
-    console.log(`💰 Balance for ${address}: ${formatted} ETH`);
-
-    return {
-      eth: balance.toString(),
-      formatted: formatted
-    };
-  } catch (error) {
-    console.error('Error getting balance:', error);
-    throw error;  // Re-throw to let caller handle the error
   }
+  
+  console.error('Error getting balance after all retries:', lastError);
+  throw lastError;  // Re-throw to let caller handle the error
 }
 
 // Store wallet info in localStorage (encrypted in production)
