@@ -8,6 +8,7 @@ import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
 import { z } from "zod";
+import { sendContactEmail } from "./email";
 
 // Contract addresses are now stored in database per chain
 
@@ -29,6 +30,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertContactSchema.parse(req.body);
       const contact = await storage.createContact(validatedData);
+
+      // Send email notification
+      const emailData = {
+        firstName: contact.first_name,
+        lastName: contact.last_name,
+        email: contact.email,
+        company: contact.company || undefined,
+        message: contact.message
+      };
+
+      const emailSent = await sendContactEmail(emailData);
+      
+      if (!emailSent) {
+        console.warn("Email notification could not be sent, but contact was saved successfully");
+      }
 
       res.json({
         success: true,
