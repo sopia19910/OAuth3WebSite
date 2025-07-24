@@ -227,9 +227,9 @@ export default function Services() {
                     </span>
                   ))}
                 </div>
-                <div className="w-full py-3 bg-accent/10 text-accent text-center rounded-lg font-semibold">
-                  Coming Soon
-                </div>
+                <Button className="w-full bg-accent hover:bg-accent/90 text-background">
+                  Get Started
+                </Button>
               </div>
             </CardContent>
           </Card>
