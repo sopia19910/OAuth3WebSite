@@ -101,7 +101,8 @@ export default function Footer() {
           ))}
         </div>
         <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-          <p>&copy; 2024 OAuth 3. All rights reserved.</p>
+          <p className="mb-2">Nexus Revolution Corp. | 18 Yongeview Ave, Richmond Hill, ON L4C 7A4, Canada</p>
+          <p>Corp. No: 1088083-3 | BN: 745497487RC0001 | © 2025 All Rights Reserved.</p>
         </div>
       </div>
     </footer>
