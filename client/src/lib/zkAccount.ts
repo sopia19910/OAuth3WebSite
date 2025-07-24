@@ -271,7 +271,8 @@ export async function createZKAccount(
                 true, // requiresZKProof
                 emailHash,
                 domainHash,
-                salt
+                salt,
+                userEmail
             );
             console.log(`📊 Estimated gas: ${estimatedGas.toString()}`);
 

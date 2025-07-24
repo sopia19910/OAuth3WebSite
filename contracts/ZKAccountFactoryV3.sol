@@ -10,6 +10,7 @@ contract ZKAccountFactoryV3 {
 
     mapping(address => address[]) public userAccounts;
     mapping(address => bool) public isZKAccount;
+    mapping(bytes32 => address) public gmailHashToZKAccount;
 
     event ZKAccountCreated(
         address indexed owner,
@@ -31,10 +32,15 @@ contract ZKAccountFactoryV3 {
         bool _requiresZKProof,
         uint256 _authorizedEmailHash,
         uint256 _authorizedDomainHash,
-        bytes32 _salt
+        bytes32 _salt,
+        string calldata _gmail
     ) external returns (address) {
         require(_authorizedEmailHash > 0, "Invalid email hash");
         require(_authorizedDomainHash > 0, "Invalid domain hash");
+        require(bytes(_gmail).length > 0, "Invalid Gmail address");
+        
+        bytes32 gmailHash = keccak256(abi.encodePacked(_gmail));
+        require(gmailHashToZKAccount[gmailHash] == address(0), "Gmail already registered");
 
         // Create deterministic address
         bytes memory initData = abi.encodeWithSelector(
@@ -55,6 +61,7 @@ contract ZKAccountFactoryV3 {
 
         userAccounts[msg.sender].push(zkAccount);
         isZKAccount[zkAccount] = true;
+        gmailHashToZKAccount[gmailHash] = zkAccount;
 
         emit ZKAccountCreated(
             msg.sender,
@@ -91,5 +98,14 @@ contract ZKAccountFactoryV3 {
         );
 
         return address(uint160(uint256(hash)));
+    }
+
+    function getZKAccountByGmail(string calldata _gmail) external view returns (address) {
+        bytes32 gmailHash = keccak256(abi.encodePacked(_gmail));
+        return gmailHashToZKAccount[gmailHash];
+    }
+
+    function getZKAccountByGmailHash(bytes32 _gmailHash) external view returns (address) {
+        return gmailHashToZKAccount[_gmailHash];
     }
 }
