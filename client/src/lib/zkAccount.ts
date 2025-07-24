@@ -452,7 +452,6 @@ export async function transferETHFromZKAccount(
         // ZK Account V3 ABI for execution
         const zkAccountV3ABI = [
             "function execute(tuple(uint256[2] a, uint256[2][2] b, uint256[2] c, uint256[3] publicSignals) proof, address target, uint256 value, bytes data) external",
-            "function getAccountInfo() external view returns (address, address, bool, uint256, uint256, uint256)",
             "function requiresZKProof() external view returns (bool)"
         ];
 
@@ -510,29 +509,6 @@ export async function transferETHFromZKAccount(
                 c: zkProof.c,
                 publicSignals: zkProof.publicSignals
             });
-
-            // Get the ZK account info to compare email hashes
-            const zkAccountCheckABI = [
-                "function getAccountInfo() external view returns (address, address, bool, uint256, uint256, uint256)"
-            ];
-            const zkAccountForCheck = new ethers.Contract(zkAccountAddress, zkAccountCheckABI, provider);
-            const accountInfo = await zkAccountForCheck.getAccountInfo();
-
-            console.log('🔍 Contract authorized email hash:', accountInfo[3].toString());
-            console.log('🔍 Proof email hash:', zkProof.publicSignals[0].toString());
-            console.log('🔍 Contract authorized domain hash:', accountInfo[4].toString());
-            console.log('🔍 Proof domain hash:', zkProof.publicSignals[1].toString());
-
-            // Check if hashes match
-            if (accountInfo[3].toString() !== zkProof.publicSignals[0].toString()) {
-                console.error('❌ Email hash mismatch! Contract expects:', accountInfo[3].toString(), 'but proof has:', zkProof.publicSignals[0].toString());
-                throw new Error(`Email hash mismatch: ZK Account was created with a different email. Contract expects hash ${accountInfo[3].toString()} but current OAuth session provides ${zkProof.publicSignals[0].toString()}. Please create a new ZK Account with the current email or use the original email session.`);
-            }
-            if (accountInfo[4].toString() !== zkProof.publicSignals[1].toString()) {
-                console.error('❌ Domain hash mismatch! Contract expects:', accountInfo[4].toString(), 'but proof has:', zkProof.publicSignals[1].toString());
-                throw new Error(`Domain hash mismatch: ZK Account was created with a different domain. Contract expects hash ${accountInfo[4].toString()} but current OAuth session provides ${zkProof.publicSignals[1].toString()}. Please create a new ZK Account with the current email or use the original email session.`);
-            }
-
             // Execute with ZK proof
             try {
                 const gasEstimate = await zkAccount.execute.estimateGas(zkProof, toAddress, amountWei, '0x');
@@ -772,29 +748,6 @@ export async function transferTokenFromZKAccount(
                 c: zkProof.c,
                 publicSignals: zkProof.publicSignals
             });
-
-            // Get the ZK account info to compare email hashes
-            const zkAccountCheckABI = [
-                "function getAccountInfo() external view returns (address, address, bool, uint256, uint256, uint256)"
-            ];
-            const zkAccountForCheck = new ethers.Contract(zkAccountAddress, zkAccountCheckABI, provider);
-            const accountInfo = await zkAccountForCheck.getAccountInfo();
-
-            console.log('🔍 Contract authorized email hash:', accountInfo[3].toString());
-            console.log('🔍 Proof email hash:', zkProof.publicSignals[0].toString());
-            console.log('🔍 Contract authorized domain hash:', accountInfo[4].toString());
-            console.log('🔍 Proof domain hash:', zkProof.publicSignals[1].toString());
-
-            // Check if hashes match
-            if (accountInfo[3].toString() !== zkProof.publicSignals[0].toString()) {
-                console.error('❌ Email hash mismatch! Contract expects:', accountInfo[3].toString(), 'but proof has:', zkProof.publicSignals[0].toString());
-                throw new Error(`Email hash mismatch: ZK Account was created with a different email. Contract expects hash ${accountInfo[3].toString()} but current OAuth session provides ${zkProof.publicSignals[0].toString()}. Please create a new ZK Account with the current email or use the original email session.`);
-            }
-            if (accountInfo[4].toString() !== zkProof.publicSignals[1].toString()) {
-                console.error('❌ Domain hash mismatch! Contract expects:', accountInfo[4].toString(), 'but proof has:', zkProof.publicSignals[1].toString());
-                throw new Error(`Domain hash mismatch: ZK Account was created with a different domain. Contract expects hash ${accountInfo[4].toString()} but current OAuth session provides ${zkProof.publicSignals[1].toString()}. Please create a new ZK Account with the current email or use the original email session.`);
-            }
-
             // Execute with ZK proof
             try {
                 const gasEstimate = await zkAccount.execute.estimateGas(zkProof, tokenAddress, 0, transferData);

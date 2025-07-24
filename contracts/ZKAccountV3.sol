@@ -113,17 +113,6 @@ contract ZKAccountV3 is Initializable, UUPSUpgradeable {
         _executeCall(target, value, data);
     }
 
-    /**
-     * @dev Execute batch transactions with single ZK proof
-     */
-    function executeBatch(
-        ZKProof memory proof,
-        Call[] calldata calls
-    ) external payable onlyOwner validZKProof(proof) {
-        for (uint256 i = 0; i < calls.length; i++) {
-            _executeCall(calls[i].target, calls[i].value, calls[i].data);
-        }
-    }
 
     /**
      * @dev Validate and process ZK proof with enhanced security
