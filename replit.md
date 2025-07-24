@@ -4,6 +4,8 @@
 
 This is a full-stack web application for OAuth 3, a next-generation hybrid authentication protocol that combines Web2 convenience with Web3 security. The application is built using modern web technologies with a React frontend and Express.js backend, utilizing PostgreSQL for data storage through Drizzle ORM.
 
+GitHub Repository: https://github.com/oauth-3
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
