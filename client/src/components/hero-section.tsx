@@ -135,7 +135,7 @@ export default function HeroSection() {
             {particlePositions.map((position, index) => (
               <div
                 key={index}
-                className="absolute rounded-full animate-particle flex items-center justify-center bg-white/10 backdrop-blur-sm"
+                className="absolute rounded-full animate-particle flex items-center justify-center"
                 style={{
                   top: `${position.top}%`,
                   left: `${position.left}%`,
