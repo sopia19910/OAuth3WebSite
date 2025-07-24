@@ -65,7 +65,7 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Use port 5000 to match workflow configuration
+  // Use port from environment or default to 5000
   const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
   server.listen(port, () => {
     log(`serving on port ${port}`);

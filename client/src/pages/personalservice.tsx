@@ -352,7 +352,7 @@ export default function Demo() {
       setWalletCreationStatus("Fetching balance...");
       try {
         if (selectedChainId) {
-          const selectedChain = chains.find(chain => chain.id.toString() === selectedChainId);
+          const selectedChain = chains.find(chain => chain.chainId.toString() === selectedChainId);
           if (selectedChain) {
             const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
             const balance = await getWalletBalance(walletInfo.address, provider);
@@ -406,31 +406,68 @@ export default function Demo() {
   };
 
   const refreshBalance = async () => {
-    if (!wallet || !selectedChainId) return;
+    if (!wallet) {
+      console.error('No wallet available');
+      setBalanceError('No wallet connected');
+      return;
+    }
+    
+    if (!selectedChainId) {
+      console.error('No chain selected');
+      setBalanceError('Please select a network');
+      return;
+    }
+    
+    if (chains.length === 0) {
+      console.error('Chains not loaded yet');
+      setBalanceError('Loading network information...');
+      return;
+    }
 
     setIsRefreshingBalance(true);
     setBalanceError("");
     try {
-      console.log("chains:", chains);
-      console.log("selectedChainId:", selectedChainId);
-      // Find the selected chain
-      const selectedChain = chains.find(chain => chain.chainId === parseInt(selectedChainId));
-      console.log("selectedChain:", selectedChain);
+      console.log("Refreshing balance with:", {
+        chainsCount: chains.length,
+        selectedChainId: selectedChainId,
+        walletAddress: wallet.address
+      });
+      
+      // Find the selected chain - compare as strings since selectedChainId is a string
+      const selectedChain = chains.find(chain => chain.chainId.toString() === selectedChainId);
+      console.log("Found chain:", selectedChain);
+      
       if (selectedChain) {
         console.log('🌐 Refreshing balance on chain:', selectedChain.networkName);
         console.log('🔗 Using RPC URL:', selectedChain.rpcUrl);
+        
         const provider = new ethers.JsonRpcProvider(selectedChain.rpcUrl);
         const balance = await getWalletBalance(wallet.address, provider);
         setWalletBalance(balance.formatted);
         setBalanceError("");
         console.log('✅ Balance refreshed:', balance.formatted, 'ETH');
       } else {
-        throw new Error('No chain selected');
+        console.error('Chain not found for chainId:', selectedChainId);
+        console.error('Available chains:', chains.map(c => ({ id: c.id, chainId: c.chainId, name: c.networkName })));
+        throw new Error(`Network with chain ID ${selectedChainId} not found`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to refresh balance:', error);
-      setBalanceError('Failed to fetch balance. Please check your network connection and try again.');
+      console.error('Error details:', {
+        message: error.message,
+        chains: chains.length,
+        selectedChainId,
+        wallet: wallet?.address
+      });
+      const errorMessage = error.message || 'Failed to fetch balance. Please check your network connection and try again.';
+      setBalanceError(errorMessage);
       setWalletBalance("0.0");
+      toast({
+        title: "Balance Error",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 3000,
+      });
     } finally {
       setIsRefreshingBalance(false);
     }

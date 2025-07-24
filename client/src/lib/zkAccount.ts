@@ -33,13 +33,14 @@ async function loadContractAddresses(chainId?: string) {
 
 // ZKAccountFactoryV3 ABI
 const ZK_ACCOUNT_FACTORY_V3_ABI = [
-    "function createZKAccount(bool _requiresZKProof, uint256 _authorizedEmailHash, uint256 _authorizedDomainHash, bytes32 _salt) external returns (address)",
+    "function createZKAccount(bool _requiresZKProof, uint256 _authorizedEmailHash, uint256 _authorizedDomainHash, bytes32 _salt, string calldata _gmail) external returns (address)",
     "function getUserAccounts(address user) external view returns (address[])",
     "function getAccountCount(address user) external view returns (uint256)",
     "function predictZKAccountAddress(address owner, bytes32 _salt) external view returns (address)",
     "function isZKAccount(address) external view returns (bool)",
     "function zkVerifier() external view returns (address)",
     "function zkAccountImplementation() external view returns (address)",
+    "function getZKAccountByGmailHash(bytes32 _gmailHash) external view returns (address)",
     "event ZKAccountCreated(address indexed owner, address indexed zkAccount, uint256 emailHash, uint256 domainHash, bool requiresZKProof)"
 ];
 
@@ -301,6 +302,7 @@ export async function createZKAccount(
             emailHash,
             domainHash,
             salt,
+            userEmail,
             {
                 gasLimit: gasLimit
             }

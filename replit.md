@@ -120,6 +120,14 @@ Preferred communication style: Simple, everyday language.
 The application is designed to be easily extensible for implementing the actual OAuth 3 authentication features while maintaining a professional marketing presence for the protocol.
 
 ### Recent Changes
+- **Personal Service Balance Refresh Fix (2025-01-22)**:
+  - Fixed refresh button not working in personal service page
+  - Corrected chain ID comparison from using database ID to actual chain ID
+  - Added retry mechanism with 3 attempts for balance fetching
+  - Implemented 10-second timeout for RPC calls to prevent hanging
+  - Enhanced error messages to show specific failure reasons
+  - Added validation checks for wallet, chain selection, and chains loading state
+  - Balance now correctly fetches based on selected chain's RPC URL
 - **Dashboard ZK Account Detection Fix (2025-01-21)**:
   - Fixed issue where zkaccount3/check API wasn't being called on dashboard initial load
   - Resolved race condition between chain selection and wallet data loading
