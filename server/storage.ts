@@ -109,6 +109,7 @@ export class MemStorage implements IStorage {
       networkImage: insertChain.networkImage ?? null,
       zkAccountFactory: insertChain.zkAccountFactory ?? null,
       verifierAddress: insertChain.verifierAddress ?? null,
+      oauthNamingService: insertChain.oauthNamingService ?? null,
       createdAt: new Date(),
       updatedAt: new Date()
     };

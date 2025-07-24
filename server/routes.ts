@@ -231,6 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         explorerUrl: selectedChain.explorerUrl,
         zkVerifierV3Address: selectedChain.verifierAddress,
         zkAccountFactoryV3Address: selectedChain.zkAccountFactory,
+        oauthNamingService: selectedChain.oauthNamingService,
         oa3TokenAddress: process.env.OA3_TOKEN_ADDRESS || '0xA28FB91e203721B077fE1EBE450Ee62C0d9857Ea',
         taikoTokenAddress: process.env.TAIKO_TOKEN_ADDRESS || '0x1234567890123456789012345678901234567890'
       });

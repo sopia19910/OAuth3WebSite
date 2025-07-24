@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {Progress} from "@/components/ui/progress";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {
     CreditCardIcon,
     PaperAirplaneIcon,
@@ -55,6 +56,10 @@ export default function Dashboard() {
     const [activeMenu, setActiveMenu] = useState<string>("overview");
     const [sendAmount, setSendAmount] = useState("");
     const [sendAddress, setSendAddress] = useState("");
+    const [receiverType, setReceiverType] = useState("wallet"); // "wallet" or "gmail"
+    const [resolvedWalletAddress, setResolvedWalletAddress] = useState("");
+    const [isResolvingEmail, setIsResolvingEmail] = useState(false);
+    const [emailResolveError, setEmailResolveError] = useState("");
     const [selectedToken, setSelectedToken] = useState("ETH");
     const [tokenAddress, setTokenAddress] = useState("");
     const [tokenSymbol, setTokenSymbol] = useState("");
@@ -158,7 +163,19 @@ export default function Dashboard() {
         setSelectedToken('ETH');
         
         // Add debouncing to prevent rapid chain switching issues
-        const timeoutId = setTimeout(() => {
+        const timeoutId = setTimeout(async () => {
+            // Reload configuration for the new chain
+            try {
+                const configUrl = selectedChainId ? `/api/config?chainId=${selectedChainId}` : "/api/config";
+                const configResponse = await fetch(configUrl);
+                const configData = await configResponse.json();
+                if (configData.success) {
+                    setConfig(configData);
+                }
+            } catch (error) {
+                console.error("Failed to load config for chain:", selectedChainId, error);
+            }
+            
             refreshAccountData();
             loadTokensFromDB(); // Also reload tokens for the new chain
         }, 300); // 300ms debounce
@@ -351,8 +368,9 @@ export default function Dashboard() {
             // Get network info and config
             const networkInfo = await getNetworkInfo();
             setNetworkName(networkInfo.name === 'unknown' ? 'Holesky Testnet' : networkInfo.name);
-            // Load configuration
-            const configResponse = await fetch("/api/config");
+            // Load configuration for selected chain
+            const configUrl = selectedChainId ? `/api/config?chainId=${selectedChainId}` : "/api/config";
+            const configResponse = await fetch(configUrl);
             const configData = await configResponse.json();
             if (configData.success) {
                 setConfig(configData);
@@ -589,6 +607,94 @@ export default function Dashboard() {
         }
     };
 
+    // Helper function to generate email hash using keccak256(abi.encodePacked(email))
+    const generateEmailHash = (email: string): string => {
+        // Using ethers.utils.solidityKeccak256 to mimic abi.encodePacked behavior
+        return ethers.keccak256(ethers.toUtf8Bytes(email));
+    };
+
+    // Helper function to validate inputs based on receiver type
+    const validateRecipientInput = (input: string, type: string): boolean => {
+        if (type === "wallet") {
+            // Validate Ethereum address format
+            return ethers.isAddress(input);
+        } else if (type === "gmail") {
+            // Validate Gmail address format
+            const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+            return gmailRegex.test(input);
+        }
+        return false;
+    };
+
+    // Function to resolve gmail address to wallet address using OAuth naming service
+    const resolveGmailToWallet = async (email: string): Promise<string> => {
+        if (!config) {
+            throw new Error("Configuration not loaded");
+        }
+
+        console.log('🔧 Full config object:', config);
+        const emailHash = generateEmailHash(email);
+        console.log('📧 Email hash generated:', emailHash);
+        
+        // Get OAuth naming service contract address from config
+        const oauthNamingServiceAddress = config.oauthNamingService;
+        console.log('🏭 OAuth naming service address from config:', oauthNamingServiceAddress);
+        if (!oauthNamingServiceAddress) {
+            throw new Error("OAuth naming service not configured for this network");
+        }
+
+        // Create ethers provider and contract instance
+        const provider = new ethers.JsonRpcProvider(config.rpcUrl);
+        const oauthNamingServiceABI = [
+            "function getZkAccountByEmail(bytes32 emailHash) external view returns (address)"
+        ];
+        const oauthNamingContract = new ethers.Contract(
+            oauthNamingServiceAddress,
+            oauthNamingServiceABI,
+            provider
+        );
+
+        // Call getZkAccountByEmail
+        const walletAddress = await oauthNamingContract.getZkAccountByEmail(emailHash);
+        
+        if (walletAddress === ethers.ZeroAddress) {
+            throw new Error(`No ZK Account found for email: ${email}`);
+        }
+
+        console.log('✅ Gmail resolved to wallet:', walletAddress);
+        return walletAddress;
+    };
+
+    // Function to handle email input and resolve wallet address in real-time
+    const handleEmailInput = async (email: string) => {
+        setSendAddress(email);
+        setResolvedWalletAddress("");
+        setEmailResolveError("");
+
+        if (!email || !validateRecipientInput(email, "gmail")) {
+            return;
+        }
+
+        setIsResolvingEmail(true);
+        try {
+            const walletAddress = await resolveGmailToWallet(email);
+            setResolvedWalletAddress(walletAddress);
+        } catch (error) {
+            console.error('Error resolving email:', error);
+            setEmailResolveError(error instanceof Error ? error.message : 'Failed to resolve email');
+        } finally {
+            setIsResolvingEmail(false);
+        }
+    };
+
+    // Reset resolved address when receiver type changes
+    const handleReceiverTypeChange = (type: string) => {
+        setReceiverType(type);
+        setResolvedWalletAddress("");
+        setEmailResolveError("");
+        setSendAddress("");
+    };
+
     const handleSendTransaction = async () => {
         if (!wallet || !zkAccountInfo?.hasZKAccount) {
             setSendError("No wallet or ZK Account found");
@@ -597,6 +703,16 @@ export default function Dashboard() {
 
         if (!sendAddress || !sendAmount || parseFloat(sendAmount) <= 0) {
             setSendError("Please fill in all required fields with valid values");
+            return;
+        }
+
+        // Validate recipient input based on receiver type
+        if (!validateRecipientInput(sendAddress, receiverType)) {
+            setSendError(
+                receiverType === "wallet" 
+                    ? "Please enter a valid Ethereum wallet address" 
+                    : "Please enter a valid Gmail address"
+            );
             return;
         }
 
@@ -610,7 +726,21 @@ export default function Dashboard() {
             setSendProgress(25);
             setSendStatus("Validating transaction details...");
 
-            // Step 2: Prepare transfer (50%)
+            // Step 2: Use resolved address or resolve if needed (30%)
+            let recipientAddress = sendAddress;
+            if (receiverType === "gmail") {
+                if (resolvedWalletAddress) {
+                    // Use already resolved address
+                    recipientAddress = resolvedWalletAddress;
+                } else {
+                    // Resolve if not already done
+                    setSendProgress(30);
+                    setSendStatus("Resolving Gmail to wallet address...");
+                    recipientAddress = await resolveGmailToWallet(sendAddress);
+                }
+            }
+
+            // Step 3: Prepare transfer (50%)
             setSendProgress(50);
             setSendStatus("Preparing transaction...");
 
@@ -620,7 +750,7 @@ export default function Dashboard() {
                 result = await transferETHFromZKAccount(
                     wallet.privateKey,
                     wallet.address,
-                    sendAddress,
+                    recipientAddress,
                     sendAmount,
                     selectedChainId
                 );
@@ -629,7 +759,7 @@ export default function Dashboard() {
                 result = await transferTokenFromZKAccount(
                     wallet.privateKey,
                     wallet.address,
-                    sendAddress,
+                    recipientAddress,
                     sendAmount,
                     selectedToken,
                     selectedChainId
@@ -1066,16 +1196,58 @@ export default function Dashboard() {
                             <h2 className="text-lg font-semibold">Send Coin/Token</h2>
                         </div>
                         <div>
+                            <Label className="text-sm font-medium mb-3 block">
+                                Receiver Type
+                            </Label>
+                            <RadioGroup value={receiverType} onValueChange={handleReceiverTypeChange} className="flex gap-6 mb-4">
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="wallet" id="wallet" />
+                                    <Label htmlFor="wallet" className="cursor-pointer">Wallet Address</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="gmail" id="gmail" />
+                                    <Label htmlFor="gmail" className="cursor-pointer">Gmail Address</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                        <div>
                             <Label htmlFor="recipient" className="text-sm font-medium">
-                                Recipient Address
+                                {receiverType === "wallet" ? "Recipient Wallet Address" : "Recipient Gmail Address"}
                             </Label>
                             <Input
                                 id="recipient"
-                                placeholder="0x..."
+                                placeholder={receiverType === "wallet" ? "0x..." : "example@gmail.com"}
                                 value={sendAddress}
-                                onChange={(e) => setSendAddress(e.target.value)}
+                                onChange={(e) => {
+                                    if (receiverType === "gmail") {
+                                        handleEmailInput(e.target.value);
+                                    } else {
+                                        setSendAddress(e.target.value);
+                                    }
+                                }}
                                 className="mt-1"
+                                type={receiverType === "gmail" ? "email" : "text"}
                             />
+                            {receiverType === "gmail" && (
+                                <div className="mt-2">
+                                    {isResolvingEmail && (
+                                        <div className="text-sm text-blue-600 flex items-center gap-2">
+                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+                                            Resolving email to wallet address...
+                                        </div>
+                                    )}
+                                    {resolvedWalletAddress && (
+                                        <div className="text-sm text-green-600">
+                                            ✅ Resolved to: <span className="font-mono">{resolvedWalletAddress}</span>
+                                        </div>
+                                    )}
+                                    {emailResolveError && (
+                                        <div className="text-sm text-red-600">
+                                            ⚠️ {emailResolveError}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                         <div>
                             <Label htmlFor="token-select" className="text-sm font-medium">

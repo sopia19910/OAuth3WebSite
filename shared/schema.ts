@@ -37,6 +37,7 @@ export const chains = pgTable("chains", {
   networkImage: text("network_image"),
   zkAccountFactory: text("zk_account_factory"),
   verifierAddress: text("verifier_address"),
+  oauthNamingService: text("oauth_naming_service"),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
