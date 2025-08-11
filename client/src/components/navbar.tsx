@@ -78,19 +78,19 @@ export default function Navbar() {
                     className="flex items-center space-x-2"
                   >
                     <LogOut size={16} />
-                    <span>{isLoggingOut ? "로그아웃..." : "로그아웃"}</span>
+                    <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
                   </Button>
                 </div>
               ) : (
                 <div className="flex items-center space-x-3">
                   <Link href="/login">
                     <Button variant="ghost" size="sm">
-                      로그인
+                      Sign In
                     </Button>
                   </Link>
                   <Link href="/register">
                     <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
-                      회원가입
+                      Sign Up
                     </Button>
                   </Link>
                 </div>
@@ -156,7 +156,7 @@ export default function Navbar() {
                       style={{ width: 'calc(100% - 1.5rem)' }}
                     >
                       <LogOut size={16} />
-                      <span>{isLoggingOut ? "로그아웃..." : "로그아웃"}</span>
+                      <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
                     </Button>
                   </div>
                 ) : (
@@ -168,7 +168,7 @@ export default function Navbar() {
                         className="w-full"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        로그인
+                        Sign In
                       </Button>
                     </Link>
                     <Link href="/register">
@@ -178,7 +178,7 @@ export default function Navbar() {
                         className="w-full bg-primary hover:bg-primary/90"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        회원가입
+                        Sign Up
                       </Button>
                     </Link>
                   </div>
