@@ -27,10 +27,19 @@ declare module 'express-session' {
   interface SessionData {
     userId?: number;
     user?: {
-      id: number;
-      username: string;
+      id: string;
       email: string;
-      isAdmin: boolean;
+      name?: string;
+      picture?: string;
+      googleId: string;
+      username?: string;
+      isAdmin?: boolean;
+    };
+    zkpData?: {
+      circuitInput: any;
+      inputFilename: string;
+      userSecret: string;
+      timestamp: number;
     };
   }
 }
@@ -249,7 +258,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const applications = await storage.getApiApplications(req.session.user.id);
+      // Convert Google ID to a number for the current storage interface
+      // In a real implementation, you might want to update the schema to use string IDs
+      const numericUserId = parseInt(req.session.user.id) || 0;
+      const applications = await storage.getApiApplications(numericUserId);
       res.json(applications);
     } catch (error) {
       console.error("Error fetching API applications:", error);
@@ -271,9 +283,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertApiApplicationSchema.parse(req.body);
       
+      // Convert Google ID to a number for the current storage interface
+      const numericUserId = parseInt(req.session.user.id) || 0;
       const application = await storage.createApiApplication({
         ...validatedData,
-        userId: req.session.user.id
+        userId: numericUserId
       });
 
       res.json({

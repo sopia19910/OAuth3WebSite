@@ -4,10 +4,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
 interface User {
-  id: number;
-  username: string;
+  id: string;
   email: string;
-  isAdmin: boolean;
+  name?: string;
+  picture?: string;
+  googleId: string;
+  username?: string;
+  isAdmin?: boolean;
 }
 
 export function useAuth() {

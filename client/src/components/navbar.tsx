@@ -82,7 +82,7 @@ export default function Navbar() {
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                       <User size={14} className="text-white" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">{user?.username}</span>
+                    <span className="text-sm font-medium text-foreground">{user?.name || user?.email || 'User'}</span>
                   </div>
                   <Button 
                     size="sm"
@@ -156,7 +156,7 @@ export default function Navbar() {
                       <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                         <User size={14} className="text-white" />
                       </div>
-                      <span className="text-sm font-medium text-foreground">{user?.username}</span>
+                      <span className="text-sm font-medium text-foreground">{user?.name || user?.email || 'User'}</span>
                     </div>
                     <Button 
                       size="sm"
