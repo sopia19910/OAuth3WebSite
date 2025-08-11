@@ -59,6 +59,8 @@ export const projects = pgTable("projects", {
   description: text("description"),
   owner: text("owner").notNull(), // user email or identifier
   status: text("status").notNull().default("active"), // active, suspended, deleted
+  approvalStatus: text("approval_status").notNull().default("pending"), // pending, approved, rejected
+  selectedPlan: text("selected_plan"), // starter, team, scale
   purpose: text("purpose").notNull(), // web, mobile, server, other
   callbackDomains: jsonb("callback_domains").$type<string[]>().default([]),
   ipWhitelist: jsonb("ip_whitelist").$type<string[]>().default([]),
@@ -72,6 +74,8 @@ export const projects = pgTable("projects", {
   webhookSecret: text("webhook_secret"),
   riskScore: integer("risk_score").default(0), // 0-100
   notes: text("notes"),
+  apiCallsUsed: integer("api_calls_used").default(0),
+  apiCallsLimit: integer("api_calls_limit").default(1000), // based on plan
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -241,6 +245,7 @@ export const insertProjectSchema = createInsertSchema(projects).pick({
   description: true,
   owner: true,
   purpose: true,
+  selectedPlan: true,
   callbackDomains: true,
   ipWhitelist: true,
   defaultChainId: true,
@@ -250,11 +255,13 @@ export const insertProjectSchema = createInsertSchema(projects).pick({
   dailyAmountLimit: true,
   allowedChains: true,
   webhookUrl: true,
+  apiCallsLimit: true,
 }).extend({
   name: z.string().min(2, "Project name must be at least 2 characters").max(50, "Project name too long"),
   description: z.string().min(1, "Description is required"),
   owner: z.string().email("Valid email required"),
   purpose: z.enum(["web", "mobile", "server", "other"]),
+  selectedPlan: z.enum(["starter", "team", "scale"]).optional(),
   defaultChainId: z.number().positive("Chain ID must be positive"),
   callbackDomains: z.array(z.string().url()).optional().default([]),
   ipWhitelist: z.array(z.string()).optional().default([]),
@@ -264,6 +271,7 @@ export const insertProjectSchema = createInsertSchema(projects).pick({
   dailyAmountLimit: z.string().optional().default("1000"),
   allowedChains: z.array(z.number()).optional().default([]),
   webhookUrl: z.union([z.string().url(), z.literal(""), z.undefined()]).optional(),
+  apiCallsLimit: z.number().optional(),
 });
 
 export const insertApiKeySchema = createInsertSchema(apiKeys).pick({

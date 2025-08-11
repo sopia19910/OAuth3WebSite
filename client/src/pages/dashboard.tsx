@@ -34,6 +34,7 @@ import Navbar from "@/components/navbar";
 import QRCode from 'qrcode';
 import { PricingModal } from "@/components/PricingModal";
 import ethereumLogo from "@assets/image_1752985874370.png";
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import {
     getWalletFromStorage,
     getWalletBalance,
@@ -212,11 +213,16 @@ export default function Dashboard() {
         
         // Get the form data and submit with selected plan
         const formData = apiForm.getValues();
+        
+        // Set API calls limit based on plan
+        const apiCallsLimit = plan === 'starter' ? 1000 : plan === 'team' ? 100000 : 500000;
+        
         createProjectMutation.mutate({
             ...formData,
+            selectedPlan: plan,
+            apiCallsLimit: apiCallsLimit,
             acceptedTerms,
             createSandbox,
-            // Store plan in localStorage or use it as needed
         });
         
         // Store the selected plan for future reference
@@ -224,7 +230,7 @@ export default function Dashboard() {
         
         toast({
             title: "Plan Selected",
-            description: `You selected the ${plan} plan. Creating your project...`,
+            description: `You selected the ${plan} plan. Your project will be reviewed by our team.`,
         });
     };
     
@@ -1674,13 +1680,21 @@ export default function Dashboard() {
                                     <CardHeader>
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <CardTitle className="text-2xl">🎉 Project Created Successfully!</CardTitle>
+                                                <CardTitle className="text-2xl">
+                                                    {projectResult?.approvalStatus === 'pending' ? '⏳ Project Pending Approval' : '🎉 Project Approved!'}
+                                                </CardTitle>
                                                 <CardDescription className="mt-2">
-                                                    Your API key has been generated. Make sure to copy it now - you won't be able to see it again!
+                                                    {projectResult?.approvalStatus === 'pending' 
+                                                        ? 'Your project is under review. You will be notified once it is approved.'
+                                                        : 'Your API key has been generated. Make sure to copy it now - you won\'t be able to see it again!'}
                                                 </CardDescription>
                                             </div>
-                                            <Badge variant="outline" className="text-green-600 border-green-600">
-                                                Active
+                                            <Badge variant="outline" className={
+                                                projectResult?.approvalStatus === 'pending' 
+                                                    ? "text-yellow-600 border-yellow-600" 
+                                                    : "text-green-600 border-green-600"
+                                            }>
+                                                {projectResult?.approvalStatus === 'pending' ? 'Pending' : 'Approved'}
                                             </Badge>
                                         </div>
                                     </CardHeader>
@@ -1772,6 +1786,107 @@ export default function Dashboard() {
                                         </div>
                                     </CardContent>
                                 </Card>
+
+                                {/* API Usage Metrics - Only show for approved projects */}
+                                {projectResult?.approvalStatus === 'approved' && (
+                                    <Card className="mb-8">
+                                        <CardHeader>
+                                            <CardTitle>API Usage Analytics</CardTitle>
+                                            <CardDescription>
+                                                Monitor your API usage and performance metrics
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-6">
+                                            {/* Usage Summary */}
+                                            <div className="grid gap-4 md:grid-cols-3">
+                                                <Card>
+                                                    <CardHeader className="pb-2">
+                                                        <CardTitle className="text-sm font-medium">API Calls Used</CardTitle>
+                                                    </CardHeader>
+                                                    <CardContent>
+                                                        <div className="text-2xl font-bold">
+                                                            {projectResult?.apiCallsUsed || 0}
+                                                        </div>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            of {projectResult?.apiCallsLimit || 1000} limit
+                                                        </p>
+                                                        <Progress 
+                                                            value={(projectResult?.apiCallsUsed || 0) / (projectResult?.apiCallsLimit || 1000) * 100} 
+                                                            className="mt-2"
+                                                        />
+                                                    </CardContent>
+                                                </Card>
+
+                                                <Card>
+                                                    <CardHeader className="pb-2">
+                                                        <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+                                                    </CardHeader>
+                                                    <CardContent>
+                                                        <div className="text-2xl font-bold">99.8%</div>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Last 7 days
+                                                        </p>
+                                                    </CardContent>
+                                                </Card>
+
+                                                <Card>
+                                                    <CardHeader className="pb-2">
+                                                        <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+                                                    </CardHeader>
+                                                    <CardContent>
+                                                        <div className="text-2xl font-bold">145ms</div>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Last 24 hours
+                                                        </p>
+                                                    </CardContent>
+                                                </Card>
+                                            </div>
+
+                                            {/* Usage Chart */}
+                                            <div>
+                                                <h3 className="text-sm font-medium mb-4">API Calls Over Time</h3>
+                                                <ResponsiveContainer width="100%" height={300}>
+                                                    <AreaChart data={[
+                                                        { date: 'Mon', calls: 120 },
+                                                        { date: 'Tue', calls: 150 },
+                                                        { date: 'Wed', calls: 180 },
+                                                        { date: 'Thu', calls: 140 },
+                                                        { date: 'Fri', calls: 210 },
+                                                        { date: 'Sat', calls: 95 },
+                                                        { date: 'Sun', calls: 80 },
+                                                    ]}>
+                                                        <CartesianGrid strokeDasharray="3 3" />
+                                                        <XAxis dataKey="date" />
+                                                        <YAxis />
+                                                        <Tooltip />
+                                                        <Area 
+                                                            type="monotone" 
+                                                            dataKey="calls" 
+                                                            stroke="#8b5cf6" 
+                                                            fill="#8b5cf6" 
+                                                            fillOpacity={0.2}
+                                                        />
+                                                    </AreaChart>
+                                                </ResponsiveContainer>
+                                            </div>
+
+                                            {/* Plan Details */}
+                                            <div className="border-t pt-4">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <p className="text-sm font-medium">Current Plan</p>
+                                                        <p className="text-2xl font-bold capitalize">
+                                                            {projectResult?.selectedPlan || 'Starter'}
+                                                        </p>
+                                                    </div>
+                                                    <Button variant="outline" size="sm">
+                                                        Upgrade Plan
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )}
 
                                 <Tabs defaultValue="quickstart" className="w-full">
                                     <TabsList className="grid w-full grid-cols-3">

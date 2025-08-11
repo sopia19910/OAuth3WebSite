@@ -1009,21 +1009,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/projects', async (req, res) => {
     try {
       const validatedData = insertProjectSchema.parse(req.body);
-      const project = await storage.createProject(validatedData);
       
-      // Generate API key for the project
+      // Create project with pending approval status
+      const projectData = {
+        ...validatedData,
+        approvalStatus: 'pending',
+        status: 'active'
+      };
+      
+      const project = await storage.createProject(projectData);
+      
+      // Generate API key for the project (will be activated when approved)
       const apiKey = `oa3_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
       const keyHash = Buffer.from(apiKey).toString('base64');
       const keyPrefix = apiKey.substring(0, 8);
       
-      // Create main API key
+      // Create main API key (inactive until approved)
       const mainApiKeyData = {
         projectId: project.id,
         keyName: 'Production API Key',
         keyHash,
         keyPrefix,
         permissions: ['read', 'transfer'],
-        isActive: true
+        isActive: false // Will be activated when project is approved
       };
       
       await storage.createApiKey(mainApiKeyData);
@@ -1041,7 +1049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           keyHash: sandboxKeyHash,
           keyPrefix: sandboxKeyPrefix,
           permissions: ['read', 'transfer'],
-          isActive: true
+          isActive: false // Will be activated when project is approved
         };
         
         await storage.createApiKey(sandboxApiKeyData);
@@ -1054,13 +1062,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'project.created',
         resource: 'project',
         resourceId: project.id,
-        details: { projectName: project.name }
+        details: { 
+          projectName: project.name,
+          selectedPlan: project.selectedPlan,
+          approvalStatus: 'pending'
+        }
       });
       
       res.json({
         ...project,
         apiKey: apiKey,
-        sandboxApiKey: sandboxApiKey
+        sandboxApiKey: sandboxApiKey,
+        message: 'Your project has been created and is pending approval. You will be notified once it is approved.'
       });
     } catch (error) {
       console.error('Error creating project:', error);
