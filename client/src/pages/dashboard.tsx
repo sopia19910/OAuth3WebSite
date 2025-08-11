@@ -1729,29 +1729,35 @@ export default function Dashboard() {
                                     <div>
                                         <h3 className="text-sm font-medium mb-4">Most Used Endpoints</h3>
                                         <ResponsiveContainer width="100%" height={200}>
-                                            <BarChart data={[
-                                                { endpoint: '/accounts/create', calls: 0 },
-                                                { endpoint: '/accounts/:address', calls: 0 },
-                                                { endpoint: '/transfers/send', calls: 0 },
-                                                { endpoint: '/tokens/balance', calls: 0 },
-                                                { endpoint: '/auth/verify', calls: 0 },
-                                            ]} layout="horizontal">
-                                                <CartesianGrid strokeDasharray="3 3" />
+                                            <BarChart 
+                                                data={[
+                                                    { endpoint: '/accounts/create', calls: 0 },
+                                                    { endpoint: '/accounts/:address', calls: 0 },
+                                                    { endpoint: '/transfers/send', calls: 0 },
+                                                    { endpoint: '/tokens/balance', calls: 0 },
+                                                    { endpoint: '/auth/verify', calls: 0 },
+                                                ]} 
+                                                layout="horizontal"
+                                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                                                 <XAxis type="number" />
                                                 <YAxis dataKey="endpoint" type="category" width={120} />
                                                 <Tooltip 
                                                     contentStyle={{ 
-                                                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                                                        backgroundColor: 'white', 
                                                         border: '1px solid #e5e7eb',
                                                         borderRadius: '6px',
-                                                        fontSize: '12px'
+                                                        fontSize: '12px',
+                                                        padding: '8px'
                                                     }}
-                                                    wrapperStyle={{ 
-                                                        outline: 'none',
-                                                        zIndex: 100
-                                                    }}
+                                                    cursor={false}
                                                 />
-                                                <Bar dataKey="calls" fill="#8b5cf6" />
+                                                <Bar 
+                                                    dataKey="calls" 
+                                                    fill="#8b5cf6"
+                                                    radius={[0, 4, 4, 0]}
+                                                />
                                             </BarChart>
                                         </ResponsiveContainer>
                                     </div>
