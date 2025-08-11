@@ -58,10 +58,17 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-cyan-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background gradients matching main page */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-r from-accent/5 via-transparent to-primary/5" />
+      </div>
+      
       <Navbar />
       
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="max-w-md mx-auto">
           {/* Back to home link */}
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
@@ -69,22 +76,25 @@ export default function Login() {
             Back to Home
           </Link>
 
-          <Card className="border-2 shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
-            <CardHeader className="space-y-4 text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                  Sign In to OAuth 3
-                </CardTitle>
-                <CardDescription className="text-base mt-2">
-                  Access your OAuth 3 authentication platform
-                </CardDescription>
-              </div>
-            </CardHeader>
+          {/* Main login card with glassmorphism effect matching main page */}
+          <div className="group relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent rounded-3xl blur-2xl" />
+            <Card className="relative bg-gradient-to-br from-card to-card/50 backdrop-blur border border-border/50 rounded-3xl hover:shadow-2xl hover:border-primary/50 transition-all duration-300">
+              <CardHeader className="space-y-4 text-center p-8">
+                <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center bg-primary/10">
+                  <Shield className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl font-bold text-foreground">
+                    Sign In to OAuth 3
+                  </CardTitle>
+                  <CardDescription className="text-base mt-2 text-muted-foreground">
+                    Access your OAuth 3 authentication platform
+                  </CardDescription>
+                </div>
+              </CardHeader>
 
-            <CardContent>
+            <CardContent className="p-8 pt-0">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -98,7 +108,7 @@ export default function Login() {
                             {...field}
                             type="email"
                             placeholder="your@email.com"
-                            className="h-12 border-2 focus:border-purple-500 transition-colors"
+                            className="h-12 bg-background/50 border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                           />
                         </FormControl>
                         <FormMessage />
@@ -117,7 +127,7 @@ export default function Login() {
                             {...field}
                             type="password"
                             placeholder="••••••••"
-                            className="h-12 border-2 focus:border-purple-500 transition-colors"
+                            className="h-12 bg-background/50 border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                           />
                         </FormControl>
                         <FormMessage />
@@ -127,7 +137,7 @@ export default function Login() {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 text-white font-semibold text-base shadow-lg transition-all duration-200"
+                    className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300"
                     disabled={loginMutation.isPending}
                   >
                     {loginMutation.isPending ? (
@@ -148,22 +158,23 @@ export default function Login() {
               <div className="mt-6 text-center space-y-4">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300" />
+                    <div className="w-full border-t border-border/50" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white dark:bg-gray-900 text-muted-foreground">or</span>
+                    <span className="px-2 bg-card text-muted-foreground">or</span>
                   </div>
                 </div>
 
                 <p className="text-sm text-muted-foreground">
                   Don't have an account?{" "}
-                  <Link href="/register" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
+                  <Link href="/register" className="font-medium text-primary hover:text-primary/80 transition-colors">
                     Sign up now
                   </Link>
                 </p>
               </div>
             </CardContent>
-          </Card>
+            </Card>
+          </div>
 
           {/* Security notice */}
           <div className="mt-8 text-center">

@@ -61,10 +61,17 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-cyan-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background gradients matching main page */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-r from-accent/5 via-transparent to-primary/5" />
+      </div>
+      
       <Navbar />
       
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="max-w-md mx-auto">
           {/* Back to home link */}
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
@@ -72,22 +79,25 @@ export default function Register() {
             Back to Home
           </Link>
 
-          <Card className="border-2 shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
-            <CardHeader className="space-y-4 text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center">
-                <UserPlus className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                  Join OAuth 3
-                </CardTitle>
-                <CardDescription className="text-base mt-2">
-                  Create your OAuth 3 authentication account
-                </CardDescription>
-              </div>
-            </CardHeader>
+          {/* Main register card with glassmorphism effect matching main page */}
+          <div className="group relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent rounded-3xl blur-2xl" />
+            <Card className="relative bg-gradient-to-br from-card to-card/50 backdrop-blur border border-border/50 rounded-3xl hover:shadow-2xl hover:border-primary/50 transition-all duration-300">
+              <CardHeader className="space-y-4 text-center p-8">
+                <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center bg-primary/10">
+                  <UserPlus className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl font-bold text-foreground">
+                    Join OAuth 3
+                  </CardTitle>
+                  <CardDescription className="text-base mt-2 text-muted-foreground">
+                    Create your OAuth 3 authentication account
+                  </CardDescription>
+                </div>
+              </CardHeader>
 
-            <CardContent>
+            <CardContent className="p-8 pt-0">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
@@ -240,7 +250,8 @@ export default function Register() {
                 </p>
               </div>
             </CardContent>
-          </Card>
+            </Card>
+          </div>
 
           {/* Benefits */}
           <div className="mt-8 space-y-4">
