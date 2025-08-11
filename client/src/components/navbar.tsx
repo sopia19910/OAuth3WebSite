@@ -66,9 +66,11 @@ export default function Navbar() {
             <div className="flex items-center space-x-4">
               {isAuthenticated ? (
                 <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-2 text-sm">
-                    <User size={16} className="text-primary" />
-                    <span className="text-foreground font-medium">{user?.username}</span>
+                  <div className="flex items-center space-x-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                      <User size={14} className="text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-foreground">{user?.username}</span>
                   </div>
                   <Button 
                     size="sm"
@@ -140,8 +142,12 @@ export default function Navbar() {
                 {isAuthenticated ? (
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2 px-3 py-2">
-                      <User size={16} className="text-primary" />
-                      <span className="text-foreground font-medium">{user?.username}</span>
+                      <div className="flex items-center space-x-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                          <User size={14} className="text-white" />
+                        </div>
+                        <span className="text-sm font-medium text-foreground">{user?.username}</span>
+                      </div>
                     </div>
                     <Button 
                       size="sm"
