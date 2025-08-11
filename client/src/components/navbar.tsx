@@ -20,6 +20,14 @@ export default function Navbar() {
   ];
 
   const authenticatedNavItems = [
+    { label: "About OAuth 3", href: "/about", isRoute: true },
+    { label: "Technology", href: "/technology", isRoute: true },
+    { label: "Services", href: "/services", isRoute: true },
+    { label: "Docs", href: "/resources", isRoute: true },
+    { label: "Contact Us", href: "/contact", isRoute: true },
+  ];
+
+  const adminNavItems = [
     { label: "Dashboard", href: "/dashboard", isRoute: true },
     { label: "About OAuth 3", href: "/about", isRoute: true },
     { label: "Technology", href: "/technology", isRoute: true },
@@ -28,7 +36,7 @@ export default function Navbar() {
     { label: "Contact Us", href: "/contact", isRoute: true },
   ];
 
-  const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;
+  const navItems = isAuthenticated ? (user?.isAdmin ? adminNavItems : authenticatedNavItems) : publicNavItems;
 
   const handleNavClick = (href: string, isRoute: boolean) => {
     if (isRoute) {
