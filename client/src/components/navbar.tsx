@@ -20,7 +20,7 @@ export default function Navbar() {
   ];
 
   const authenticatedNavItems = [
-    { label: "Dashboard", href: "/", isRoute: true },
+    { label: "Dashboard", href: "/dashboard", isRoute: true },
     { label: "API Application", href: "/api-application", isRoute: true },
     { label: "About OAuth 3", href: "/about", isRoute: true },
     { label: "Technology", href: "/technology", isRoute: true },
