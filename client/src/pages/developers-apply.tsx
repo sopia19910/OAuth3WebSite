@@ -346,6 +346,15 @@ export default function DevelopersApply() {
         {/* Main Content */}
         <div className="flex-1 overflow-x-hidden">
           <div className="max-w-4xl mx-auto px-4 py-8 md:ml-0">
+          {/* Header */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-foreground">
+                API Application
+              </h3>
+            </div>
+          </div>
+          
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="text-2xl text-green-600">🎉 Project Created Successfully!</CardTitle>
@@ -678,6 +687,15 @@ export default function DevelopersApply() {
       {/* Main Content */}
       <div className="flex-1 overflow-x-hidden">
         <div className="max-w-4xl mx-auto px-4 py-8 md:ml-0">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-foreground">
+              API Application
+            </h3>
+          </div>
+        </div>
+        
         {/* Hero Section */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">OAuth3 Account & Transfer API</h1>
