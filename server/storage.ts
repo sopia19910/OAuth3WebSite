@@ -442,10 +442,24 @@ export class DatabaseStorage implements IStorage {
 
   async getUserProjects(userEmail: string): Promise<Project[]> {
     const { db } = await import("./db");
-    const { projects } = await import("@shared/schema");
+    const { projects, apiKeys } = await import("@shared/schema");
     const { eq } = await import("drizzle-orm");
     
-    return await db.select().from(projects).where(eq(projects.owner, userEmail));
+    const userProjects = await db.select().from(projects).where(eq(projects.owner, userEmail));
+    
+    // Add API key to each project
+    for (const project of userProjects) {
+      const projectApiKeys = await db.select().from(apiKeys)
+        .where(eq(apiKeys.projectId, project.id))
+        .limit(1);
+      
+      if (projectApiKeys.length > 0) {
+        // Generate a display API key
+        (project as any).apiKey = `oa3_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+      }
+    }
+    
+    return userProjects;
   }
 
   // API Key management methods
