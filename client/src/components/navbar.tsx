@@ -71,13 +71,12 @@ export default function Navbar() {
                     <span className="text-foreground font-medium">{user?.username}</span>
                   </div>
                   <Button 
-                    variant="outline" 
                     size="sm"
                     onClick={logout}
                     disabled={isLoggingOut}
-                    className="flex items-center space-x-2"
+                    className="bg-white hover:bg-gray-100 text-black font-semibold border border-gray-300 shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
                   >
-                    <LogOut size={16} />
+                    <LogOut size={16} className="text-black" />
                     <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
                   </Button>
                 </div>
@@ -145,17 +144,16 @@ export default function Navbar() {
                       <span className="text-foreground font-medium">{user?.username}</span>
                     </div>
                     <Button 
-                      variant="outline" 
                       size="sm"
                       onClick={() => {
                         logout();
                         setIsMenuOpen(false);
                       }}
                       disabled={isLoggingOut}
-                      className="w-full flex items-center space-x-2 mx-3"
+                      className="w-full bg-white hover:bg-gray-100 text-black font-semibold border border-gray-300 shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-2 mx-3"
                       style={{ width: 'calc(100% - 1.5rem)' }}
                     >
-                      <LogOut size={16} />
+                      <LogOut size={16} className="text-black" />
                       <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
                     </Button>
                   </div>
