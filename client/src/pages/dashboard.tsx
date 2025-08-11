@@ -1690,7 +1690,18 @@ export default function Dashboard() {
                                                 <CartesianGrid strokeDasharray="3 3" />
                                                 <XAxis dataKey="date" />
                                                 <YAxis />
-                                                <Tooltip />
+                                                <Tooltip 
+                                                    contentStyle={{ 
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                                                        border: '1px solid #e5e7eb',
+                                                        borderRadius: '6px',
+                                                        fontSize: '12px'
+                                                    }}
+                                                    wrapperStyle={{ 
+                                                        outline: 'none',
+                                                        zIndex: 100
+                                                    }}
+                                                />
                                                 <Legend />
                                                 <Area 
                                                     type="monotone" 
@@ -1728,7 +1739,18 @@ export default function Dashboard() {
                                                 <CartesianGrid strokeDasharray="3 3" />
                                                 <XAxis type="number" />
                                                 <YAxis dataKey="endpoint" type="category" width={120} />
-                                                <Tooltip />
+                                                <Tooltip 
+                                                    contentStyle={{ 
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                                                        border: '1px solid #e5e7eb',
+                                                        borderRadius: '6px',
+                                                        fontSize: '12px'
+                                                    }}
+                                                    wrapperStyle={{ 
+                                                        outline: 'none',
+                                                        zIndex: 100
+                                                    }}
+                                                />
                                                 <Bar dataKey="calls" fill="#8b5cf6" />
                                             </BarChart>
                                         </ResponsiveContainer>
