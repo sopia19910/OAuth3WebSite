@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { loginUserSchema, type LoginUser } from "@shared/schema";
 import { Link } from "wouter";
-import { ArrowLeft, Shield, Lock } from "lucide-react";
+import { Shield, Lock } from "lucide-react";
 import Navbar from "@/components/navbar";
 
 export default function Login() {
@@ -70,12 +70,6 @@ export default function Login() {
       
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="max-w-md mx-auto">
-          {/* Back to home link */}
-          <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
-          </Link>
-
           {/* Main login card with glassmorphism effect matching main page */}
           <div className="group relative">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent rounded-3xl blur-2xl" />
