@@ -26,7 +26,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Key Components & Features
 - **Database Layer**: Drizzle ORM for type-safe database interactions.
-- **Authentication System**: Separated Google OAuth login and OAuth 3 ZK authentication. Google login for basic access, separate OAuth 3 generation endpoint for ZK proof features.
+- **Authentication System**: Google OAuth integration with session management, API key generation for developers.
 - **UI Components**: Comprehensive library based on Radix UI, featuring professional OAuth 3 branding, subtle hover effects, and smooth transitions.
 - **Data Flow**: Client API calls to Express.js, Drizzle ORM for database operations, JSON responses, and TanStack Query for client-side state management.
 - **User Interface**: Responsive design with a mobile-first approach, modern UI with animations, integrated OAuth 3 branding, consistent typography, dark theme with gradients, and glassmorphism design. Includes a functional contact form, an interactive personal service simulation, and dashboard with left sidebar menu including API Application access.
