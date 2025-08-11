@@ -74,17 +74,17 @@ export default function Home() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-3xl" />
               <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden">
-                <CardContent className="p-8">
-                  <div className="w-full">
+                <CardContent className="p-0">
+                  <div className="w-full aspect-video">
                     <iframe
                       width="100%"
-                      height="315"
-                      src="https://www.youtube.com/embed/evXPFNMw3jY?si=AsppHlj3WRgtrOCx"
+                      height="100%"
+                      src="https://www.youtube.com/embed/evXPFNMw3jY?si=AsppHlj3WRgtrOCx&loop=1&playlist=evXPFNMw3jY"
                       title="OAuth 3 Demo Video"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
-                      className="rounded-lg shadow-lg"
+                      className="w-full h-full object-cover"
                     ></iframe>
                   </div>
                 </CardContent>
