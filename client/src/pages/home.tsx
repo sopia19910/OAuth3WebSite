@@ -11,69 +11,13 @@ import {
   UsersIcon,
   CogIcon,
   BuildingOfficeIcon,
-  ArrowRightIcon,
-  UserCircleIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightIcon
 } from "@heroicons/react/24/outline";
-import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
-  const { user, isAuthenticated, logout, isLoggingOut } = useAuth();
-
   return (
     <div className="min-h-screen">
       <Navbar />
-      
-      {/* User Dashboard Section */}
-      {isAuthenticated && user && (
-        <section className="pt-20 pb-8 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5" />
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <Card className="bg-white/80 backdrop-blur-lg border border-gray-200 shadow-xl">
-              <CardContent className="p-8">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                      <UserCircleIcon className="w-10 h-10 text-gray-700" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900">Welcome back, {user.username}!</h2>
-                      <p className="text-gray-600 mt-1">{user.email}</p>
-                      {user.isAdmin && (
-                        <span className="inline-block mt-2 px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-full">
-                          Admin
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <Button
-                      variant="outline"
-                      className="bg-white hover:bg-gray-100 text-black font-semibold border border-gray-300 shadow-md hover:shadow-lg transition-all duration-300"
-                      onClick={logout}
-                      disabled={isLoggingOut}
-                    >
-                      {isLoggingOut ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                          <span>Signing Out...</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center space-x-2">
-                          <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                          <span>Sign Out</span>
-                        </div>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-      )}
-      
       <HeroSection />
       {/* What is OAuth 3 */}
       <section className="py-16 relative overflow-hidden">
