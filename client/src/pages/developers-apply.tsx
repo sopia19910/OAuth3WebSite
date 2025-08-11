@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -13,12 +13,12 @@ import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Eye, EyeOff, RefreshCw, ExternalLink, Code, Zap, Shield } from "lucide-react";
+import { Copy, Eye, EyeOff, RefreshCw, ExternalLink, Code, Zap, Shield, Menu, X, Home, Grid3x3, Settings, User, Send, Download, LogOut, Plus } from "lucide-react";
 import { insertProjectSchema, type InsertProject, type Chain } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import Footer from "@/components/footer";
-import Navbar from "@/components/navbar";
+import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function DevelopersApply() {
   const { toast } = useToast();
@@ -27,6 +27,9 @@ export default function DevelopersApply() {
   const [showApiKey, setShowApiKey] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [createSandbox, setCreateSandbox] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [location, setLocation] = useLocation();
+  const { user, isLoading: authLoading } = useAuth();
 
   const form = useForm<InsertProject>({
     resolver: zodResolver(insertProjectSchema),
@@ -118,11 +121,231 @@ export default function DevelopersApply() {
     });
   };
 
+  const handleLogout = async () => {
+    try {
+      await apiRequest("/api/auth/logout", { method: "POST" });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      setLocation("/");
+      toast({
+        title: "Logged out successfully",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Error logging out",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Check authentication
+  useEffect(() => {
+    if (!authLoading && !user) {
+      setLocation("/login");
+    }
+  }, [authLoading, user, setLocation]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   if (step === "success") {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="min-h-screen bg-background flex">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:flex w-64 flex-col">
+          <div className="flex-1 bg-card border-r border-border">
+            <div className="p-4">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">O3</span>
+                </div>
+                <span className="font-bold text-lg">OAuth 3</span>
+              </div>
+              
+              <div className="space-y-1">
+                <button
+                  onClick={() => setLocation("/dashboard")}
+                  className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                >
+                  <Home className="inline-block w-4 h-4 mr-2" />
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => setLocation("/dashboard#zkaccount")}
+                  className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                >
+                  <Grid3x3 className="inline-block w-4 h-4 mr-2" />
+                  ZK Account
+                </button>
+                <button
+                  onClick={() => setLocation("/dashboard#settings")}
+                  className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                >
+                  <Settings className="inline-block w-4 h-4 mr-2" />
+                  Settings
+                </button>
+                <button
+                  onClick={() => setLocation("/dashboard#send")}
+                  className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                >
+                  Send
+                </button>
+                <button
+                  onClick={() => setLocation("/dashboard#receive")}
+                  className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                >
+                  Receive
+                </button>
+                <div className="border-t border-border/50 my-2"></div>
+                <button
+                  onClick={() => setLocation("/developers/apply")}
+                  className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors bg-muted/50 text-foreground"
+                >
+                  API Application
+                </button>
+              </div>
+            </div>
+            
+            <div className="mt-auto p-4 border-t border-border">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{user?.name || user?.email}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                <LogOut className="inline-block w-4 h-4 mr-2" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden fixed top-4 left-4 z-50 p-2 bg-card rounded-lg border border-border"
+        >
+          {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+
+        {/* Mobile Sidebar */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden fixed inset-0 z-40 flex">
+            <div className="fixed inset-0 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
+            <div className="relative flex w-64 flex-col bg-card">
+              <div className="flex-1">
+                <div className="p-4">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                      <span className="text-white font-bold text-lg">O3</span>
+                    </div>
+                    <span className="font-bold text-lg">OAuth 3</span>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => {
+                        setLocation("/dashboard");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    >
+                      <Home className="inline-block w-4 h-4 mr-2" />
+                      Dashboard
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLocation("/dashboard#zkaccount");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    >
+                      <Grid3x3 className="inline-block w-4 h-4 mr-2" />
+                      ZK Account
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLocation("/dashboard#settings");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    >
+                      <Settings className="inline-block w-4 h-4 mr-2" />
+                      Settings
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLocation("/dashboard#send");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    >
+                      Send
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLocation("/dashboard#receive");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    >
+                      Receive
+                    </button>
+                    <div className="border-t border-border/50 my-2"></div>
+                    <button
+                      onClick={() => {
+                        setLocation("/developers/apply");
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors bg-muted/50 text-foreground"
+                    >
+                      API Application
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="mt-auto p-4 border-t border-border">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-base font-medium truncate">{user?.name || user?.email}</p>
+                      <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  >
+                    <LogOut className="inline-block w-4 h-4 mr-2" />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-x-hidden">
+          <div className="max-w-4xl mx-auto px-4 py-8 md:ml-0">
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="text-2xl text-green-600">🎉 Project Created Successfully!</CardTitle>
@@ -262,15 +485,199 @@ export default function DevelopersApply() {
             </CardContent>
           </Card>
         </div>
-        <Footer />
       </div>
+    </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background flex">
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex w-64 flex-col">
+        <div className="flex-1 bg-card border-r border-border">
+          <div className="p-4">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                <span className="text-white font-bold text-lg">O3</span>
+              </div>
+              <span className="font-bold text-lg">OAuth 3</span>
+            </div>
+            
+            <div className="space-y-1">
+              <button
+                onClick={() => setLocation("/dashboard")}
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                <Home className="inline-block w-4 h-4 mr-2" />
+                Dashboard
+              </button>
+              <button
+                onClick={() => setLocation("/dashboard#zkaccount")}
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                <Grid3x3 className="inline-block w-4 h-4 mr-2" />
+                ZK Account
+              </button>
+              <button
+                onClick={() => setLocation("/dashboard#settings")}
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                <Settings className="inline-block w-4 h-4 mr-2" />
+                Settings
+              </button>
+              <button
+                onClick={() => setLocation("/dashboard#send")}
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                Send
+              </button>
+              <button
+                onClick={() => setLocation("/dashboard#receive")}
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                Receive
+              </button>
+              <div className="border-t border-border/50 my-2"></div>
+              <button
+                onClick={() => setLocation("/developers/apply")}
+                className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors bg-muted/50 text-foreground"
+              >
+                API Application
+              </button>
+            </div>
+          </div>
+          
+          <div className="mt-auto p-4 border-t border-border">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                <User className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{user?.name || user?.email}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            >
+              <LogOut className="inline-block w-4 h-4 mr-2" />
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-card rounded-lg border border-border"
+      >
+        {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      </button>
+
+      {/* Mobile Sidebar */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-40 flex">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="relative flex w-64 flex-col bg-card">
+            <div className="flex-1">
+              <div className="p-4">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">O3</span>
+                  </div>
+                  <span className="font-bold text-lg">OAuth 3</span>
+                </div>
+                
+                <div className="space-y-1">
+                  <button
+                    onClick={() => {
+                      setLocation("/dashboard");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  >
+                    <Home className="inline-block w-4 h-4 mr-2" />
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLocation("/dashboard#zkaccount");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  >
+                    <Grid3x3 className="inline-block w-4 h-4 mr-2" />
+                    ZK Account
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLocation("/dashboard#settings");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  >
+                    <Settings className="inline-block w-4 h-4 mr-2" />
+                    Settings
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLocation("/dashboard#send");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  >
+                    Send
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLocation("/dashboard#receive");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  >
+                    Receive
+                  </button>
+                  <div className="border-t border-border/50 my-2"></div>
+                  <button
+                    onClick={() => {
+                      setLocation("/developers/apply");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors bg-muted/50 text-foreground"
+                  >
+                    API Application
+                  </button>
+                </div>
+              </div>
+              
+              <div className="mt-auto p-4 border-t border-border">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-base font-medium truncate">{user?.name || user?.email}</p>
+                    <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                >
+                  <LogOut className="inline-block w-4 h-4 mr-2" />
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-x-hidden">
+        <div className="max-w-4xl mx-auto px-4 py-8 md:ml-0">
         {/* Hero Section */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">OAuth3 Account & Transfer API</h1>
@@ -583,7 +990,7 @@ export default function DevelopersApply() {
           </CardContent>
         </Card>
       </div>
-      <Footer />
     </div>
+  </div>
   );
 }
