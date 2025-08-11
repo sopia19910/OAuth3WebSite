@@ -75,28 +75,17 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-3xl" />
               <Card className="relative bg-card/50 backdrop-blur border-border/50 overflow-hidden">
                 <CardContent className="p-8">
-                  <div className="space-y-6 text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                        O3
-                      </span>
-                    </div>
-                    <h3 className="text-2xl font-bold text-foreground">Hybrid Authentication</h3>
-                    <p className="text-muted-foreground">
-                      The next generation authentication protocol that bridges Web2 and Web3
-                    </p>
-                    <div className="mt-6">
-                      <iframe
-                        width="100%"
-                        height="315"
-                        src="https://www.youtube.com/embed/evXPFNMw3jY?si=AsppHlj3WRgtrOCx"
-                        title="OAuth 3 Demo Video"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        className="rounded-lg shadow-lg"
-                      ></iframe>
-                    </div>
+                  <div className="w-full">
+                    <iframe
+                      width="100%"
+                      height="315"
+                      src="https://www.youtube.com/embed/evXPFNMw3jY?si=AsppHlj3WRgtrOCx"
+                      title="OAuth 3 Demo Video"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="rounded-lg shadow-lg"
+                    ></iframe>
                   </div>
                 </CardContent>
               </Card>
