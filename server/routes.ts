@@ -1011,14 +1011,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertProjectSchema.parse(req.body);
       const project = await storage.createProject(validatedData);
       
+      // Generate API key for the project
+      const apiKey = `oa3_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+      const keyHash = Buffer.from(apiKey).toString('base64');
+      const keyPrefix = apiKey.substring(0, 8);
+      
+      // Create main API key
+      const mainApiKeyData = {
+        projectId: project.id,
+        keyName: 'Production API Key',
+        keyHash,
+        keyPrefix,
+        permissions: ['read', 'transfer'],
+        isActive: true
+      };
+      
+      await storage.createApiKey(mainApiKeyData);
+      
+      // Create sandbox API key if requested
+      let sandboxApiKey = null;
+      if (req.body.createSandbox) {
+        const sandboxKey = `oa3_sandbox_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+        const sandboxKeyHash = Buffer.from(sandboxKey).toString('base64');
+        const sandboxKeyPrefix = sandboxKey.substring(0, 12);
+        
+        const sandboxApiKeyData = {
+          projectId: project.id,
+          keyName: 'Sandbox API Key',
+          keyHash: sandboxKeyHash,
+          keyPrefix: sandboxKeyPrefix,
+          permissions: ['read', 'transfer'],
+          isActive: true
+        };
+        
+        await storage.createApiKey(sandboxApiKeyData);
+        sandboxApiKey = sandboxKey;
+      }
+      
       // Create audit log
       await storage.createAuditLog({
+        actor: project.owner,
         action: 'project.created',
-        userId: project.id,
-        metadata: { projectName: project.name }
+        resource: 'project',
+        resourceId: project.id,
+        details: { projectName: project.name }
       });
       
-      res.json(project);
+      res.json({
+        ...project,
+        apiKey: apiKey,
+        sandboxApiKey: sandboxApiKey
+      });
     } catch (error) {
       console.error('Error creating project:', error);
       if (error instanceof z.ZodError) {
@@ -1051,9 +1094,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create audit log
       await storage.createAuditLog({
+        actor: 'system',
         action: 'project.updated',
-        userId: project.id,
-        metadata: { projectName: project.name }
+        resource: 'project',
+        resourceId: project.id,
+        details: { projectName: project.name }
       });
       
       res.json(project);
@@ -1072,9 +1117,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create audit log
       await storage.createAuditLog({
+        actor: 'system',
         action: 'project.deleted',
-        userId: req.params.id,
-        metadata: { projectId: req.params.id }
+        resource: 'project',
+        resourceId: req.params.id,
+        details: { projectId: req.params.id }
       });
       
       res.json({ success: true });
@@ -1116,9 +1163,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create audit log
       await storage.createAuditLog({
+        actor: 'system',
         action: 'apikey.created',
-        userId: req.params.projectId,
-        metadata: { keyId: apiKey.id, keyName: apiKey.name }
+        resource: 'apikey',
+        resourceId: apiKey.id,
+        details: { projectId: req.params.projectId, keyName: apiKey.name }
       });
       
       // Return the full key only once (for display to user)
@@ -1138,9 +1187,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create audit log
       await storage.createAuditLog({
+        actor: 'system',
         action: 'apikey.updated',
-        userId: apiKey.projectId,
-        metadata: { keyId: apiKey.id, status: apiKey.status }
+        resource: 'apikey',
+        resourceId: apiKey.id,
+        details: { projectId: apiKey.projectId, status: apiKey.status }
       });
       
       res.json(apiKey);
@@ -1159,15 +1210,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create audit log
       await storage.createAuditLog({
+        actor: 'system',
         action: 'apikey.deleted',
-        userId: 'system',
-        metadata: { keyId: req.params.id }
+        resource: 'apikey',
+        resourceId: req.params.id,
+        details: { keyId: req.params.id }
       });
       
       res.json({ success: true });
     } catch (error) {
       console.error('Error deleting API key:', error);
       res.status(500).json({ error: 'Failed to delete API key' });
+    }
+  });
+  
+  // Regenerate API key endpoint
+  app.post('/api/projects/:id/regenerate-key', async (req, res) => {
+    try {
+      const projectId = req.params.id;
+      
+      // Get existing project
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+      
+      // Get existing API keys and deactivate the old production key
+      const existingKeys = await storage.getApiKeys(projectId);
+      const oldProductionKey = existingKeys.find(key => key.keyName === 'Production API Key' && key.isActive);
+      
+      if (oldProductionKey) {
+        await storage.updateApiKey(oldProductionKey.id, { isActive: false });
+      }
+      
+      // Generate new API key
+      const newApiKey = `oa3_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+      const keyHash = Buffer.from(newApiKey).toString('base64');
+      const keyPrefix = newApiKey.substring(0, 8);
+      
+      // Create new API key
+      const newApiKeyData = {
+        projectId: projectId,
+        keyName: 'Production API Key',
+        keyHash,
+        keyPrefix,
+        permissions: ['read', 'transfer'],
+        isActive: true
+      };
+      
+      await storage.createApiKey(newApiKeyData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        actor: project.owner,
+        action: 'apikey.regenerated',
+        resource: 'apikey',
+        resourceId: projectId,
+        details: { projectId, projectName: project.name }
+      });
+      
+      res.json({ apiKey: newApiKey });
+    } catch (error) {
+      console.error('Error regenerating API key:', error);
+      res.status(500).json({ error: 'Failed to regenerate API key' });
     }
   });
 
