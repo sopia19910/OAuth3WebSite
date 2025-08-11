@@ -103,16 +103,16 @@ export default function AdminDashboard() {
     },
     onSuccess: (_, variables) => {
       toast({
-        title: variables.block ? "사용자 차단됨" : "차단 해제됨",
+        title: variables.block ? "User Blocked" : "User Unblocked",
         description: variables.block 
-          ? "사용자가 차단되었습니다." 
-          : "사용자 차단이 해제되었습니다.",
+          ? "User has been blocked successfully." 
+          : "User has been unblocked successfully.",
       });
       refetchUsers();
     },
     onError: (error: Error) => {
       toast({
-        title: "오류 발생",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -129,16 +129,16 @@ export default function AdminDashboard() {
     },
     onSuccess: (_, variables) => {
       toast({
-        title: variables.status === "approved" ? "승인 완료" : "거부 완료",
+        title: variables.status === "approved" ? "Approval Complete" : "Rejection Complete",
         description: variables.status === "approved" 
-          ? "API 신청이 승인되었습니다." 
-          : "API 신청이 거부되었습니다.",
+          ? "API application has been approved successfully." 
+          : "API application has been rejected.",
       });
       refetchApplications();
     },
     onError: (error: Error) => {
       toast({
-        title: "오류 발생",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });

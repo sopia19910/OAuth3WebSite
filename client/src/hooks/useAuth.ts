@@ -37,15 +37,15 @@ export function useAuth() {
       queryClient.setQueryData(["auth", "user"], null);
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       toast({
-        title: "로그아웃 완료",
-        description: "성공적으로 로그아웃되었습니다.",
+        title: "Logout Successful",
+        description: "You have been successfully logged out.",
       });
       setLocation("/");
     },
     onError: (error: Error) => {
       toast({
-        title: "로그아웃 실패",
-        description: error.message || "로그아웃 중 오류가 발생했습니다.",
+        title: "Logout Failed",
+        description: error.message || "An error occurred during logout.",
         variant: "destructive",
       });
     },
