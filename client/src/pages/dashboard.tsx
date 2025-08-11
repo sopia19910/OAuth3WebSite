@@ -193,9 +193,6 @@ export default function Dashboard() {
     });
 
     const onApiFormSubmit = (data: InsertProject) => {
-        console.log("Form submitted with data:", data);
-        console.log("Accepted terms:", acceptedTerms);
-        
         if (!acceptedTerms) {
             toast({
                 title: "Terms Required",
@@ -1657,11 +1654,6 @@ export default function Dashboard() {
                                                 type="submit"
                                                 className="w-full"
                                                 disabled={createProjectMutation.isPending}
-                                                onClick={() => {
-                                                    console.log("Button clicked");
-                                                    console.log("Form errors:", apiForm.formState.errors);
-                                                    console.log("Form values:", apiForm.getValues());
-                                                }}
                                             >
                                                 {createProjectMutation.isPending ? "Creating Project..." : "Create Project & Get API Key"}
                                             </Button>
