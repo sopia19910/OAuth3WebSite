@@ -1560,7 +1560,14 @@ export default function Dashboard() {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <form onSubmit={apiForm.handleSubmit(onApiFormSubmit)} className="space-y-6">
+                                        <form onSubmit={(e) => {
+                                            e.preventDefault();
+                                            console.log("Form submit event triggered");
+                                            console.log("Form is valid:", apiForm.formState.isValid);
+                                            console.log("Form errors:", apiForm.formState.errors);
+                                            console.log("Form values:", apiForm.getValues());
+                                            apiForm.handleSubmit(onApiFormSubmit)(e);
+                                        }} className="space-y-6">
                                             <div className="grid gap-6">
                                                 <div>
                                                     <Label htmlFor="name">Project Name *</Label>
