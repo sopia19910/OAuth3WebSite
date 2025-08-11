@@ -193,6 +193,9 @@ export default function Dashboard() {
     });
 
     const onApiFormSubmit = (data: InsertProject) => {
+        console.log("Form submitted with data:", data);
+        console.log("Accepted terms:", acceptedTerms);
+        
         if (!acceptedTerms) {
             toast({
                 title: "Terms Required",
@@ -1594,10 +1597,11 @@ export default function Dashboard() {
                                                 </div>
 
                                                 <div>
-                                                    <Label htmlFor="owner">Owner/Company Name *</Label>
+                                                    <Label htmlFor="owner">Owner Email *</Label>
                                                     <Input
                                                         id="owner"
-                                                        placeholder="e.g., Acme Corporation"
+                                                        type="email"
+                                                        placeholder="e.g., admin@example.com"
                                                         {...apiForm.register("owner")}
                                                         className="mt-1"
                                                     />
@@ -1620,8 +1624,7 @@ export default function Dashboard() {
                                                         <SelectContent>
                                                             <SelectItem value="web">Web Application</SelectItem>
                                                             <SelectItem value="mobile">Mobile Application</SelectItem>
-                                                            <SelectItem value="desktop">Desktop Application</SelectItem>
-                                                            <SelectItem value="api">API Service</SelectItem>
+                                                            <SelectItem value="server">Server/API Service</SelectItem>
                                                             <SelectItem value="other">Other</SelectItem>
                                                         </SelectContent>
                                                     </Select>
@@ -1654,6 +1657,11 @@ export default function Dashboard() {
                                                 type="submit"
                                                 className="w-full"
                                                 disabled={createProjectMutation.isPending}
+                                                onClick={() => {
+                                                    console.log("Button clicked");
+                                                    console.log("Form errors:", apiForm.formState.errors);
+                                                    console.log("Form values:", apiForm.getValues());
+                                                }}
                                             >
                                                 {createProjectMutation.isPending ? "Creating Project..." : "Create Project & Get API Key"}
                                             </Button>
