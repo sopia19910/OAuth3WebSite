@@ -68,7 +68,7 @@ export default function Login() {
       
       <Navbar />
       
-      <div className="container mx-auto px-4 relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)]">
+      <div className="container mx-auto px-4 pt-16 relative z-10 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-md">
           {/* Main login card with glassmorphism effect matching main page */}
           <div className="group relative">
