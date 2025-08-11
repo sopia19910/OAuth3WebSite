@@ -10,7 +10,7 @@ async function createAdminUser() {
     // 관리자 계정 정보
     const adminEmail = 'admin@oauth3.io';
     const adminUsername = 'admin';
-    const adminPassword = 'Admin@123456';
+    const adminPassword = '123456';
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
     
     // 기존 관리자 계정 확인
