@@ -1576,8 +1576,8 @@ export default function Dashboard() {
                 const approvedProjects = userProjects?.filter((p: any) => p.approvalStatus === 'approved') || [];
                 const hasApprovedProjects = approvedProjects.length > 0;
 
-                // If user has approved projects and not in form mode, show their usage
-                if (hasApprovedProjects && apiStep !== "form") {
+                // If user has approved projects, show their usage (override form mode)
+                if (hasApprovedProjects) {
                     const activeProject = projectResult || approvedProjects[0];
                     
                     return (
