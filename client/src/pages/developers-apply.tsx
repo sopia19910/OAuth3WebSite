@@ -18,6 +18,7 @@ import { insertProjectSchema, type InsertProject, type Chain } from "@shared/sch
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import Footer from "@/components/footer";
+import Navbar from "@/components/navbar";
 
 export default function DevelopersApply() {
   const { toast } = useToast();
@@ -120,6 +121,7 @@ export default function DevelopersApply() {
   if (step === "success") {
     return (
       <div className="min-h-screen bg-background">
+        <Navbar />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <Card className="mb-8">
             <CardHeader>
@@ -267,6 +269,7 @@ export default function DevelopersApply() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navbar />
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-8">
