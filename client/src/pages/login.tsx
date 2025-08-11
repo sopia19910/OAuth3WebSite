@@ -131,17 +131,17 @@ export default function Login() {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="w-full h-12 bg-white hover:bg-gray-100 text-black font-semibold text-base border border-gray-300 shadow-md hover:shadow-lg transition-all duration-300"
                     disabled={loginMutation.isPending}
                   >
                     {loginMutation.isPending ? (
                       <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                         <span>Signing In...</span>
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <Lock className="h-4 w-4" />
+                        <Lock className="h-4 w-4 text-black" />
                         <span>Sign In</span>
                       </div>
                     )}
