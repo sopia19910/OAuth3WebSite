@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { loginUserSchema, type LoginUser } from "@shared/schema";
 import { Link } from "wouter";
-import { Shield, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import Navbar from "@/components/navbar";
 
 export default function Login() {
@@ -75,9 +75,6 @@ export default function Login() {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent rounded-3xl blur-2xl" />
             <Card className="relative bg-gradient-to-br from-card to-card/50 backdrop-blur border border-border/50 rounded-3xl hover:shadow-2xl hover:border-primary/50 transition-all duration-300">
               <CardHeader className="space-y-4 text-center p-8">
-                <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center bg-primary/10">
-                  <Shield className="h-8 w-8 text-primary" />
-                </div>
                 <div>
                   <CardTitle className="text-2xl font-bold text-foreground">
                     Sign In to OAuth 3
