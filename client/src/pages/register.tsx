@@ -105,7 +105,7 @@ export default function Register() {
                             <Input
                               {...field}
                               placeholder="John"
-                              className="h-12 border-2 focus:border-purple-500 transition-colors"
+                              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
                             />
                           </FormControl>
                           <FormMessage />
@@ -123,7 +123,7 @@ export default function Register() {
                             <Input
                               {...field}
                               placeholder="Doe"
-                              className="h-12 border-2 focus:border-purple-500 transition-colors"
+                              className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
                             />
                           </FormControl>
                           <FormMessage />
@@ -142,7 +142,7 @@ export default function Register() {
                           <Input
                             {...field}
                             placeholder="Enter your username"
-                            className="h-12 border-2 focus:border-purple-500 transition-colors"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
                           />
                         </FormControl>
                         <FormMessage />
@@ -161,7 +161,7 @@ export default function Register() {
                             {...field}
                             type="email"
                             placeholder="your@email.com"
-                            className="h-12 border-2 focus:border-purple-500 transition-colors"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
                           />
                         </FormControl>
                         <FormMessage />
@@ -180,7 +180,7 @@ export default function Register() {
                             {...field}
                             type="password"
                             placeholder="Enter at least 8 characters"
-                            className="h-12 border-2 focus:border-purple-500 transition-colors"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
                           />
                         </FormControl>
                         <FormMessage />
@@ -198,7 +198,7 @@ export default function Register() {
                           <Input
                             {...field}
                             placeholder="Enter your company name"
-                            className="h-12 border-2 focus:border-purple-500 transition-colors"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
                           />
                         </FormControl>
                         <FormMessage />

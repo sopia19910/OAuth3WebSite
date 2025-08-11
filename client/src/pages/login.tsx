@@ -102,7 +102,7 @@ export default function Login() {
                             {...field}
                             type="email"
                             placeholder="your@email.com"
-                            className="h-12 bg-background/50 border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
                           />
                         </FormControl>
                         <FormMessage />
@@ -121,7 +121,7 @@ export default function Login() {
                             {...field}
                             type="password"
                             placeholder="••••••••"
-                            className="h-12 bg-background/50 border border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all duration-200"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
                           />
                         </FormControl>
                         <FormMessage />
