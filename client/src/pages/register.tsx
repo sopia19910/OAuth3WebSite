@@ -69,7 +69,7 @@ export default function Register() {
           {/* Back to home link */}
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            홈으로 돌아가기
+            Back to Home
           </Link>
 
           <Card className="border-2 shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
@@ -79,10 +79,10 @@ export default function Register() {
               </div>
               <div>
                 <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                  OAuth3 회원가입
+                  Join OAuth 3
                 </CardTitle>
                 <CardDescription className="text-base mt-2">
-                  블록체인 인증 플랫폼에 가입하세요
+                  Create your OAuth 3 authentication account
                 </CardDescription>
               </div>
             </CardHeader>
@@ -96,11 +96,11 @@ export default function Register() {
                       name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium">이름</FormLabel>
+                          <FormLabel className="text-sm font-medium">First Name</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder="홍길동"
+                              placeholder="John"
                               className="h-12 border-2 focus:border-purple-500 transition-colors"
                             />
                           </FormControl>
@@ -114,11 +114,11 @@ export default function Register() {
                       name="lastName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium">성</FormLabel>
+                          <FormLabel className="text-sm font-medium">Last Name</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder="김"
+                              placeholder="Doe"
                               className="h-12 border-2 focus:border-purple-500 transition-colors"
                             />
                           </FormControl>
@@ -133,11 +133,11 @@ export default function Register() {
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">사용자명</FormLabel>
+                        <FormLabel className="text-sm font-medium">Username</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="사용자명을 입력하세요"
+                            placeholder="Enter your username"
                             className="h-12 border-2 focus:border-purple-500 transition-colors"
                           />
                         </FormControl>
@@ -151,7 +151,7 @@ export default function Register() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">이메일</FormLabel>
+                        <FormLabel className="text-sm font-medium">Email Address</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -170,12 +170,12 @@ export default function Register() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">비밀번호</FormLabel>
+                        <FormLabel className="text-sm font-medium">Password</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             type="password"
-                            placeholder="8자 이상 입력하세요"
+                            placeholder="Enter at least 8 characters"
                             className="h-12 border-2 focus:border-purple-500 transition-colors"
                           />
                         </FormControl>
@@ -189,11 +189,11 @@ export default function Register() {
                     name="company"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">회사 (선택사항)</FormLabel>
+                        <FormLabel className="text-sm font-medium">Company (Optional)</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="회사명을 입력하세요"
+                            placeholder="Enter your company name"
                             className="h-12 border-2 focus:border-purple-500 transition-colors"
                           />
                         </FormControl>
@@ -210,12 +210,12 @@ export default function Register() {
                     {registerMutation.isPending ? (
                       <div className="flex items-center space-x-2">
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>계정 생성 중...</span>
+                        <span>Creating Account...</span>
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
                         <UserPlus className="h-4 w-4" />
-                        <span>계정 생성</span>
+                        <span>Create Account</span>
                       </div>
                     )}
                   </Button>
@@ -228,14 +228,14 @@ export default function Register() {
                     <div className="w-full border-t border-gray-300" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white dark:bg-gray-900 text-muted-foreground">또는</span>
+                    <span className="px-2 bg-white dark:bg-gray-900 text-muted-foreground">or</span>
                   </div>
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  이미 계정이 있으신가요?{" "}
+                  Already have an account?{" "}
                   <Link href="/login" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
-                    로그인하기
+                    Sign in here
                   </Link>
                 </p>
               </div>
@@ -245,24 +245,24 @@ export default function Register() {
           {/* Benefits */}
           <div className="mt-8 space-y-4">
             <h3 className="text-center text-lg font-semibold text-gray-900 dark:text-white">
-              OAuth3와 함께 얻는 혜택
+              Benefits with OAuth 3
             </h3>
             <div className="grid gap-3">
               <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-300">
                 <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span>블록체인 기반 보안 인증</span>
+                <span>Blockchain-based secure authentication</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-300">
                 <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span>API 키 관리 및 모니터링</span>
+                <span>API key management and monitoring</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-300">
                 <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span>멀티체인 지원</span>
+                <span>Multi-chain network support</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-300">
                 <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span>실시간 트랜잭션 추적</span>
+                <span>Real-time transaction tracking</span>
               </div>
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function Register() {
           {/* Security notice */}
           <div className="mt-8 text-center">
             <p className="text-xs text-muted-foreground">
-              🔒 모든 개인정보는 암호화되어 안전하게 보관됩니다
+              🔒 All personal information is encrypted and securely stored
             </p>
           </div>
         </div>

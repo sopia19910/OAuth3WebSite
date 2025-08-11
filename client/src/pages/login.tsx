@@ -66,7 +66,7 @@ export default function Login() {
           {/* Back to home link */}
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            홈으로 돌아가기
+            Back to Home
           </Link>
 
           <Card className="border-2 shadow-xl backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
@@ -76,10 +76,10 @@ export default function Login() {
               </div>
               <div>
                 <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                  OAuth3 로그인
+                  Sign In to OAuth 3
                 </CardTitle>
                 <CardDescription className="text-base mt-2">
-                  블록체인 인증 플랫폼에 로그인하세요
+                  Access your OAuth 3 authentication platform
                 </CardDescription>
               </div>
             </CardHeader>
@@ -92,7 +92,7 @@ export default function Login() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">이메일</FormLabel>
+                        <FormLabel className="text-sm font-medium">Email Address</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -111,7 +111,7 @@ export default function Login() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">비밀번호</FormLabel>
+                        <FormLabel className="text-sm font-medium">Password</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -133,12 +133,12 @@ export default function Login() {
                     {loginMutation.isPending ? (
                       <div className="flex items-center space-x-2">
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>로그인 중...</span>
+                        <span>Signing In...</span>
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
                         <Lock className="h-4 w-4" />
-                        <span>로그인</span>
+                        <span>Sign In</span>
                       </div>
                     )}
                   </Button>
@@ -151,14 +151,14 @@ export default function Login() {
                     <div className="w-full border-t border-gray-300" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white dark:bg-gray-900 text-muted-foreground">또는</span>
+                    <span className="px-2 bg-white dark:bg-gray-900 text-muted-foreground">or</span>
                   </div>
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  계정이 없으신가요?{" "}
+                  Don't have an account?{" "}
                   <Link href="/register" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
-                    회원가입하기
+                    Sign up now
                   </Link>
                 </p>
               </div>
@@ -168,7 +168,7 @@ export default function Login() {
           {/* Security notice */}
           <div className="mt-8 text-center">
             <p className="text-xs text-muted-foreground">
-              🔒 모든 통신은 End-to-End 암호화로 보호됩니다
+              🔒 All communications are protected with End-to-End encryption
             </p>
           </div>
         </div>
