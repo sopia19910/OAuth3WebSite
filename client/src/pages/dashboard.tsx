@@ -32,6 +32,7 @@ import {
 import {SiGoogle} from "react-icons/si";
 import Navbar from "@/components/navbar";
 import QRCode from 'qrcode';
+import { PricingModal } from "@/components/PricingModal";
 import ethereumLogo from "@assets/image_1752985874370.png";
 import {
     getWalletFromStorage,
@@ -127,6 +128,8 @@ export default function Dashboard() {
     const [showApiKey, setShowApiKey] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [createSandbox, setCreateSandbox] = useState(true);
+    const [showPricingModal, setShowPricingModal] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
     
     // API Application form
     const apiForm = useForm<InsertProject>({
@@ -199,10 +202,29 @@ export default function Dashboard() {
             return;
         }
 
+        // Open pricing modal instead of directly creating project
+        setShowPricingModal(true);
+    };
+
+    const handlePlanSelection = (plan: string) => {
+        setSelectedPlan(plan);
+        setShowPricingModal(false);
+        
+        // Get the form data and submit with selected plan
+        const formData = apiForm.getValues();
         createProjectMutation.mutate({
-            ...data,
+            ...formData,
             acceptedTerms,
             createSandbox,
+            // Store plan in localStorage or use it as needed
+        });
+        
+        // Store the selected plan for future reference
+        localStorage.setItem(`project_${formData.name}_plan`, plan);
+        
+        toast({
+            title: "Plan Selected",
+            description: `You selected the ${plan} plan. Creating your project...`,
         });
     };
     
@@ -2248,6 +2270,13 @@ const account = await response.json();`}
                     {renderMainContent()}
                 </div>
             </div>
+            
+            {/* Pricing Modal */}
+            <PricingModal 
+                isOpen={showPricingModal}
+                onClose={() => setShowPricingModal(false)}
+                onSelectPlan={handlePlanSelection}
+            />
         </div>
     );
 }
