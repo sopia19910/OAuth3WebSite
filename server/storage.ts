@@ -440,6 +440,14 @@ export class DatabaseStorage implements IStorage {
     return !!result;
   }
 
+  async getUserProjects(userEmail: string): Promise<Project[]> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    return await db.select().from(projects).where(eq(projects.owner, userEmail));
+  }
+
   // API Key management methods
   async getApiKeys(projectId: string): Promise<ApiKey[]> {
     const { db } = await import("./db");

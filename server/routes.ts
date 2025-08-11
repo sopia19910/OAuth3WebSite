@@ -1006,6 +1006,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's projects
+  app.get('/api/projects/user', async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Get all projects for the user's email
+      const projects = await storage.getUserProjects(user.email);
+      res.json(projects);
+    } catch (error) {
+      console.error('Error fetching user projects:', error);
+      res.status(500).json({ error: 'Failed to fetch projects' });
+    }
+  });
+
   app.post('/api/projects', async (req, res) => {
     try {
       const validatedData = insertProjectSchema.parse(req.body);
