@@ -152,7 +152,7 @@ export const riskRules = pgTable("risk_rules", {
 // API Applications Table
 export const apiApplications = pgTable("api_applications", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: integer("user_id").notNull(),
+  userId: text("user_id").notNull(), // Changed to text to support Google OAuth IDs
   projectName: text("project_name").notNull(),
   projectDescription: text("project_description").notNull(),
   projectType: text("project_type").notNull(), // web, mobile, desktop, server, other
@@ -161,7 +161,7 @@ export const apiApplications = pgTable("api_applications", {
   additionalInfo: text("additional_info"),
   status: text("status").notNull().default("pending"), // pending, approved, rejected
   apiKey: text("api_key"), // generated when approved
-  reviewedBy: integer("reviewed_by"), // admin user id
+  reviewedBy: text("reviewed_by"), // Changed to text for consistency
   reviewNotes: text("review_notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
