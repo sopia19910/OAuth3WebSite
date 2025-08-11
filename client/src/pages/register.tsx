@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { insertUserSchema, type InsertUser } from "@shared/schema";
 import { Link } from "wouter";
-import { UserPlus, Shield, Check } from "lucide-react";
+import { UserPlus, Shield } from "lucide-react";
 import Navbar from "@/components/navbar";
 
 export default function Register() {
@@ -78,9 +78,6 @@ export default function Register() {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent rounded-3xl blur-2xl" />
             <Card className="relative bg-gradient-to-br from-card to-card/50 backdrop-blur border border-border/50 rounded-3xl hover:shadow-2xl hover:border-primary/50 transition-all duration-300">
               <CardHeader className="space-y-4 text-center p-8">
-                <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center bg-primary/10">
-                  <UserPlus className="h-8 w-8 text-primary" />
-                </div>
                 <div>
                   <CardTitle className="text-2xl font-bold text-foreground">
                     Join OAuth 3
@@ -208,17 +205,17 @@ export default function Register() {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 text-white font-semibold text-base shadow-lg transition-all duration-200"
+                    className="w-full h-12 bg-white hover:bg-gray-100 text-black font-semibold text-base border border-gray-300 shadow-md hover:shadow-lg transition-all duration-300"
                     disabled={registerMutation.isPending}
                   >
                     {registerMutation.isPending ? (
                       <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                         <span>Creating Account...</span>
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <UserPlus className="h-4 w-4" />
+                        <UserPlus className="h-4 w-4 text-black" />
                         <span>Create Account</span>
                       </div>
                     )}
@@ -247,30 +244,7 @@ export default function Register() {
             </Card>
           </div>
 
-          {/* Benefits */}
-          <div className="mt-8 space-y-4">
-            <h3 className="text-center text-lg font-semibold text-gray-900 dark:text-white">
-              Benefits with OAuth 3
-            </h3>
-            <div className="grid gap-3">
-              <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-300">
-                <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span>Blockchain-based secure authentication</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-300">
-                <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span>API key management and monitoring</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-300">
-                <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span>Multi-chain network support</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-300">
-                <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span>Real-time transaction tracking</span>
-              </div>
-            </div>
-          </div>
+
 
 
         </div>
