@@ -238,7 +238,9 @@ export default function Dashboard() {
     
     // Check if admin and redirect
     useEffect(() => {
+        console.log('Dashboard: Auth check', { authLoading, user, isAdmin: user?.isAdmin });
         if (!authLoading && user?.isAdmin) {
+            console.log('Dashboard: Redirecting to admin dashboard');
             setLocation('/admin/dashboard');
         }
     }, [user, authLoading, setLocation]);

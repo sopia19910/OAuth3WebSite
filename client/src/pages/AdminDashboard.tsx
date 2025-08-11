@@ -57,9 +57,13 @@ export default function AdminDashboard() {
   const { user, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("users");
   
+  console.log('AdminDashboard: Rendered', { user, authLoading, isAdmin: user?.isAdmin });
+  
   // 관리자 권한 확인
   useEffect(() => {
+    console.log('AdminDashboard: Auth check', { authLoading, user, isAdmin: user?.isAdmin });
     if (!authLoading && (!user || !user.isAdmin)) {
+      console.log('AdminDashboard: Not admin, redirecting to dashboard');
       toast({
         title: "접근 권한 없음",
         description: "관리자 권한이 필요합니다.",
