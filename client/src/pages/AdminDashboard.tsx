@@ -187,27 +187,50 @@ export default function AdminDashboard() {
           <p className="text-muted-foreground">Manage system users and API applications.</p>
         </div>
 
-        {/* 탭 메뉴 */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <UsersIcon className="h-4 w-4" />
-              User Management
-            </TabsTrigger>
-            <TabsTrigger value="applications" className="flex items-center gap-2">
-              <KeyIcon className="h-4 w-4" />
-              API Management
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content with Sidebar */}
+        <div className="flex gap-6">
+          {/* Left Sidebar Menu */}
+          <div className="w-64 min-h-[600px]">
+            <Card className="bg-card/50 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <nav className="space-y-2">
+                  <button
+                    onClick={() => setActiveTab("users")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                      activeTab === "users" 
+                        ? "bg-gradient-to-r from-purple-500/10 to-cyan-500/10 text-purple-500 border border-purple-500/20" 
+                        : "hover:bg-accent/50 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <UsersIcon className="h-5 w-5" />
+                    <span className="font-medium">User Management</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("applications")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                      activeTab === "applications" 
+                        ? "bg-gradient-to-r from-purple-500/10 to-cyan-500/10 text-purple-500 border border-purple-500/20" 
+                        : "hover:bg-accent/50 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <KeyIcon className="h-5 w-5" />
+                    <span className="font-medium">API Management</span>
+                  </button>
+                </nav>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* User Management Tab */}
-          <TabsContent value="users">
-            <Card>
-              <CardHeader>
-                <CardTitle>User List</CardTitle>
-                <CardDescription>Manage registered users and block access.</CardDescription>
-              </CardHeader>
-              <CardContent>
+          {/* Right Content Area */}
+          <div className="flex-1">
+            {/* User Management Content */}
+            {activeTab === "users" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>User List</CardTitle>
+                  <CardDescription>Manage registered users and block access.</CardDescription>
+                </CardHeader>
+                <CardContent>
                 {usersLoading ? (
                   <div className="flex justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -291,16 +314,16 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+            )}
 
-          {/* API Management Tab */}
-          <TabsContent value="applications">
-            <Card>
-              <CardHeader>
-                <CardTitle>API Application List</CardTitle>
-                <CardDescription>Review and approve API usage applications.</CardDescription>
-              </CardHeader>
-              <CardContent>
+            {/* API Management Content */}
+            {activeTab === "applications" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>API Application List</CardTitle>
+                  <CardDescription>Review and approve API usage applications.</CardDescription>
+                </CardHeader>
+                <CardContent>
                 {appsLoading ? (
                   <div className="flex justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -408,8 +431,9 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
