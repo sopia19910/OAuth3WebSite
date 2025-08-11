@@ -214,7 +214,7 @@ export default function Register() {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-white hover:bg-gray-100 text-black font-semibold text-base border border-gray-300 shadow-md hover:shadow-lg transition-all duration-300"
+                    className="w-full h-12 bg-white/70 hover:bg-white/90 backdrop-blur-md text-black font-semibold text-base border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300"
                     disabled={registerMutation.isPending}
                   >
                     {registerMutation.isPending ? (
