@@ -13,6 +13,7 @@ export const users = pgTable("users", {
   company: text("company"),
   isVerified: boolean("is_verified").default(false),
   isAdmin: boolean("is_admin").default(false),
+  isBlocked: boolean("is_blocked").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

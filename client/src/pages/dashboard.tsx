@@ -61,11 +61,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Dashboard() {
 
     const [, setLocation] = useLocation();
     const {toast} = useToast();
+    const { user, isLoading: authLoading } = useAuth();
     const [activeMenu, setActiveMenu] = useState<string>("overview");
     const [sendAmount, setSendAmount] = useState("");
     const [sendAddress, setSendAddress] = useState("");
@@ -234,6 +236,13 @@ export default function Dashboard() {
         });
     };
     
+    // Check if admin and redirect
+    useEffect(() => {
+        if (!authLoading && user?.isAdmin) {
+            setLocation('/admin/dashboard');
+        }
+    }, [user, authLoading, setLocation]);
+
     // Load wallet and account data on component mount
     useEffect(() => {
         // Load chains first, then wallet data

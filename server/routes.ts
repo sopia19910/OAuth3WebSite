@@ -1357,6 +1357,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin middleware
+  const requireAdmin = async (req: any, res: any, next: any) => {
+    const userId = req.session?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    const user = await storage.getUser(userId);
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    
+    next();
+  };
+
+  // Admin Routes
+  app.get('/api/admin/users', requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json({ success: true, users });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Failed to fetch users' });
+    }
+  });
+
+  app.post('/api/admin/users/:id/block', requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { block } = req.body;
+      
+      const user = await storage.updateUserBlockStatus(userId, block);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      res.json({ success: true, user });
+    } catch (error) {
+      console.error('Error updating user block status:', error);
+      res.status(500).json({ error: 'Failed to update user status' });
+    }
+  });
+
+  app.get('/api/admin/applications', requireAdmin, async (req, res) => {
+    try {
+      const applications = await storage.getAllApiApplications();
+      res.json({ success: true, applications });
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      res.status(500).json({ error: 'Failed to fetch applications' });
+    }
+  });
+
+  app.post('/api/admin/applications/:id/approve', requireAdmin, async (req, res) => {
+    try {
+      const applicationId = req.params.id;
+      const { status } = req.body;
+      
+      const application = await storage.updateApiApplicationStatus(applicationId, status);
+      if (!application) {
+        return res.status(404).json({ error: 'Application not found' });
+      }
+      
+      // API 신청이 승인되면 프로젝트 상태도 업데이트
+      if (status === 'approved' && application.projectId) {
+        await storage.updateProject(application.projectId, {
+          approvalStatus: 'approved',
+          status: 'active'
+        });
+      }
+      
+      res.json({ success: true, application });
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      res.status(500).json({ error: 'Failed to update application status' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

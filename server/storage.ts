@@ -39,6 +39,8 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  getAllUsers(): Promise<User[]>;
+  updateUserBlockStatus(id: number, isBlocked: boolean): Promise<User | undefined>;
   
   // Contact management
   createContact(contact: InsertContact): Promise<Contact>;
@@ -88,6 +90,8 @@ export interface IStorage {
   getApiApplications(userId: number): Promise<ApiApplication[]>;
   createApiApplication(application: InsertApiApplication & { userId: number }): Promise<ApiApplication>;
   updateApiApplication(id: string, application: Partial<ApiApplication>): Promise<ApiApplication | undefined>;
+  getAllApiApplications(): Promise<ApiApplication[]>;
+  updateApiApplicationStatus(id: string, status: string): Promise<ApiApplication | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -256,6 +260,26 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    
+    return await db.select().from(users);
+  }
+
+  async updateUserBlockStatus(id: number, isBlocked: boolean): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [user] = await db
+      .update(users)
+      .set({ isBlocked, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   async createContact(insertContact: InsertContact): Promise<Contact> {
@@ -667,6 +691,62 @@ export class DatabaseStorage implements IStorage {
       .where(eq(apiApplications.id, id))
       .returning();
     return application || undefined;
+  }
+
+  async getAllApiApplications(): Promise<ApiApplication[]> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    
+    // Return all projects as API applications
+    const allProjects = await db.select().from(projects);
+    
+    return allProjects.map(project => ({
+      id: project.id,
+      name: project.name,
+      owner: project.owner,
+      selectedPlan: project.selectedPlan || '',
+      approvalStatus: project.approvalStatus,
+      purpose: project.purpose,
+      createdAt: project.createdAt,
+      updatedAt: project.updatedAt,
+      projectId: project.id,
+      userId: 0, // Default value since we're using projects
+      description: project.description || '',
+      status: project.status
+    })) as ApiApplication[];
+  }
+
+  async updateApiApplicationStatus(id: string, status: string): Promise<ApiApplication | undefined> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [updatedProject] = await db
+      .update(projects)
+      .set({ 
+        approvalStatus: status,
+        status: status === 'approved' ? 'active' : 'suspended',
+        updatedAt: new Date() 
+      })
+      .where(eq(projects.id, id))
+      .returning();
+    
+    if (!updatedProject) return undefined;
+    
+    return {
+      id: updatedProject.id,
+      name: updatedProject.name,
+      owner: updatedProject.owner,
+      selectedPlan: updatedProject.selectedPlan || '',
+      approvalStatus: updatedProject.approvalStatus,
+      purpose: updatedProject.purpose,
+      createdAt: updatedProject.createdAt,
+      updatedAt: updatedProject.updatedAt,
+      projectId: updatedProject.id,
+      userId: 0,
+      description: updatedProject.description || '',
+      status: updatedProject.status
+    } as ApiApplication;
   }
 }
 
