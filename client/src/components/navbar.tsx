@@ -74,9 +74,9 @@ export default function Navbar() {
                     size="sm"
                     onClick={logout}
                     disabled={isLoggingOut}
-                    className="bg-white/70 hover:bg-white/90 backdrop-blur-md text-black font-semibold border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
+                    className="bg-black/20 hover:bg-black/30 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white dark:text-black font-semibold flex items-center space-x-2"
                   >
-                    <LogOut size={16} className="text-black" />
+                    <LogOut size={16} />
                     <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
                   </Button>
                 </div>
@@ -150,10 +150,10 @@ export default function Navbar() {
                         setIsMenuOpen(false);
                       }}
                       disabled={isLoggingOut}
-                      className="w-full bg-white/70 hover:bg-white/90 backdrop-blur-md text-black font-semibold border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2 mx-3"
+                      className="w-full bg-black/20 hover:bg-black/30 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white dark:text-black font-semibold flex items-center space-x-2 mx-3"
                       style={{ width: 'calc(100% - 1.5rem)' }}
                     >
-                      <LogOut size={16} className="text-black" />
+                      <LogOut size={16} />
                       <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
                     </Button>
                   </div>
