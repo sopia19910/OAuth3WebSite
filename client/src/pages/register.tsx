@@ -13,28 +13,42 @@ import { insertUserSchema, type InsertUser } from "@shared/schema";
 import { Link } from "wouter";
 import { UserPlus, Shield } from "lucide-react";
 import Navbar from "@/components/navbar";
+import { z } from "zod";
+
+// Extended schema with password confirmation
+const registerFormSchema = insertUserSchema.extend({
+  confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+type RegisterFormData = z.infer<typeof registerFormSchema>;
 
 export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const form = useForm<InsertUser>({
-    resolver: zodResolver(insertUserSchema),
+  const form = useForm<RegisterFormData>({
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
+      confirmPassword: "",
       firstName: "",
       lastName: "",
-      company: "",
     },
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (data: InsertUser) => {
+    mutationFn: async (data: RegisterFormData) => {
+      // Remove confirmPassword before sending to server
+      const { confirmPassword, ...registerData } = data;
+      // Auto-generate username from email
+      const username = registerData.email.split('@')[0];
       return apiRequest("/api/auth/register", {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...registerData, username }),
       });
     },
     onSuccess: () => {
@@ -56,7 +70,7 @@ export default function Register() {
     },
   });
 
-  const onSubmit = (data: InsertUser) => {
+  const onSubmit = (data: RegisterFormData) => {
     registerMutation.mutate(data);
   };
 
@@ -131,24 +145,6 @@ export default function Register() {
 
                   <FormField
                     control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium">Username</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="Enter your username"
-                            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
@@ -187,14 +183,15 @@ export default function Register() {
 
                   <FormField
                     control={form.control}
-                    name="company"
+                    name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">Company (Optional)</FormLabel>
+                        <FormLabel className="text-sm font-medium">Confirm Password</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="Enter your company name"
+                            type="password"
+                            placeholder="Confirm your password"
                             className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
                           />
                         </FormControl>
