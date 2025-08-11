@@ -176,15 +176,15 @@ export default function AdminDashboard() {
                 <ArrowLeftIcon className="h-5 w-5" />
               </Button>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-cyan-500 bg-clip-text text-transparent">
-                관리자 대쉬보드
+                Admin Dashboard
               </h1>
             </div>
             <Badge variant="outline" className="text-purple-500 border-purple-500">
               <ShieldCheckIcon className="h-4 w-4 mr-1" />
-              관리자
+              Admin
             </Badge>
           </div>
-          <p className="text-muted-foreground">시스템 사용자 및 API 신청을 관리합니다.</p>
+          <p className="text-muted-foreground">Manage system users and API applications.</p>
         </div>
 
         {/* 탭 메뉴 */}
@@ -192,20 +192,20 @@ export default function AdminDashboard() {
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="users" className="flex items-center gap-2">
               <UsersIcon className="h-4 w-4" />
-              회원 관리
+              User Management
             </TabsTrigger>
             <TabsTrigger value="applications" className="flex items-center gap-2">
               <KeyIcon className="h-4 w-4" />
-              API 관리
+              API Management
             </TabsTrigger>
           </TabsList>
 
-          {/* 회원 관리 탭 */}
+          {/* User Management Tab */}
           <TabsContent value="users">
             <Card>
               <CardHeader>
-                <CardTitle>회원 목록</CardTitle>
-                <CardDescription>등록된 사용자를 관리하고 차단할 수 있습니다.</CardDescription>
+                <CardTitle>User List</CardTitle>
+                <CardDescription>Manage registered users and block access.</CardDescription>
               </CardHeader>
               <CardContent>
                 {usersLoading ? (
@@ -214,17 +214,17 @@ export default function AdminDashboard() {
                   </div>
                 ) : users.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    등록된 사용자가 없습니다.
+                    No registered users.
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>사용자명</TableHead>
-                        <TableHead>이메일</TableHead>
-                        <TableHead>상태</TableHead>
-                        <TableHead>가입일</TableHead>
-                        <TableHead className="text-right">작업</TableHead>
+                        <TableHead>Username</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Join Date</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -242,18 +242,18 @@ export default function AdminDashboard() {
                               {user.isVerified && (
                                 <Badge variant="outline" className="text-green-500 border-green-500">
                                   <CheckCircleIcon className="h-3 w-3 mr-1" />
-                                  인증됨
+                                  Verified
                                 </Badge>
                               )}
                               {user.isBlocked && (
                                 <Badge variant="outline" className="text-red-500 border-red-500">
                                   <NoSymbolIcon className="h-3 w-3 mr-1" />
-                                  차단됨
+                                  Blocked
                                 </Badge>
                               )}
                               {!user.isVerified && !user.isBlocked && (
                                 <Badge variant="outline" className="text-gray-500 border-gray-500">
-                                  일반
+                                  Normal
                                 </Badge>
                               )}
                             </div>
@@ -274,12 +274,12 @@ export default function AdminDashboard() {
                               {user.isBlocked ? (
                                 <>
                                   <CheckCircleIcon className="h-4 w-4 mr-1" />
-                                  차단 해제
+                                  Unblock
                                 </>
                               ) : (
                                 <>
                                   <NoSymbolIcon className="h-4 w-4 mr-1" />
-                                  차단
+                                  Block
                                 </>
                               )}
                             </Button>
@@ -293,12 +293,12 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          {/* API 관리 탭 */}
+          {/* API Management Tab */}
           <TabsContent value="applications">
             <Card>
               <CardHeader>
-                <CardTitle>API 신청 목록</CardTitle>
-                <CardDescription>API 사용 신청을 검토하고 승인할 수 있습니다.</CardDescription>
+                <CardTitle>API Application List</CardTitle>
+                <CardDescription>Review and approve API usage applications.</CardDescription>
               </CardHeader>
               <CardContent>
                 {appsLoading ? (
@@ -307,19 +307,19 @@ export default function AdminDashboard() {
                   </div>
                 ) : applications.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    API 신청이 없습니다.
+                    No API applications.
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>프로젝트명</TableHead>
-                        <TableHead>신청자</TableHead>
-                        <TableHead>플랜</TableHead>
-                        <TableHead>용도</TableHead>
-                        <TableHead>상태</TableHead>
-                        <TableHead>신청일</TableHead>
-                        <TableHead className="text-right">작업</TableHead>
+                        <TableHead>Project Name</TableHead>
+                        <TableHead>Applicant</TableHead>
+                        <TableHead>Plan</TableHead>
+                        <TableHead>Purpose</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Application Date</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -342,19 +342,19 @@ export default function AdminDashboard() {
                             {app.approvalStatus === "pending" && (
                               <Badge variant="outline" className="text-yellow-500 border-yellow-500">
                                 <ClockIcon className="h-3 w-3 mr-1" />
-                                대기 중
+                                Pending
                               </Badge>
                             )}
                             {app.approvalStatus === "approved" && (
                               <Badge variant="outline" className="text-green-500 border-green-500">
                                 <CheckCircleIcon className="h-3 w-3 mr-1" />
-                                승인됨
+                                Approved
                               </Badge>
                             )}
                             {app.approvalStatus === "rejected" && (
                               <Badge variant="outline" className="text-red-500 border-red-500">
                                 <XCircleIcon className="h-3 w-3 mr-1" />
-                                거부됨
+                                Rejected
                               </Badge>
                             )}
                           </TableCell>
@@ -374,7 +374,7 @@ export default function AdminDashboard() {
                                   disabled={approveApplicationMutation.isPending}
                                 >
                                   <CheckCircleIcon className="h-4 w-4 mr-1" />
-                                  승인
+                                  Approve
                                 </Button>
                                 <Button
                                   size="sm"
@@ -386,18 +386,18 @@ export default function AdminDashboard() {
                                   disabled={approveApplicationMutation.isPending}
                                 >
                                   <XCircleIcon className="h-4 w-4 mr-1" />
-                                  거부
+                                  Reject
                                 </Button>
                               </div>
                             )}
                             {app.approvalStatus === "approved" && (
                               <Badge variant="outline" className="text-green-500 border-green-500">
-                                승인 완료
+                                Approved
                               </Badge>
                             )}
                             {app.approvalStatus === "rejected" && (
                               <Badge variant="outline" className="text-red-500 border-red-500">
-                                거부됨
+                                Rejected
                               </Badge>
                             )}
                           </TableCell>
