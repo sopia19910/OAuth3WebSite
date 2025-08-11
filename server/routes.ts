@@ -7,7 +7,9 @@ import {
   insertChainSchema,
   insertProjectSchema,
   insertApiKeySchema,
-  insertTransferSchema
+  insertTransferSchema,
+  insertUserSchema,
+  loginUserSchema
 } from "@shared/schema";
 import { getOAuth2Client, requireAuth, generateSecureCircuitInput, generateSecureZKProof } from "./auth";
 import { ethers } from "ethers";
@@ -15,8 +17,22 @@ import fs from "fs";
 import path from "path";
 import { z } from "zod";
 import { sendContactEmail } from "./email";
+import bcrypt from "bcryptjs";
 
 // Contract addresses are now stored in database per chain
+
+// Extend session data interface
+declare module 'express-session' {
+  interface SessionData {
+    userId?: number;
+    user?: {
+      id: number;
+      username: string;
+      email: string;
+      isAdmin: boolean;
+    };
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configure session middleware
@@ -31,6 +47,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
       sameSite: 'lax'
     }
   }));
+
+  // Authentication endpoints
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const validatedData = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUserByEmail = await storage.getUserByEmail(validatedData.email);
+      if (existingUserByEmail) {
+        return res.status(400).json({
+          success: false,
+          message: "이미 사용 중인 이메일입니다."
+        });
+      }
+
+      const existingUserByUsername = await storage.getUserByUsername(validatedData.username);
+      if (existingUserByUsername) {
+        return res.status(400).json({
+          success: false,
+          message: "이미 사용 중인 사용자명입니다."
+        });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(validatedData.password, 12);
+      
+      // Create user
+      const user = await storage.createUser({
+        ...validatedData,
+        password: hashedPassword
+      });
+
+      res.json({
+        success: true,
+        message: "회원가입이 완료되었습니다.",
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email
+        }
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      
+      if (error instanceof Error && 'issues' in error) {
+        res.status(400).json({
+          success: false,
+          message: "입력 정보를 확인해주세요.",
+          errors: (error as any).issues
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "회원가입 중 오류가 발생했습니다."
+        });
+      }
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const validatedData = loginUserSchema.parse(req.body);
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(validatedData.email);
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "이메일 또는 비밀번호가 올바르지 않습니다."
+        });
+      }
+
+      // Verify password
+      const isValidPassword = await bcrypt.compare(validatedData.password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({
+          success: false,
+          message: "이메일 또는 비밀번호가 올바르지 않습니다."
+        });
+      }
+
+      // Store user in session
+      req.session.userId = user.id;
+      req.session.user = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        isAdmin: user.isAdmin || false
+      };
+
+      res.json({
+        success: true,
+        message: "로그인 성공",
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          isAdmin: user.isAdmin || false
+        }
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      
+      if (error instanceof Error && 'issues' in error) {
+        res.status(400).json({
+          success: false,
+          message: "입력 정보를 확인해주세요.",
+          errors: (error as any).issues
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "로그인 중 오류가 발생했습니다."
+        });
+      }
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          message: "로그아웃 중 오류가 발생했습니다."
+        });
+      }
+      res.json({
+        success: true,
+        message: "로그아웃되었습니다."
+      });
+    });
+  });
+
+  app.get("/api/auth/me", (req, res) => {
+    if (!req.session.user) {
+      return res.status(401).json({
+        success: false,
+        message: "로그인이 필요합니다."
+      });
+    }
+
+    res.json({
+      success: true,
+      user: req.session.user
+    });
+  });
   // Contact form submission endpoint
   app.post("/api/contact", async (req, res) => {
     try {

@@ -14,6 +14,8 @@ import PersonalService from "@/pages/personalservice";
 import Dashboard from "@/pages/dashboard";
 import DevelopersApply from "@/pages/developers-apply";
 import AdminApi from "@/pages/admin-api";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -30,6 +32,8 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/developers/apply" component={DevelopersApply} />
       <Route path="/admin/api" component={AdminApi} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route component={NotFound} />
     </Switch>
   );

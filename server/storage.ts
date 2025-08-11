@@ -10,6 +10,7 @@ import {
   auditLogs,
   type User, 
   type InsertUser, 
+  type LoginUser,
   type Contact, 
   type InsertContact, 
   type Token, 
@@ -33,6 +34,7 @@ export interface IStorage {
   // User management
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
   // Contact management
@@ -209,6 +211,15 @@ export class DatabaseStorage implements IStorage {
     const { eq } = await import("drizzle-orm");
     
     const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
   }
 

@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile.tsx";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import logoImage from "@assets/image_1752117480535.png";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { user, isAuthenticated, logout, isLoggingOut } = useAuth();
 
   const navItems = [
     { label: "About OAuth 3", href: "/about", isRoute: true },
@@ -39,7 +41,7 @@ export default function Navbar() {
           </Link>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               item.isRoute ? (
                 <Link
@@ -59,6 +61,41 @@ export default function Navbar() {
                 </button>
               )
             ))}
+            
+            {/* Authentication Buttons */}
+            <div className="flex items-center space-x-4">
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <User size={16} className="text-primary" />
+                    <span className="text-foreground font-medium">{user?.username}</span>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={logout}
+                    disabled={isLoggingOut}
+                    className="flex items-center space-x-2"
+                  >
+                    <LogOut size={16} />
+                    <span>{isLoggingOut ? "로그아웃..." : "로그아웃"}</span>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <Link href="/login">
+                    <Button variant="ghost" size="sm">
+                      로그인
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
+                      회원가입
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -98,6 +135,55 @@ export default function Navbar() {
                   </button>
                 )
               ))}
+              
+              {/* Mobile Authentication Section */}
+              <div className="border-t border-border pt-3 mt-3">
+                {isAuthenticated ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 px-3 py-2">
+                      <User size={16} className="text-primary" />
+                      <span className="text-foreground font-medium">{user?.username}</span>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      disabled={isLoggingOut}
+                      className="w-full flex items-center space-x-2 mx-3"
+                      style={{ width: 'calc(100% - 1.5rem)' }}
+                    >
+                      <LogOut size={16} />
+                      <span>{isLoggingOut ? "로그아웃..." : "로그아웃"}</span>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-2 px-3">
+                    <Link href="/login">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        로그인
+                      </Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        className="w-full bg-primary hover:bg-primary/90"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        회원가입
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
