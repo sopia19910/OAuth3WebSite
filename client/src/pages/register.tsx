@@ -15,9 +15,13 @@ import { UserPlus, Shield } from "lucide-react";
 import Navbar from "@/components/navbar";
 import { z } from "zod";
 
-// Extended schema with password confirmation
-const registerFormSchema = insertUserSchema.extend({
+// Extended schema with password confirmation - excluding username and company from form
+const registerFormSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -46,9 +50,15 @@ export default function Register() {
       const { confirmPassword, ...registerData } = data;
       // Auto-generate username from email
       const username = registerData.email.split('@')[0];
+      // Ensure company field is not sent if not in form
+      const finalData = {
+        ...registerData,
+        username,
+        company: undefined
+      };
       return apiRequest("/api/auth/register", {
         method: "POST",
-        body: JSON.stringify({ ...registerData, username }),
+        body: JSON.stringify(finalData),
       });
     },
     onSuccess: () => {
@@ -71,6 +81,8 @@ export default function Register() {
   });
 
   const onSubmit = (data: RegisterFormData) => {
+    console.log("Submitting registration form:", data);
+    console.log("Form errors:", form.formState.errors);
     registerMutation.mutate(data);
   };
 
