@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import session from "express-session";
 import { storage } from "./storage";
 import { 
   insertContactSchema, 
@@ -8,7 +9,7 @@ import {
   insertApiKeySchema,
   insertTransferSchema
 } from "@shared/schema";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { getOAuth2Client, requireAuth, generateSecureCircuitInput, generateSecureZKProof } from "./auth";
 import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
@@ -18,20 +19,18 @@ import { sendContactEmail } from "./email";
 // Contract addresses are now stored in database per chain
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
-
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+  // Configure session middleware
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production' && !process.env.GOOGLE_REDIRECT_URI?.includes('localhost'),
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax'
     }
-  });
+  }));
   // Contact form submission endpoint
   app.post("/api/contact", async (req, res) => {
     try {
@@ -477,7 +476,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate ZK Proof
-  app.post('/api/zkp/generate', isAuthenticated, async (req: any, res) => {
+  app.post('/api/zkp/generate', requireAuth, async (req, res) => {
     try {
       if (!req.session.zkpData) {
         return res.status(400).json({
@@ -520,7 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Token Management APIs
-  app.get('/api/tokens', isAuthenticated, async (req: any, res) => {
+  app.get('/api/tokens', requireAuth, async (req, res) => {
     try {
       const { chainId } = req.query;
       if (!chainId) {
@@ -547,10 +546,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/tokens', isAuthenticated, async (req: any, res) => {
+  app.post('/api/tokens', requireAuth, async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
-      if (!userId) {
+      const userEmail = req.session.user?.email;
+      if (!userEmail) {
         return res.status(401).json({
           success: false,
           error: 'Unauthorized'
@@ -585,10 +584,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/tokens/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/tokens/:id', requireAuth, async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
-      if (!userId) {
+      const userEmail = req.session.user?.email;
+      if (!userEmail) {
         return res.status(401).json({
           success: false,
           error: 'Unauthorized'
@@ -760,7 +759,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API Management Routes
 
   // Developer Application Routes
-  app.get('/api/projects', isAuthenticated, async (req: any, res) => {
+  app.get('/api/projects', async (req, res) => {
     try {
       const projects = await storage.getProjects();
       res.json(projects);
@@ -770,19 +769,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/projects', isAuthenticated, async (req: any, res) => {
+  app.post('/api/projects', async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const validatedData = insertProjectSchema.parse({
-        ...req.body,
-        ownerId: userId
-      });
+      const validatedData = insertProjectSchema.parse(req.body);
       const project = await storage.createProject(validatedData);
       
       // Create audit log
       await storage.createAuditLog({
         action: 'project.created',
-        userId: userId,
+        userId: project.id,
         metadata: { projectName: project.name }
       });
       
@@ -797,7 +792,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/projects/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/projects/:id', async (req, res) => {
     try {
       const project = await storage.getProject(req.params.id);
       if (!project) {
@@ -810,7 +805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/projects/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/projects/:id', async (req, res) => {
     try {
       const project = await storage.updateProject(req.params.id, req.body);
       if (!project) {
@@ -831,7 +826,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/projects/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/projects/:id', async (req, res) => {
     try {
       const success = await storage.deleteProject(req.params.id);
       if (!success) {

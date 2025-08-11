@@ -1,28 +1,12 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal, uuid, varchar, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 
-// Session storage table for Replit Auth
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
-
-// User storage table for Replit Auth
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
 });
 
 export const contacts = pgTable("contacts", {
@@ -65,7 +49,7 @@ export const projects = pgTable("projects", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
-  ownerId: varchar("owner_id").notNull(), // user ID from users table
+  owner: text("owner").notNull(), // user email or identifier
   status: text("status").notNull().default("active"), // active, suspended, deleted
   purpose: text("purpose").notNull(), // web, mobile, server, other
   callbackDomains: jsonb("callback_domains").$type<string[]>().default([]),
@@ -157,16 +141,10 @@ export const riskRules = pgTable("risk_rules", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Replit Auth user types
 export const insertUserSchema = createInsertSchema(users).pick({
-  id: true,
-  email: true,
-  firstName: true,
-  lastName: true,
-  profileImageUrl: true,
+  username: true,
+  password: true,
 });
-
-export type UpsertUser = typeof users.$inferInsert;
 
 export const insertContactSchema = createInsertSchema(contacts).pick({
   firstName: true,
@@ -219,7 +197,7 @@ export const insertChainSchema = createInsertSchema(chains).pick({
 export const insertProjectSchema = createInsertSchema(projects).pick({
   name: true,
   description: true,
-  ownerId: true,
+  owner: true,
   purpose: true,
   callbackDomains: true,
   ipWhitelist: true,
@@ -232,7 +210,7 @@ export const insertProjectSchema = createInsertSchema(projects).pick({
   webhookUrl: true,
 }).extend({
   name: z.string().min(2, "Project name must be at least 2 characters").max(50, "Project name too long"),
-  ownerId: z.string().min(1, "Owner ID required"),
+  owner: z.string().email("Valid email required"),
   purpose: z.enum(["web", "mobile", "server", "other"]),
   defaultChainId: z.number().positive("Chain ID must be positive"),
   callbackDomains: z.array(z.string().url()).optional().default([]),
@@ -276,18 +254,10 @@ export const projectsRelations = relations(projects, ({ many, one }) => ({
   apiKeys: many(apiKeys),
   transfers: many(transfers),
   usageMetrics: many(usageMetrics),
-  owner: one(users, {
-    fields: [projects.ownerId],
-    references: [users.id],
-  }),
   defaultChain: one(chains, {
     fields: [projects.defaultChainId],
     references: [chains.chainId],
   }),
-}));
-
-export const usersRelations = relations(users, ({ many }) => ({
-  projects: many(projects),
 }));
 
 export const apiKeysRelations = relations(apiKeys, ({ one, many }) => ({

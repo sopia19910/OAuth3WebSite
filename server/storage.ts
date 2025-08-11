@@ -9,7 +9,7 @@ import {
   usageMetrics, 
   auditLogs,
   type User, 
-  type UpsertUser, 
+  type InsertUser, 
   type Contact, 
   type InsertContact, 
   type Token, 
@@ -30,9 +30,10 @@ import {
 // you might need
 
 export interface IStorage {
-  // User management (Replit Auth)
-  getUser(id: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
+  // User management
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
   
   // Contact management
   createContact(contact: InsertContact): Promise<Contact>;
@@ -80,7 +81,7 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+  private users: Map<number, User>;
   private tokens: Map<number, Token>;
   private chains: Map<number, Chain>;
   currentId: number;
@@ -92,18 +93,19 @@ export class MemStorage implements IStorage {
     this.currentId = 1;
   }
 
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const id = userData.id || `user_${this.currentId++}`;
-    const user: User = { 
-      ...userData, 
-      id,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.username === username,
+    );
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = this.currentId++;
+    const user: User = { ...insertUser, id };
     this.users.set(id, user);
     return user;
   }
@@ -192,7 +194,7 @@ export class MemStorage implements IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const { db } = await import("./db");
     const { users } = await import("@shared/schema");
     const { eq } = await import("drizzle-orm");
@@ -201,20 +203,22 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
     const { db } = await import("./db");
     const { users } = await import("@shared/schema");
     
     const [user] = await db
       .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
+      .values(insertUser)
       .returning();
     return user;
   }

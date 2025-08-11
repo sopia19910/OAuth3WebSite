@@ -1,144 +1,24 @@
-import { useAuth } from "@/hooks/useAuth";
+import Navbar from "@/components/navbar";
+import HeroSection from "@/components/hero-section";
+import Footer from "@/components/footer";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { 
-  User, 
-  Key, 
-  Settings,
-  FileText,
-  LogOut,
-  Plus,
-  Activity
-} from "lucide-react";
+  ShieldCheckIcon, 
+  KeyIcon, 
+  GlobeAltIcon,
+  UsersIcon,
+  CogIcon,
+  BuildingOfficeIcon,
+  ArrowRightIcon
+} from "@heroicons/react/24/outline";
 
 export default function Home() {
-  const { user } = useAuth();
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-950 via-blue-950 to-indigo-950">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between p-6 backdrop-blur-sm bg-white/5 border-b border-white/10">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-lg"></div>
-          <span className="text-2xl font-bold text-white">OAuth 3</span>
-        </div>
-        <div className="flex items-center space-x-4">
-          <span className="text-white">Welcome, {user?.firstName || user?.email || 'User'}</span>
-          <Button 
-            onClick={() => window.location.href = '/api/logout'}
-            variant="ghost" 
-            className="text-white hover:bg-white/10"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
-      </nav>
-
-      <div className="container mx-auto px-6 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
-          <p className="text-gray-300">Manage your OAuth 3 applications and API keys</p>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Link href="/developers/apply">
-            <Card className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
-              <CardHeader className="text-center">
-                <Plus className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                <CardTitle className="text-white text-sm">New Project</CardTitle>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          <Link href="/admin/api">
-            <Card className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
-              <CardHeader className="text-center">
-                <Key className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
-                <CardTitle className="text-white text-sm">API Keys</CardTitle>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          <Link href="/dashboard">
-            <Card className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
-              <CardHeader className="text-center">
-                <Activity className="w-8 h-8 text-indigo-400 mx-auto mb-2" />
-                <CardTitle className="text-white text-sm">Analytics</CardTitle>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
-            <CardHeader className="text-center">
-              <Settings className="w-8 h-8 text-green-400 mx-auto mb-2" />
-              <CardTitle className="text-white text-sm">Settings</CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="grid lg:grid-cols-2 gap-8">
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <FileText className="w-5 h-5 mr-2" />
-                Recent Projects
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                  <div>
-                    <p className="text-white font-medium">My Web App</p>
-                    <p className="text-gray-400 text-sm">Created 2 days ago</p>
-                  </div>
-                  <Badge className="bg-green-500/20 text-green-300 border-green-500/50">Active</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                  <div>
-                    <p className="text-white font-medium">Mobile App</p>
-                    <p className="text-gray-400 text-sm">Created 1 week ago</p>
-                  </div>
-                  <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/50">Pending</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/5 backdrop-blur-sm border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <User className="w-5 h-5 mr-2" />
-                Account Info
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-gray-400 text-sm">Email</p>
-                  <p className="text-white">{user?.email || 'Not provided'}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Name</p>
-                  <p className="text-white">{user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Not provided'}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Plan</p>
-                  <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/50">Developer</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
-}
+    <div className="min-h-screen">
+      <Navbar />
+      <HeroSection />
       {/* What is OAuth 3 */}
       <section className="py-16 relative overflow-hidden">
         <div className="absolute inset-0 tech-grid opacity-10" />
