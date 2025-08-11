@@ -105,7 +105,9 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight clean-title">
-              <span className="clean-logo">OAuth 3</span><br />
+              <span className="inline-block px-4 py-2 mb-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
+                <span className="clean-logo">OAuth 3</span>
+              </span><br />
               The Future of{" "}
               <span className="text-primary">Integrated Authentication</span>
             </h1>
