@@ -377,8 +377,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         googleId: payload.sub
       };
 
+      console.log('✅ Google OAuth successful!');
+      console.log('📧 User logged in:', email);
+
+      // Redirect back to dashboard after successful login
+      res.redirect('/dashboard');
+
+    } catch (error) {
+      console.error('❌ OAuth callback error:', error);
+      res.redirect('/personalservice?oauth=error&message=' + encodeURIComponent('Authentication failed'));
+    }
+  });
+
+  // OAuth 3 authentication endpoint - separate from regular Google login
+  app.post('/api/auth/oauth3/generate', async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Please log in first'
+        });
+      }
+
+      const email = req.session.user.email;
+      const emailDomain = email.split('@')[1];
+
+      console.log('🔐 Generating OAuth 3 ZK circuit input...');
+      console.log('📧 Email:', email);
+      console.log('🌐 Domain:', emailDomain);
+
       // Generate secure circuit input for ZKP
-      const circuitInput = await generateSecureCircuitInput(email, emailDomain, tokens.id_token!);
+      const circuitInput = await generateSecureCircuitInput(email, emailDomain, '');
 
       // Save input file for proof generation
       const sanitizedEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
@@ -394,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       fs.writeFileSync(inputPath, JSON.stringify(circuitInput, null, 2));
 
-      console.log('✅ OAuth successful!');
+      console.log('✅ OAuth 3 circuit input generated!');
       console.log('💾 ZK input saved to:', inputPath);
 
       // Store ZKP data in session for later use
@@ -405,12 +434,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: circuitInput.timestamp
       };
 
-      // Redirect back to personal service page
-      res.redirect(`/personalservice?oauth=success&email=${encodeURIComponent(email)}&domain=${encodeURIComponent(emailDomain)}`);
+      res.json({
+        success: true,
+        message: 'OAuth 3 authentication prepared',
+        email: email,
+        domain: emailDomain
+      });
 
     } catch (error) {
-      console.error('❌ OAuth callback error:', error);
-      res.redirect('/personalservice?oauth=error&message=' + encodeURIComponent('Authentication failed'));
+      console.error('❌ OAuth 3 generation error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to generate OAuth 3 authentication'
+      });
     }
   });
 
