@@ -39,15 +39,15 @@ export default function Login() {
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       
       toast({
-        title: "로그인 성공",
-        description: "OAuth3 플랫폼에 오신 것을 환영합니다!",
+        title: "Login Successful",
+        description: "Welcome to the OAuth3 platform!",
       });
       setLocation("/");
     },
     onError: (error: Error) => {
       toast({
-        title: "로그인 실패",
-        description: error.message || "이메일 또는 비밀번호를 확인해주세요.",
+        title: "Login Failed",
+        description: error.message || "Please check your email and password.",
         variant: "destructive",
       });
     },

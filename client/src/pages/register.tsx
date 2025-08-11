@@ -66,15 +66,15 @@ export default function Register() {
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       
       toast({
-        title: "회원가입 성공",
-        description: "OAuth3 계정이 성공적으로 생성되었습니다. 로그인해주세요.",
+        title: "Registration Successful",
+        description: "Your OAuth3 account has been created successfully. Please sign in.",
       });
       setLocation("/login");
     },
     onError: (error: Error) => {
       toast({
-        title: "회원가입 실패",
-        description: error.message || "회원가입 중 오류가 발생했습니다.",
+        title: "Registration Failed",
+        description: error.message || "An error occurred during registration.",
         variant: "destructive",
       });
     },

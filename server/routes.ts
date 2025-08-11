@@ -58,7 +58,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existingUserByEmail) {
         return res.status(400).json({
           success: false,
-          message: "이미 사용 중인 이메일입니다."
+          message: "Email is already in use."
         });
       }
 
@@ -66,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existingUserByUsername) {
         return res.status(400).json({
           success: false,
-          message: "이미 사용 중인 사용자명입니다."
+          message: "Username is already taken."
         });
       }
 
@@ -81,7 +81,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         success: true,
-        message: "회원가입이 완료되었습니다.",
+        message: "Account created successfully.",
         user: {
           id: user.id,
           username: user.username,
@@ -94,13 +94,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof Error && 'issues' in error) {
         res.status(400).json({
           success: false,
-          message: "입력 정보를 확인해주세요.",
+          message: "Please check your input information.",
           errors: (error as any).issues
         });
       } else {
         res.status(500).json({
           success: false,
-          message: "회원가입 중 오류가 발생했습니다."
+          message: "An error occurred during registration."
         });
       }
     }
@@ -115,7 +115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user) {
         return res.status(401).json({
           success: false,
-          message: "이메일 또는 비밀번호가 올바르지 않습니다."
+          message: "Invalid email or password."
         });
       }
 
@@ -124,7 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!isValidPassword) {
         return res.status(401).json({
           success: false,
-          message: "이메일 또는 비밀번호가 올바르지 않습니다."
+          message: "Invalid email or password."
         });
       }
 
@@ -139,7 +139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         success: true,
-        message: "로그인 성공",
+        message: "Login successful",
         user: {
           id: user.id,
           username: user.username,
@@ -153,13 +153,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof Error && 'issues' in error) {
         res.status(400).json({
           success: false,
-          message: "입력 정보를 확인해주세요.",
+          message: "Please check your input information.",
           errors: (error as any).issues
         });
       } else {
         res.status(500).json({
           success: false,
-          message: "로그인 중 오류가 발생했습니다."
+          message: "An error occurred during login."
         });
       }
     }
@@ -170,12 +170,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (err) {
         return res.status(500).json({
           success: false,
-          message: "로그아웃 중 오류가 발생했습니다."
+          message: "An error occurred during logout."
         });
       }
       res.json({
         success: true,
-        message: "로그아웃되었습니다."
+        message: "Logged out successfully."
       });
     });
   });
@@ -184,7 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.session.user) {
       return res.status(401).json({
         success: false,
-        message: "로그인이 필요합니다."
+        message: "Login required."
       });
     }
 
