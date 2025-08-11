@@ -11,13 +11,25 @@ export default function Navbar() {
   const isMobile = useIsMobile();
   const { user, isAuthenticated, logout, isLoggingOut } = useAuth();
 
-  const navItems = [
+  const publicNavItems = [
     { label: "About OAuth 3", href: "/about", isRoute: true },
     { label: "Technology", href: "/technology", isRoute: true },
     { label: "Services", href: "/services", isRoute: true },
     { label: "Docs", href: "/resources", isRoute: true },
     { label: "Contact Us", href: "/contact", isRoute: true },
   ];
+
+  const authenticatedNavItems = [
+    { label: "Dashboard", href: "/", isRoute: true },
+    { label: "API Application", href: "/api-application", isRoute: true },
+    { label: "About OAuth 3", href: "/about", isRoute: true },
+    { label: "Technology", href: "/technology", isRoute: true },
+    { label: "Services", href: "/services", isRoute: true },
+    { label: "Docs", href: "/resources", isRoute: true },
+    { label: "Contact Us", href: "/contact", isRoute: true },
+  ];
+
+  const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;
 
   const handleNavClick = (href: string, isRoute: boolean) => {
     if (isRoute) {

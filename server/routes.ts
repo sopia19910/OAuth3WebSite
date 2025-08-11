@@ -9,7 +9,8 @@ import {
   insertApiKeySchema,
   insertTransferSchema,
   insertUserSchema,
-  loginUserSchema
+  loginUserSchema,
+  insertApiApplicationSchema
 } from "@shared/schema";
 import { getOAuth2Client, requireAuth, generateSecureCircuitInput, generateSecureZKProof } from "./auth";
 import { ethers } from "ethers";
@@ -233,6 +234,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(500).json({
           success: false,
           message: "An error occurred while processing your request"
+        });
+      }
+    }
+  });
+
+  // API Applications endpoints
+  app.get("/api/applications", async (req, res) => {
+    if (!req.session.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required"
+      });
+    }
+
+    try {
+      const applications = await storage.getApiApplications(req.session.user.id);
+      res.json(applications);
+    } catch (error) {
+      console.error("Error fetching API applications:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch applications"
+      });
+    }
+  });
+
+  app.post("/api/applications", async (req, res) => {
+    if (!req.session.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required"
+      });
+    }
+
+    try {
+      const validatedData = insertApiApplicationSchema.parse(req.body);
+      
+      const application = await storage.createApiApplication({
+        ...validatedData,
+        userId: req.session.user.id
+      });
+
+      res.json({
+        success: true,
+        message: "Application submitted successfully",
+        application
+      });
+    } catch (error) {
+      console.error("Error creating API application:", error);
+      
+      if (error instanceof Error && 'issues' in error) {
+        res.status(400).json({
+          success: false,
+          message: "Please check your input data",
+          errors: (error as any).issues
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "Failed to submit application"
         });
       }
     }

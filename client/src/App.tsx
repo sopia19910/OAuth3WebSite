@@ -16,6 +16,7 @@ import DevelopersApply from "@/pages/developers-apply";
 import AdminApi from "@/pages/admin-api";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
+import ApiApplication from "@/pages/api-application";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/developers/apply" component={DevelopersApply} />
       <Route path="/admin/api" component={AdminApi} />
+      <Route path="/api-application" component={ApiApplication} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route component={NotFound} />

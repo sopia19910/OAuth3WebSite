@@ -149,6 +149,24 @@ export const riskRules = pgTable("risk_rules", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// API Applications Table
+export const apiApplications = pgTable("api_applications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: integer("user_id").notNull(),
+  projectName: text("project_name").notNull(),
+  projectDescription: text("project_description").notNull(),
+  projectType: text("project_type").notNull(), // web, mobile, desktop, server, other
+  expectedUsage: text("expected_usage").notNull(), // low, medium, high
+  website: text("website"),
+  additionalInfo: text("additional_info"),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected
+  apiKey: text("api_key"), // generated when approved
+  reviewedBy: integer("reviewed_by"), // admin user id
+  reviewNotes: text("review_notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
@@ -325,6 +343,29 @@ export type Token = typeof tokens.$inferSelect;
 export type InsertChain = z.infer<typeof insertChainSchema>;
 export type Chain = typeof chains.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+export const insertApiApplicationSchema = createInsertSchema(apiApplications).pick({
+  projectName: true,
+  projectDescription: true,
+  projectType: true,
+  expectedUsage: true,
+  website: true,
+  additionalInfo: true,
+}).extend({
+  projectName: z.string().min(1, "Project name is required").max(100, "Project name too long"),
+  projectDescription: z.string().min(10, "Description must be at least 10 characters").max(500, "Description too long"),
+  projectType: z.enum(["web", "mobile", "desktop", "server", "other"], {
+    required_error: "Please select a project type",
+  }),
+  expectedUsage: z.enum(["low", "medium", "high"], {
+    required_error: "Please select expected usage",
+  }),
+  website: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  additionalInfo: z.string().max(1000, "Additional info too long").optional(),
+});
+
+export type InsertApiApplication = z.infer<typeof insertApiApplicationSchema>;
+export type ApiApplication = typeof apiApplications.$inferSelect;
 export type Project = typeof projects.$inferSelect;
 export type InsertApiKey = z.infer<typeof insertApiKeySchema>;
 export type ApiKey = typeof apiKeys.$inferSelect;

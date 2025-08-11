@@ -8,6 +8,7 @@ import {
   transfers, 
   usageMetrics, 
   auditLogs,
+  apiApplications,
   type User, 
   type InsertUser, 
   type LoginUser,
@@ -24,7 +25,9 @@ import {
   type Transfer,
   type InsertTransfer,
   type UsageMetric,
-  type AuditLog
+  type AuditLog,
+  type ApiApplication,
+  type InsertApiApplication
 } from "@shared/schema";
 
 // modify the interface with any CRUD methods
@@ -80,6 +83,11 @@ export interface IStorage {
   // Audit logs
   getAuditLogs(timeRange?: string): Promise<AuditLog[]>;
   createAuditLog(log: Omit<AuditLog, 'id' | 'createdAt'>): Promise<AuditLog>;
+  
+  // API Applications
+  getApiApplications(userId: number): Promise<ApiApplication[]>;
+  createApiApplication(application: InsertApiApplication & { userId: number }): Promise<ApiApplication>;
+  updateApiApplication(id: string, application: Partial<ApiApplication>): Promise<ApiApplication | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -624,6 +632,41 @@ export class DatabaseStorage implements IStorage {
       .values(insertLog)
       .returning();
     return log;
+  }
+
+  // API Application methods
+  async getApiApplications(userId: number): Promise<ApiApplication[]> {
+    const { db } = await import("./db");
+    const { apiApplications } = await import("@shared/schema");
+    const { eq, desc } = await import("drizzle-orm");
+    
+    return await db.select().from(apiApplications)
+      .where(eq(apiApplications.userId, userId))
+      .orderBy(desc(apiApplications.createdAt));
+  }
+
+  async createApiApplication(insertApplication: InsertApiApplication & { userId: number }): Promise<ApiApplication> {
+    const { db } = await import("./db");
+    const { apiApplications } = await import("@shared/schema");
+    
+    const [application] = await db
+      .insert(apiApplications)
+      .values(insertApplication)
+      .returning();
+    return application;
+  }
+
+  async updateApiApplication(id: string, updateData: Partial<ApiApplication>): Promise<ApiApplication | undefined> {
+    const { db } = await import("./db");
+    const { apiApplications } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [application] = await db
+      .update(apiApplications)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(apiApplications.id, id))
+      .returning();
+    return application || undefined;
   }
 }
 
