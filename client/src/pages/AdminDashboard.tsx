@@ -1,0 +1,440 @@
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import Navbar from "@/components/navbar";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  UserIcon,
+  KeyIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  NoSymbolIcon,
+  ShieldCheckIcon,
+  UsersIcon,
+  ClockIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/outline";
+import { format } from "date-fns";
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  isBlocked?: boolean;
+  isVerified?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ApiApplication {
+  id: string;
+  name: string;
+  owner: string;
+  selectedPlan: string;
+  approvalStatus: string;
+  purpose: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export default function AdminDashboard() {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const { user, isLoading: authLoading } = useAuth();
+  const [activeTab, setActiveTab] = useState("users");
+  
+  console.log('AdminDashboard: Rendered', { user, authLoading, isAdmin: user?.isAdmin });
+  
+  // 관리자 권한 확인
+  useEffect(() => {
+    console.log('AdminDashboard: Auth check', { authLoading, user, isAdmin: user?.isAdmin });
+    if (!authLoading && (!user || !user.isAdmin)) {
+      console.log('AdminDashboard: Not admin, redirecting to dashboard');
+      toast({
+        title: "접근 권한 없음",
+        description: "관리자 권한이 필요합니다.",
+        variant: "destructive",
+      });
+      setLocation("/dashboard");
+    }
+  }, [user, authLoading, setLocation, toast]);
+
+  // 사용자 목록 조회
+  const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = useQuery<User[]>({
+    queryKey: ["admin", "users"],
+    queryFn: async () => {
+      const response = await apiRequest("/api/admin/users");
+      return response.users || [];
+    },
+    enabled: !!user?.isAdmin,
+  });
+
+  // API 신청 목록 조회
+  const { data: applications = [], isLoading: appsLoading, refetch: refetchApplications } = useQuery<ApiApplication[]>({
+    queryKey: ["admin", "applications"],
+    queryFn: async () => {
+      const response = await apiRequest("/api/admin/applications");
+      return response.applications || [];
+    },
+    enabled: !!user?.isAdmin,
+  });
+
+  // 사용자 차단/차단 해제
+  const blockUserMutation = useMutation({
+    mutationFn: async ({ userId, block }: { userId: number; block: boolean }) => {
+      return apiRequest(`/api/admin/users/${userId}/block`, {
+        method: "POST",
+        body: JSON.stringify({ block }),
+      });
+    },
+    onSuccess: (_, variables) => {
+      toast({
+        title: variables.block ? "User Blocked" : "User Unblocked",
+        description: variables.block 
+          ? "User has been blocked successfully." 
+          : "User has been unblocked successfully.",
+      });
+      refetchUsers();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // API 신청 승인/거부
+  const approveApplicationMutation = useMutation({
+    mutationFn: async ({ applicationId, status }: { applicationId: string; status: string }) => {
+      return apiRequest(`/api/admin/applications/${applicationId}/approve`, {
+        method: "POST",
+        body: JSON.stringify({ status }),
+      });
+    },
+    onSuccess: (_, variables) => {
+      toast({
+        title: variables.status === "approved" ? "Approval Complete" : "Rejection Complete",
+        description: variables.status === "approved" 
+          ? "API application has been approved successfully." 
+          : "API application has been rejected.",
+      });
+      refetchApplications();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user?.isAdmin) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="container mx-auto px-4 py-8">
+        {/* 헤더 */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/dashboard")}
+              >
+                <ArrowLeftIcon className="h-5 w-5" />
+              </Button>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-cyan-500 bg-clip-text text-transparent">
+                Admin Dashboard
+              </h1>
+            </div>
+            <Badge variant="outline" className="text-purple-500 border-purple-500">
+              <ShieldCheckIcon className="h-4 w-4 mr-1" />
+              Admin
+            </Badge>
+          </div>
+          <p className="text-muted-foreground">Manage system users and API applications.</p>
+        </div>
+
+        {/* Main Content with Sidebar */}
+        <div className="flex gap-6">
+          {/* Left Sidebar Menu */}
+          <div className="w-64 min-h-[600px]">
+            <Card className="bg-card/50 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <nav className="space-y-2">
+                  <button
+                    onClick={() => setActiveTab("users")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                      activeTab === "users" 
+                        ? "bg-gradient-to-r from-purple-500/10 to-cyan-500/10 text-purple-500 border border-purple-500/20" 
+                        : "hover:bg-accent/50 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <UsersIcon className="h-5 w-5" />
+                    <span className="font-medium">User Management</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("applications")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                      activeTab === "applications" 
+                        ? "bg-gradient-to-r from-purple-500/10 to-cyan-500/10 text-purple-500 border border-purple-500/20" 
+                        : "hover:bg-accent/50 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <KeyIcon className="h-5 w-5" />
+                    <span className="font-medium">API Management</span>
+                  </button>
+                </nav>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Content Area */}
+          <div className="flex-1">
+            {/* User Management Content */}
+            {activeTab === "users" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>User List</CardTitle>
+                  <CardDescription>Manage registered users and block access.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                {usersLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : users.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No registered users.
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Username</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Join Date</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <UserIcon className="h-4 w-4 text-muted-foreground" />
+                              {user.username}
+                            </div>
+                          </TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              {user.isVerified && (
+                                <Badge variant="outline" className="text-green-500 border-green-500">
+                                  <CheckCircleIcon className="h-3 w-3 mr-1" />
+                                  Verified
+                                </Badge>
+                              )}
+                              {user.isBlocked && (
+                                <Badge variant="outline" className="text-red-500 border-red-500">
+                                  <NoSymbolIcon className="h-3 w-3 mr-1" />
+                                  Blocked
+                                </Badge>
+                              )}
+                              {!user.isVerified && !user.isBlocked && (
+                                <Badge variant="outline" className="text-gray-500 border-gray-500">
+                                  Normal
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(user.createdAt), "yyyy-MM-dd")}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              size="sm"
+                              variant={user.isBlocked ? "default" : "destructive"}
+                              onClick={() => blockUserMutation.mutate({ 
+                                userId: user.id, 
+                                block: !user.isBlocked 
+                              })}
+                              disabled={blockUserMutation.isPending}
+                            >
+                              {user.isBlocked ? (
+                                <>
+                                  <CheckCircleIcon className="h-4 w-4 mr-1" />
+                                  Unblock
+                                </>
+                              ) : (
+                                <>
+                                  <NoSymbolIcon className="h-4 w-4 mr-1" />
+                                  Block
+                                </>
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+            )}
+
+            {/* API Management Content */}
+            {activeTab === "applications" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>API Application List</CardTitle>
+                  <CardDescription>Review and approve API usage applications.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                {appsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : applications.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No API applications.
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Project Name</TableHead>
+                        <TableHead>Applicant</TableHead>
+                        <TableHead>Plan</TableHead>
+                        <TableHead>Purpose</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Application Date</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {applications.map((app) => (
+                        <TableRow key={app.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <KeyIcon className="h-4 w-4 text-muted-foreground" />
+                              {app.name}
+                            </div>
+                          </TableCell>
+                          <TableCell>{app.owner}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-purple-500 border-purple-500">
+                              {app.selectedPlan || "Free"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{app.purpose}</TableCell>
+                          <TableCell>
+                            {app.approvalStatus === "pending" && (
+                              <Badge variant="outline" className="text-yellow-500 border-yellow-500">
+                                <ClockIcon className="h-3 w-3 mr-1" />
+                                Pending
+                              </Badge>
+                            )}
+                            {app.approvalStatus === "approved" && (
+                              <Badge variant="outline" className="text-green-500 border-green-500">
+                                <CheckCircleIcon className="h-3 w-3 mr-1" />
+                                Approved
+                              </Badge>
+                            )}
+                            {app.approvalStatus === "rejected" && (
+                              <Badge variant="outline" className="text-red-500 border-red-500">
+                                <XCircleIcon className="h-3 w-3 mr-1" />
+                                Rejected
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(app.createdAt), "yyyy-MM-dd")}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {app.approvalStatus === "pending" && (
+                              <div className="flex gap-2 justify-end">
+                                <Button
+                                  size="sm"
+                                  variant="default"
+                                  onClick={() => approveApplicationMutation.mutate({ 
+                                    applicationId: app.id, 
+                                    status: "approved" 
+                                  })}
+                                  disabled={approveApplicationMutation.isPending}
+                                >
+                                  <CheckCircleIcon className="h-4 w-4 mr-1" />
+                                  Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => approveApplicationMutation.mutate({ 
+                                    applicationId: app.id, 
+                                    status: "rejected" 
+                                  })}
+                                  disabled={approveApplicationMutation.isPending}
+                                >
+                                  <XCircleIcon className="h-4 w-4 mr-1" />
+                                  Reject
+                                </Button>
+                              </div>
+                            )}
+                            {app.approvalStatus === "approved" && (
+                              <Badge variant="outline" className="text-green-500 border-green-500">
+                                Approved
+                              </Badge>
+                            )}
+                            {app.approvalStatus === "rejected" && (
+                              <Badge variant="outline" className="text-red-500 border-red-500">
+                                Rejected
+                              </Badge>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,7 +1,8 @@
 import {useState, useEffect} from "react";
 import {useLocation} from "wouter";
 import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card";
+import {Alert, AlertDescription} from "@/components/ui/alert";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {useToast} from "@/hooks/use-toast";
@@ -31,7 +32,9 @@ import {
 import {SiGoogle} from "react-icons/si";
 import Navbar from "@/components/navbar";
 import QRCode from 'qrcode';
+import { PricingModal } from "@/components/PricingModal";
 import ethereumLogo from "@assets/image_1752985874370.png";
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import {
     getWalletFromStorage,
     getWalletBalance,
@@ -48,11 +51,23 @@ import {
     type ZKAccountInfo,
     type TransferResult
 } from "@/lib/zkAccount";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { insertProjectSchema, type InsertProject, type Chain } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Copy, Eye, EyeOff, RefreshCw, ExternalLink, Code, Zap, Shield } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Dashboard() {
 
     const [, setLocation] = useLocation();
     const {toast} = useToast();
+    const { user, isLoading: authLoading } = useAuth();
     const [activeMenu, setActiveMenu] = useState<string>("overview");
     const [sendAmount, setSendAmount] = useState("");
     const [sendAddress, setSendAddress] = useState("");
@@ -109,6 +124,134 @@ export default function Dashboard() {
     const [chains, setChains] = useState<any[]>([]);
     const [selectedChainId, setSelectedChainId] = useState<string>("");
     const [zkAccountsOnChains, setZkAccountsOnChains] = useState<Record<string, boolean>>({});
+    
+    // API Application state
+    const [apiStep, setApiStep] = useState<"form" | "success">("form");
+    const [projectResult, setProjectResult] = useState<any>(null);
+    const [showApiKey, setShowApiKey] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [createSandbox, setCreateSandbox] = useState(true);
+    const [showPricingModal, setShowPricingModal] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+    
+    // Fetch user's API projects
+    const { data: userProjects, isLoading: projectsLoading } = useQuery({
+        queryKey: ["/api/projects/user"],
+        enabled: activeMenu === "api-application" && !!user,
+        retry: false,
+    });
+    
+    // API Application form
+    const apiForm = useForm<InsertProject>({
+        resolver: zodResolver(insertProjectSchema),
+        defaultValues: {
+            name: "",
+            description: "",
+            owner: "",
+            purpose: "web",
+            callbackDomains: [],
+            ipWhitelist: [],
+            defaultChainId: 1,
+            gasSponsorEnabled: false,
+            gasDailyLimit: "0",
+            dailyTransferLimit: 100,
+            dailyAmountLimit: "1000",
+            allowedChains: [1],
+            webhookUrl: "",
+        },
+    });
+    
+    // API Application mutations
+    const createProjectMutation = useMutation({
+        mutationFn: async (data: InsertProject & { acceptedTerms: boolean; createSandbox: boolean }) => {
+            return await apiRequest("/api/projects", {
+                method: "POST",
+                body: JSON.stringify(data),
+            });
+        },
+        onSuccess: (data) => {
+            setProjectResult(data);
+            setApiStep("success");
+            queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+            toast({
+                title: "Project Created Successfully",
+                description: "Your API key has been generated. Make sure to copy it now!",
+            });
+        },
+        onError: (error) => {
+            toast({
+                title: "Error Creating Project",
+                description: error.message,
+                variant: "destructive",
+            });
+        },
+    });
+
+    const regenerateKeyMutation = useMutation({
+        mutationFn: async (projectId: string) => {
+            return await apiRequest(`/api/projects/${projectId}/regenerate-key`, {
+                method: "POST",
+            });
+        },
+        onSuccess: (data) => {
+            setProjectResult({ ...projectResult, apiKey: data.apiKey });
+            toast({
+                title: "API Key Regenerated",
+                description: "New API key generated successfully",
+            });
+        },
+    });
+
+    const onApiFormSubmit = (data: InsertProject) => {
+        if (!acceptedTerms) {
+            toast({
+                title: "Terms Required",
+                description: "Please accept the terms and conditions",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        // Open pricing modal instead of directly creating project
+        setShowPricingModal(true);
+    };
+
+    const handlePlanSelection = (plan: string) => {
+        setSelectedPlan(plan);
+        setShowPricingModal(false);
+        
+        // Get the form data and submit with selected plan
+        const formData = apiForm.getValues();
+        
+        // Set API calls limit based on plan
+        const apiCallsLimit = plan === 'starter' ? 1000 : plan === 'team' ? 100000 : 500000;
+        
+        createProjectMutation.mutate({
+            ...formData,
+            selectedPlan: plan,
+            apiCallsLimit: apiCallsLimit,
+            acceptedTerms,
+            createSandbox,
+        });
+        
+        // Store the selected plan for future reference
+        localStorage.setItem(`project_${formData.name}_plan`, plan);
+        
+        toast({
+            title: "Plan Selected",
+            description: `You selected the ${plan} plan. Your project will be reviewed by our team.`,
+        });
+    };
+    
+    // Check if admin and redirect
+    useEffect(() => {
+        console.log('Dashboard: Auth check', { authLoading, user, isAdmin: user?.isAdmin });
+        if (!authLoading && user?.isAdmin) {
+            console.log('Dashboard: Redirecting to admin dashboard');
+            setLocation('/admin/dashboard');
+        }
+    }, [user, authLoading, setLocation]);
+
     // Load wallet and account data on component mount
     useEffect(() => {
         // Load chains first, then wallet data
@@ -1419,6 +1562,832 @@ export default function Dashboard() {
                     </div>
                 );
 
+            case "api-application":
+                // Show loading state
+                if (projectsLoading) {
+                    return (
+                        <div className="flex items-center justify-center h-64">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        </div>
+                    );
+                }
+
+                // Check if user has any approved projects
+                const approvedProjects = userProjects?.filter((p: any) => p.approvalStatus === 'approved') || [];
+                const hasApprovedProjects = approvedProjects.length > 0;
+
+                // If user has approved projects, show their usage (override form mode)
+                if (hasApprovedProjects) {
+                    const activeProject = projectResult || approvedProjects[0];
+                    
+                    return (
+                        <div className="space-y-6">
+                            {/* Project selector if multiple projects */}
+                            {approvedProjects.length > 1 && (
+                                <div className="flex items-center gap-4 mb-6">
+                                    <Label>Select Project:</Label>
+                                    <Select 
+                                        value={activeProject?.id} 
+                                        onValueChange={(value) => {
+                                            const selected = approvedProjects.find((p: any) => p.id === value);
+                                            setProjectResult(selected);
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-64">
+                                            <SelectValue placeholder="Select a project" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {approvedProjects.map((project: any) => (
+                                                <SelectItem key={project.id} value={project.id}>
+                                                    {project.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
+                            {/* API Usage Analytics Card */}
+                            <Card className="mb-8">
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <CardTitle className="text-2xl">API Usage Analytics</CardTitle>
+                                            <CardDescription>
+                                                Monitor your API usage and performance metrics for {activeProject?.name}
+                                            </CardDescription>
+                                        </div>
+                                        <Badge variant="outline" className="text-green-600 border-green-600">
+                                            Active
+                                        </Badge>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {/* Usage Summary */}
+                                    <div className="grid gap-4 md:grid-cols-3">
+                                        <Card>
+                                            <CardHeader className="pb-2">
+                                                <CardTitle className="text-sm font-medium">API Calls Today</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="text-2xl font-bold">
+                                                    {activeProject?.apiCallsUsed || 0}
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    of {activeProject?.apiCallsLimit || 100000} daily limit
+                                                </p>
+                                                <Progress 
+                                                    value={(activeProject?.apiCallsUsed || 0) / (activeProject?.apiCallsLimit || 100000) * 100} 
+                                                    className="mt-2"
+                                                />
+                                            </CardContent>
+                                        </Card>
+
+                                        <Card>
+                                            <CardHeader className="pb-2">
+                                                <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="text-2xl font-bold">99.8%</div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Last 7 days
+                                                </p>
+                                                <div className="text-xs text-green-600 mt-1">
+                                                    ↑ 0.3% from last week
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+
+                                        <Card>
+                                            <CardHeader className="pb-2">
+                                                <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="text-2xl font-bold">145ms</div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Last 24 hours
+                                                </p>
+                                                <div className="text-xs text-blue-600 mt-1">
+                                                    ↓ 12ms improvement
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+
+                                    {/* Daily Usage Chart */}
+                                    <div>
+                                        <h3 className="text-sm font-medium mb-4">API Calls Over Time (7 Days)</h3>
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <AreaChart data={[
+                                                { date: 'Mon', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Tue', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Wed', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Thu', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Fri', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Sat', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Sun', calls: 0, success: 0, errors: 0 },
+                                            ]}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="date" />
+                                                <YAxis />
+                                                <Tooltip 
+                                                    contentStyle={{ 
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                                                        border: '1px solid #e5e7eb',
+                                                        borderRadius: '6px',
+                                                        fontSize: '12px'
+                                                    }}
+                                                    wrapperStyle={{ 
+                                                        outline: 'none',
+                                                        zIndex: 100
+                                                    }}
+                                                />
+                                                <Legend />
+                                                <Area 
+                                                    type="monotone" 
+                                                    dataKey="calls" 
+                                                    stackId="1"
+                                                    stroke="#8b5cf6" 
+                                                    fill="#8b5cf6" 
+                                                    fillOpacity={0.3}
+                                                    name="Total Calls"
+                                                />
+                                                <Area 
+                                                    type="monotone" 
+                                                    dataKey="success" 
+                                                    stackId="2"
+                                                    stroke="#10b981" 
+                                                    fill="#10b981" 
+                                                    fillOpacity={0.2}
+                                                    name="Successful"
+                                                />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+
+                                    {/* Endpoint Usage */}
+                                    <div>
+                                        <h3 className="text-sm font-medium mb-4">Most Used Endpoints</h3>
+                                        <ResponsiveContainer width="100%" height={200}>
+                                            <BarChart 
+                                                data={[
+                                                    { endpoint: '/accounts/create', calls: 0 },
+                                                    { endpoint: '/accounts/:address', calls: 0 },
+                                                    { endpoint: '/transfers/send', calls: 0 },
+                                                    { endpoint: '/tokens/balance', calls: 0 },
+                                                    { endpoint: '/auth/verify', calls: 0 },
+                                                ]} 
+                                                layout="horizontal"
+                                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                                                <XAxis type="number" />
+                                                <YAxis dataKey="endpoint" type="category" width={120} />
+                                                <Tooltip 
+                                                    contentStyle={{ 
+                                                        backgroundColor: 'white', 
+                                                        border: '1px solid #e5e7eb',
+                                                        borderRadius: '6px',
+                                                        fontSize: '12px',
+                                                        padding: '8px'
+                                                    }}
+                                                    cursor={false}
+                                                />
+                                                <Bar 
+                                                    dataKey="calls" 
+                                                    fill="#8b5cf6"
+                                                    radius={[0, 4, 4, 0]}
+                                                />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+
+                                    {/* API Key Management */}
+                                    <div className="border-t pt-4">
+                                        <h3 className="text-sm font-medium mb-4">API Key</h3>
+                                        <div className="flex items-center gap-2">
+                                            <code className="flex-1 bg-muted p-2 rounded text-sm font-mono">
+                                                {showApiKey ? activeProject?.apiKey : "••••••••••••••••••••••••••••••••"}
+                                            </code>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => setShowApiKey(!showApiKey)}
+                                            >
+                                                {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => copyToClipboard(activeProject?.apiKey || "", "API Key")}
+                                            >
+                                                <Copy className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {/* Plan Details */}
+                                    <div className="border-t pt-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm font-medium">Current Plan</p>
+                                                <p className="text-2xl font-bold capitalize">
+                                                    {activeProject?.selectedPlan || 'Starter'}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground mt-1">
+                                                    ${activeProject?.selectedPlan === 'team' ? '100' : activeProject?.selectedPlan === 'scale' ? '300' : '3'}/month
+                                                </p>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Button variant="outline" size="sm">
+                                                    Upgrade Plan
+                                                </Button>
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        setApiStep("form");
+                                                        apiForm.reset();
+                                                        setProjectResult(null);
+                                                    }}
+                                                    className="w-full"
+                                                >
+                                                    Create New Project
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* API Documentation */}
+                            <Tabs defaultValue="quickstart" className="w-full">
+                                <TabsList className="grid w-full grid-cols-3">
+                                    <TabsTrigger value="quickstart">Quick Start</TabsTrigger>
+                                    <TabsTrigger value="endpoints">API Endpoints</TabsTrigger>
+                                    <TabsTrigger value="examples">Code Examples</TabsTrigger>
+                                </TabsList>
+
+                                <TabsContent value="quickstart" className="space-y-4">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Getting Started</CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div>
+                                                <h4 className="font-semibold mb-2">1. Authentication</h4>
+                                                <p className="text-sm text-muted-foreground mb-2">
+                                                    Include your API key in the request headers:
+                                                </p>
+                                                <pre className="bg-muted p-3 rounded text-xs overflow-x-auto">
+                                                    {`headers: {
+  'X-API-Key': '${activeProject?.apiKey || 'your-api-key'}',
+  'Content-Type': 'application/json'
+}`}
+                                                </pre>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold mb-2">2. Base URL</h4>
+                                                <p className="text-sm text-muted-foreground mb-2">
+                                                    All API requests should be made to:
+                                                </p>
+                                                <pre className="bg-muted p-3 rounded text-xs">
+                                                    {`https://api.oauth3.io/v1`}
+                                                </pre>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+
+                                <TabsContent value="endpoints" className="space-y-4">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Available Endpoints</CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div className="space-y-3">
+                                                <div className="flex items-start gap-3">
+                                                    <Badge className="mt-1">POST</Badge>
+                                                    <div className="flex-1">
+                                                        <code className="text-sm">/accounts/create</code>
+                                                        <p className="text-xs text-muted-foreground mt-1">
+                                                            Create a new ZK account for a user
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-start gap-3">
+                                                    <Badge className="mt-1">GET</Badge>
+                                                    <div className="flex-1">
+                                                        <code className="text-sm">/accounts/:address</code>
+                                                        <p className="text-xs text-muted-foreground mt-1">
+                                                            Get account details and balance
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-start gap-3">
+                                                    <Badge className="mt-1">POST</Badge>
+                                                    <div className="flex-1">
+                                                        <code className="text-sm">/transfers/send</code>
+                                                        <p className="text-xs text-muted-foreground mt-1">
+                                                            Send tokens from a ZK account
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+
+                                <TabsContent value="examples" className="space-y-4">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Code Examples</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <h4 className="font-semibold mb-2">Create Account</h4>
+                                                    <pre className="bg-muted p-3 rounded text-xs overflow-x-auto">
+                                                        {`const response = await fetch('https://api.oauth3.io/v1/accounts/create', {
+  method: 'POST',
+  headers: {
+    'X-API-Key': '${activeProject?.apiKey || 'your-api-key'}',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    email: 'user@example.com',
+    chainId: 1
+  })
+});
+
+const account = await response.json();`}
+                                                    </pre>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+                            </Tabs>
+                        </div>
+                    );
+                }
+
+                // Show form for new project or if no approved projects
+                return (
+                    <div className="space-y-6">
+                        {apiStep === "form" ? (
+                            <>
+                                {/* Hero Section */}
+                                <div className="text-center mb-8">
+                                    <h1 className="text-4xl font-bold mb-4">OAuth3 Account & Transfer API</h1>
+                                    <p className="text-lg text-muted-foreground">
+                                        Integrate secure account management and token transfers with our powerful API
+                                    </p>
+                                </div>
+
+                                {/* Form */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Create New API Project</CardTitle>
+                                        <CardDescription>
+                                            Fill in the details to get your API key and start building
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <form onSubmit={(e) => {
+                                            e.preventDefault();
+                                            console.log("Form submit event triggered");
+                                            console.log("Form is valid:", apiForm.formState.isValid);
+                                            console.log("Form errors:", apiForm.formState.errors);
+                                            console.log("Form values:", apiForm.getValues());
+                                            apiForm.handleSubmit(onApiFormSubmit)(e);
+                                        }} className="space-y-6">
+                                            <div className="grid gap-6">
+                                                <div>
+                                                    <Label htmlFor="name">Project Name *</Label>
+                                                    <Input
+                                                        id="name"
+                                                        placeholder="e.g., My DeFi App"
+                                                        {...apiForm.register("name")}
+                                                        className="mt-1"
+                                                    />
+                                                    {apiForm.formState.errors.name && (
+                                                        <p className="text-sm text-destructive mt-1">
+                                                            {apiForm.formState.errors.name.message}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <Label htmlFor="description">Description *</Label>
+                                                    <Textarea
+                                                        id="description"
+                                                        placeholder="Describe what your project does..."
+                                                        rows={3}
+                                                        {...apiForm.register("description")}
+                                                        className="mt-1"
+                                                    />
+                                                    {apiForm.formState.errors.description && (
+                                                        <p className="text-sm text-destructive mt-1">
+                                                            {apiForm.formState.errors.description.message}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <Label htmlFor="owner">Owner Email *</Label>
+                                                    <Input
+                                                        id="owner"
+                                                        type="email"
+                                                        placeholder="e.g., admin@example.com"
+                                                        {...apiForm.register("owner")}
+                                                        className="mt-1"
+                                                    />
+                                                    {apiForm.formState.errors.owner && (
+                                                        <p className="text-sm text-destructive mt-1">
+                                                            {apiForm.formState.errors.owner.message}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <Label htmlFor="purpose">Purpose *</Label>
+                                                    <Select
+                                                        value={apiForm.watch("purpose")}
+                                                        onValueChange={(value) => apiForm.setValue("purpose", value as any)}
+                                                    >
+                                                        <SelectTrigger className="mt-1">
+                                                            <SelectValue placeholder="Select purpose" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="web">Web Application</SelectItem>
+                                                            <SelectItem value="mobile">Mobile Application</SelectItem>
+                                                            <SelectItem value="server">Server/API Service</SelectItem>
+                                                            <SelectItem value="other">Other</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+
+                                                <div className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id="createSandbox"
+                                                        checked={createSandbox}
+                                                        onCheckedChange={(checked) => setCreateSandbox(checked as boolean)}
+                                                    />
+                                                    <Label htmlFor="createSandbox" className="cursor-pointer">
+                                                        Create sandbox environment for testing
+                                                    </Label>
+                                                </div>
+
+                                                <div className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id="terms"
+                                                        checked={acceptedTerms}
+                                                        onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                                                    />
+                                                    <Label htmlFor="terms" className="cursor-pointer">
+                                                        I accept the terms and conditions
+                                                    </Label>
+                                                </div>
+                                            </div>
+
+                                            <Button
+                                                type="submit"
+                                                className="w-full"
+                                                disabled={createProjectMutation.isPending}
+                                            >
+                                                {createProjectMutation.isPending ? "Creating Project..." : "Create Project & Get API Key"}
+                                            </Button>
+                                        </form>
+                                    </CardContent>
+                                </Card>
+                            </>
+                        ) : (
+                            <>
+                                <Card className="mb-8">
+                                    <CardHeader>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <CardTitle className="text-2xl">
+                                                    {projectResult?.approvalStatus === 'pending' ? '⏳ Project Pending Approval' : '🎉 Project Approved!'}
+                                                </CardTitle>
+                                                <CardDescription className="mt-2">
+                                                    {projectResult?.approvalStatus === 'pending' 
+                                                        ? 'Your project is under review. You will be notified once it is approved.'
+                                                        : 'Your API key has been generated. Make sure to copy it now - you won\'t be able to see it again!'}
+                                                </CardDescription>
+                                            </div>
+                                            <Badge variant="outline" className={
+                                                projectResult?.approvalStatus === 'pending' 
+                                                    ? "text-yellow-600 border-yellow-600" 
+                                                    : "text-green-600 border-green-600"
+                                            }>
+                                                {projectResult?.approvalStatus === 'pending' ? 'Pending' : 'Approved'}
+                                            </Badge>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="space-y-6">
+                                        <div className="space-y-4">
+                                            <div>
+                                                <Label>Project ID</Label>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <code className="flex-1 bg-muted p-2 rounded text-sm">
+                                                        {projectResult?.id}
+                                                    </code>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => copyToClipboard(projectResult?.id || "", "Project ID")}
+                                                    >
+                                                        <Copy className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <Label>API Key</Label>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <code className="flex-1 bg-muted p-2 rounded text-sm font-mono">
+                                                        {showApiKey ? projectResult?.apiKey : "••••••••••••••••••••••••••••••••"}
+                                                    </code>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => setShowApiKey(!showApiKey)}
+                                                    >
+                                                        {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => copyToClipboard(projectResult?.apiKey || "", "API Key")}
+                                                    >
+                                                        <Copy className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                                <Alert className="mt-2">
+                                                    <AlertDescription>
+                                                        Keep your API key secure and never share it publicly. You can regenerate it if compromised.
+                                                    </AlertDescription>
+                                                </Alert>
+                                            </div>
+
+                                            {createSandbox && (
+                                                <div>
+                                                    <Label>Sandbox API Key</Label>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <code className="flex-1 bg-muted p-2 rounded text-sm font-mono">
+                                                            {projectResult?.sandboxApiKey}
+                                                        </code>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => copyToClipboard(projectResult?.sandboxApiKey || "", "Sandbox API Key")}
+                                                        >
+                                                            <Copy className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => regenerateKeyMutation.mutate(projectResult?.id)}
+                                                disabled={regenerateKeyMutation.isPending}
+                                            >
+                                                <RefreshCw className="h-4 w-4 mr-2" />
+                                                {regenerateKeyMutation.isPending ? "Regenerating..." : "Regenerate Key"}
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => {
+                                                    setApiStep("form");
+                                                    apiForm.reset();
+                                                    setAcceptedTerms(false);
+                                                    setCreateSandbox(true);
+                                                }}
+                                            >
+                                                Create Another Project
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* API Usage Metrics - Only show for approved projects */}
+                                {projectResult?.approvalStatus === 'approved' && (
+                                    <Card className="mb-8">
+                                        <CardHeader>
+                                            <CardTitle>API Usage Analytics</CardTitle>
+                                            <CardDescription>
+                                                Monitor your API usage and performance metrics
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-6">
+                                            {/* Usage Summary */}
+                                            <div className="grid gap-4 md:grid-cols-3">
+                                                <Card>
+                                                    <CardHeader className="pb-2">
+                                                        <CardTitle className="text-sm font-medium">API Calls Used</CardTitle>
+                                                    </CardHeader>
+                                                    <CardContent>
+                                                        <div className="text-2xl font-bold">
+                                                            {projectResult?.apiCallsUsed || 0}
+                                                        </div>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            of {projectResult?.apiCallsLimit || 1000} limit
+                                                        </p>
+                                                        <Progress 
+                                                            value={(projectResult?.apiCallsUsed || 0) / (projectResult?.apiCallsLimit || 1000) * 100} 
+                                                            className="mt-2"
+                                                        />
+                                                    </CardContent>
+                                                </Card>
+
+                                                <Card>
+                                                    <CardHeader className="pb-2">
+                                                        <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+                                                    </CardHeader>
+                                                    <CardContent>
+                                                        <div className="text-2xl font-bold">99.8%</div>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Last 7 days
+                                                        </p>
+                                                    </CardContent>
+                                                </Card>
+
+                                                <Card>
+                                                    <CardHeader className="pb-2">
+                                                        <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+                                                    </CardHeader>
+                                                    <CardContent>
+                                                        <div className="text-2xl font-bold">145ms</div>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Last 24 hours
+                                                        </p>
+                                                    </CardContent>
+                                                </Card>
+                                            </div>
+
+                                            {/* Usage Chart */}
+                                            <div>
+                                                <h3 className="text-sm font-medium mb-4">API Calls Over Time</h3>
+                                                <ResponsiveContainer width="100%" height={300}>
+                                                    <AreaChart data={[
+                                                        { date: 'Mon', calls: 120 },
+                                                        { date: 'Tue', calls: 150 },
+                                                        { date: 'Wed', calls: 180 },
+                                                        { date: 'Thu', calls: 140 },
+                                                        { date: 'Fri', calls: 210 },
+                                                        { date: 'Sat', calls: 95 },
+                                                        { date: 'Sun', calls: 80 },
+                                                    ]}>
+                                                        <CartesianGrid strokeDasharray="3 3" />
+                                                        <XAxis dataKey="date" />
+                                                        <YAxis />
+                                                        <Tooltip />
+                                                        <Area 
+                                                            type="monotone" 
+                                                            dataKey="calls" 
+                                                            stroke="#8b5cf6" 
+                                                            fill="#8b5cf6" 
+                                                            fillOpacity={0.2}
+                                                        />
+                                                    </AreaChart>
+                                                </ResponsiveContainer>
+                                            </div>
+
+                                            {/* Plan Details */}
+                                            <div className="border-t pt-4">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <p className="text-sm font-medium">Current Plan</p>
+                                                        <p className="text-2xl font-bold capitalize">
+                                                            {projectResult?.selectedPlan || 'Starter'}
+                                                        </p>
+                                                    </div>
+                                                    <Button variant="outline" size="sm">
+                                                        Upgrade Plan
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                                <Tabs defaultValue="quickstart" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-3">
+                                        <TabsTrigger value="quickstart">Quick Start</TabsTrigger>
+                                        <TabsTrigger value="endpoints">API Endpoints</TabsTrigger>
+                                        <TabsTrigger value="examples">Code Examples</TabsTrigger>
+                                    </TabsList>
+
+                                    <TabsContent value="quickstart" className="space-y-4">
+                                        <Card>
+                                            <CardHeader>
+                                                <CardTitle>Getting Started</CardTitle>
+                                            </CardHeader>
+                                            <CardContent className="space-y-4">
+                                                <div>
+                                                    <h4 className="font-semibold mb-2">1. Authentication</h4>
+                                                    <p className="text-sm text-muted-foreground mb-2">
+                                                        Include your API key in the request headers:
+                                                    </p>
+                                                    <pre className="bg-muted p-3 rounded text-xs overflow-x-auto">
+                                                        {`headers: {
+  'X-API-Key': 'your-api-key-here',
+  'Content-Type': 'application/json'
+}`}
+                                                    </pre>
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-semibold mb-2">2. Base URL</h4>
+                                                    <p className="text-sm text-muted-foreground mb-2">
+                                                        All API requests should be made to:
+                                                    </p>
+                                                    <pre className="bg-muted p-3 rounded text-xs">
+                                                        {`https://api.oauth3.io/v1`}
+                                                    </pre>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </TabsContent>
+
+                                    <TabsContent value="endpoints" className="space-y-4">
+                                        <Card>
+                                            <CardHeader>
+                                                <CardTitle>Available Endpoints</CardTitle>
+                                            </CardHeader>
+                                            <CardContent className="space-y-4">
+                                                <div className="space-y-3">
+                                                    <div className="flex items-start gap-3">
+                                                        <Badge className="mt-1">POST</Badge>
+                                                        <div className="flex-1">
+                                                            <code className="text-sm">/accounts/create</code>
+                                                            <p className="text-xs text-muted-foreground mt-1">
+                                                                Create a new ZK account for a user
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-start gap-3">
+                                                        <Badge className="mt-1">GET</Badge>
+                                                        <div className="flex-1">
+                                                            <code className="text-sm">/accounts/:address</code>
+                                                            <p className="text-xs text-muted-foreground mt-1">
+                                                                Get account details and balance
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-start gap-3">
+                                                        <Badge className="mt-1">POST</Badge>
+                                                        <div className="flex-1">
+                                                            <code className="text-sm">/transfers/send</code>
+                                                            <p className="text-xs text-muted-foreground mt-1">
+                                                                Send tokens from a ZK account
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </TabsContent>
+
+                                    <TabsContent value="examples" className="space-y-4">
+                                        <Card>
+                                            <CardHeader>
+                                                <CardTitle>Code Examples</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <h4 className="font-semibold mb-2">Create Account</h4>
+                                                        <pre className="bg-muted p-3 rounded text-xs overflow-x-auto">
+                                                            {`const response = await fetch('https://api.oauth3.io/v1/accounts/create', {
+  method: 'POST',
+  headers: {
+    'X-API-Key': 'your-api-key',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    email: 'user@example.com',
+    chainId: 1
+  })
+});
+
+const account = await response.json();`}
+                                                        </pre>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </TabsContent>
+                                </Tabs>
+                            </>
+                        )}
+                    </div>
+                );
+
             default:
                 return null;
         }
@@ -1687,6 +2656,17 @@ export default function Dashboard() {
                             >
                                 Receive
                             </button>
+                            <div className="border-t border-border/50 my-2"></div>
+                            <button
+                                onClick={() => setActiveMenu("api-application")}
+                                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                    activeMenu === "api-application"
+                                        ? "bg-primary/10 text-primary"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                }`}
+                            >
+                                API Application
+                            </button>
                         </nav>
                     </div>
                 </div>
@@ -1776,6 +2756,20 @@ export default function Dashboard() {
                             >
                                 Receive
                             </button>
+                            <div className="border-t border-border/50 my-2"></div>
+                            <button
+                                onClick={() => {
+                                    setActiveMenu("api-application");
+                                    setIsMobileMenuOpen(false);
+                                }}
+                                className={`w-full text-left px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                                    activeMenu === "api-application"
+                                        ? "bg-primary/10 text-primary"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                }`}
+                            >
+                                API Application
+                            </button>
                         </nav>
                     </div>
                 </div>
@@ -1786,6 +2780,13 @@ export default function Dashboard() {
                     {renderMainContent()}
                 </div>
             </div>
+            
+            {/* Pricing Modal */}
+            <PricingModal 
+                isOpen={showPricingModal}
+                onClose={() => setShowPricingModal(false)}
+                onSelectPlan={handlePlanSelection}
+            />
         </div>
     );
 }

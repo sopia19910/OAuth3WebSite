@@ -12,6 +12,12 @@ import Whitepaper from "@/pages/whitepaper";
 import Contact from "@/pages/contact";
 import PersonalService from "@/pages/personalservice";
 import Dashboard from "@/pages/dashboard";
+import AdminDashboard from "@/pages/AdminDashboard";
+import DevelopersApply from "@/pages/developers-apply";
+import AdminApi from "@/pages/admin-api";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
+import ApiApplication from "@/pages/api-application";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +32,12 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/personalservice" component={PersonalService} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/developers/apply" component={DevelopersApply} />
+      <Route path="/admin/api" component={AdminApi} />
+      <Route path="/api-application" component={ApiApplication} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route component={NotFound} />
     </Switch>
   );

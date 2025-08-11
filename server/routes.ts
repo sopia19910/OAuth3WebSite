@@ -2,15 +2,47 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertContactSchema, insertChainSchema } from "@shared/schema";
+import { 
+  insertContactSchema, 
+  insertChainSchema,
+  insertProjectSchema,
+  insertApiKeySchema,
+  insertTransferSchema,
+  insertUserSchema,
+  loginUserSchema,
+  insertApiApplicationSchema
+} from "@shared/schema";
 import { getOAuth2Client, requireAuth, generateSecureCircuitInput, generateSecureZKProof } from "./auth";
 import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
 import { z } from "zod";
 import { sendContactEmail } from "./email";
+import bcrypt from "bcryptjs";
 
 // Contract addresses are now stored in database per chain
+
+// Extend session data interface
+declare module 'express-session' {
+  interface SessionData {
+    userId?: number;
+    user?: {
+      id: string;
+      email: string;
+      name?: string;
+      picture?: string;
+      googleId: string;
+      username?: string;
+      isAdmin?: boolean;
+    };
+    zkpData?: {
+      circuitInput: any;
+      inputFilename: string;
+      userSecret: string;
+      timestamp: number;
+    };
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configure session middleware
@@ -25,6 +57,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
       sameSite: 'lax'
     }
   }));
+
+  // Authentication endpoints
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const validatedData = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUserByEmail = await storage.getUserByEmail(validatedData.email);
+      if (existingUserByEmail) {
+        return res.status(400).json({
+          success: false,
+          message: "Email is already in use."
+        });
+      }
+
+      const existingUserByUsername = await storage.getUserByUsername(validatedData.username);
+      if (existingUserByUsername) {
+        return res.status(400).json({
+          success: false,
+          message: "Username is already taken."
+        });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(validatedData.password, 12);
+      
+      // Create user
+      const user = await storage.createUser({
+        ...validatedData,
+        password: hashedPassword
+      });
+
+      res.json({
+        success: true,
+        message: "Account created successfully.",
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email
+        }
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      
+      if (error instanceof Error && 'issues' in error) {
+        res.status(400).json({
+          success: false,
+          message: "Please check your input information.",
+          errors: (error as any).issues
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "An error occurred during registration."
+        });
+      }
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const validatedData = loginUserSchema.parse(req.body);
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(validatedData.email);
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid email or password."
+        });
+      }
+
+      // Verify password
+      const isValidPassword = await bcrypt.compare(validatedData.password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid email or password."
+        });
+      }
+
+      // Store user in session
+      req.session.userId = user.id;
+      req.session.user = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        isAdmin: user.isAdmin || false
+      };
+
+      res.json({
+        success: true,
+        message: "Login successful",
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          isAdmin: user.isAdmin || false
+        }
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      
+      if (error instanceof Error && 'issues' in error) {
+        res.status(400).json({
+          success: false,
+          message: "Please check your input information.",
+          errors: (error as any).issues
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "An error occurred during login."
+        });
+      }
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          message: "An error occurred during logout."
+        });
+      }
+      res.json({
+        success: true,
+        message: "Logged out successfully."
+      });
+    });
+  });
+
+  app.get("/api/auth/me", (req, res) => {
+    if (!req.session.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Login required."
+      });
+    }
+
+    res.json({
+      success: true,
+      user: req.session.user
+    });
+  });
   // Contact form submission endpoint
   app.post("/api/contact", async (req, res) => {
     try {
@@ -65,6 +243,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(500).json({
           success: false,
           message: "An error occurred while processing your request"
+        });
+      }
+    }
+  });
+
+  // API Applications endpoints
+  app.get("/api/applications", async (req, res) => {
+    if (!req.session.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required"
+      });
+    }
+
+    try {
+      // Convert Google ID to a number for the current storage interface
+      // In a real implementation, you might want to update the schema to use string IDs
+      const numericUserId = parseInt(req.session.user.id) || 0;
+      const applications = await storage.getApiApplications(numericUserId);
+      res.json(applications);
+    } catch (error) {
+      console.error("Error fetching API applications:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch applications"
+      });
+    }
+  });
+
+  app.post("/api/applications", async (req, res) => {
+    if (!req.session.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required"
+      });
+    }
+
+    try {
+      const validatedData = insertApiApplicationSchema.parse(req.body);
+      
+      // Convert Google ID to a number for the current storage interface
+      const numericUserId = parseInt(req.session.user.id) || 0;
+      const application = await storage.createApiApplication({
+        ...validatedData,
+        userId: numericUserId
+      });
+
+      res.json({
+        success: true,
+        message: "Application submitted successfully",
+        application
+      });
+    } catch (error) {
+      console.error("Error creating API application:", error);
+      
+      if (error instanceof Error && 'issues' in error) {
+        res.status(400).json({
+          success: false,
+          message: "Please check your input data",
+          errors: (error as any).issues
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "Failed to submit application"
         });
       }
     }
@@ -747,6 +990,470 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: 'Failed to delete chain'
       });
+    }
+  });
+
+  // API Management Routes
+
+  // Developer Application Routes
+  app.get('/api/projects', async (req, res) => {
+    try {
+      const projects = await storage.getProjects();
+      res.json(projects);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      res.status(500).json({ error: 'Failed to fetch projects' });
+    }
+  });
+
+  // Get user's projects
+  app.get('/api/projects/user', async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Get all projects for the user's email
+      const projects = await storage.getUserProjects(user.email);
+      res.json(projects);
+    } catch (error) {
+      console.error('Error fetching user projects:', error);
+      res.status(500).json({ error: 'Failed to fetch projects' });
+    }
+  });
+
+  app.post('/api/projects', async (req, res) => {
+    try {
+      const validatedData = insertProjectSchema.parse(req.body);
+      
+      // Create project with pending approval status
+      const projectData = {
+        ...validatedData,
+        approvalStatus: 'pending',
+        status: 'active'
+      };
+      
+      const project = await storage.createProject(projectData);
+      
+      // Generate API key for the project (will be activated when approved)
+      const apiKey = `oa3_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+      const keyHash = Buffer.from(apiKey).toString('base64');
+      const keyPrefix = apiKey.substring(0, 8);
+      
+      // Create main API key (inactive until approved)
+      const mainApiKeyData = {
+        projectId: project.id,
+        keyName: 'Production API Key',
+        keyHash,
+        keyPrefix,
+        permissions: ['read', 'transfer'],
+        isActive: false // Will be activated when project is approved
+      };
+      
+      await storage.createApiKey(mainApiKeyData);
+      
+      // Create sandbox API key if requested
+      let sandboxApiKey = null;
+      if (req.body.createSandbox) {
+        const sandboxKey = `oa3_sandbox_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+        const sandboxKeyHash = Buffer.from(sandboxKey).toString('base64');
+        const sandboxKeyPrefix = sandboxKey.substring(0, 12);
+        
+        const sandboxApiKeyData = {
+          projectId: project.id,
+          keyName: 'Sandbox API Key',
+          keyHash: sandboxKeyHash,
+          keyPrefix: sandboxKeyPrefix,
+          permissions: ['read', 'transfer'],
+          isActive: false // Will be activated when project is approved
+        };
+        
+        await storage.createApiKey(sandboxApiKeyData);
+        sandboxApiKey = sandboxKey;
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        actor: project.owner,
+        action: 'project.created',
+        resource: 'project',
+        resourceId: project.id,
+        details: { 
+          projectName: project.name,
+          selectedPlan: project.selectedPlan,
+          approvalStatus: 'pending'
+        }
+      });
+      
+      res.json({
+        ...project,
+        apiKey: apiKey,
+        sandboxApiKey: sandboxApiKey,
+        message: 'Your project has been created and is pending approval. You will be notified once it is approved.'
+      });
+    } catch (error) {
+      console.error('Error creating project:', error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: 'Invalid project data', details: error.errors });
+      } else {
+        res.status(500).json({ error: 'Failed to create project' });
+      }
+    }
+  });
+
+  app.get('/api/projects/:id', async (req, res) => {
+    try {
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+      res.json(project);
+    } catch (error) {
+      console.error('Error fetching project:', error);
+      res.status(500).json({ error: 'Failed to fetch project' });
+    }
+  });
+
+  app.put('/api/projects/:id', async (req, res) => {
+    try {
+      const project = await storage.updateProject(req.params.id, req.body);
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        actor: 'system',
+        action: 'project.updated',
+        resource: 'project',
+        resourceId: project.id,
+        details: { projectName: project.name }
+      });
+      
+      res.json(project);
+    } catch (error) {
+      console.error('Error updating project:', error);
+      res.status(500).json({ error: 'Failed to update project' });
+    }
+  });
+
+  app.delete('/api/projects/:id', async (req, res) => {
+    try {
+      const success = await storage.deleteProject(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        actor: 'system',
+        action: 'project.deleted',
+        resource: 'project',
+        resourceId: req.params.id,
+        details: { projectId: req.params.id }
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      res.status(500).json({ error: 'Failed to delete project' });
+    }
+  });
+
+  // API Key Management Routes
+  app.get('/api/projects/:projectId/api-keys', async (req, res) => {
+    try {
+      const apiKeys = await storage.getApiKeys(req.params.projectId);
+      res.json(apiKeys);
+    } catch (error) {
+      console.error('Error fetching API keys:', error);
+      res.status(500).json({ error: 'Failed to fetch API keys' });
+    }
+  });
+
+  app.post('/api/projects/:projectId/api-keys', async (req, res) => {
+    try {
+      // Generate API key
+      const keyId = `oa3_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const keyHash = Buffer.from(keyId).toString('base64');
+      const keyPrefix = keyId.substring(0, 8);
+      
+      const apiKeyData = {
+        ...req.body,
+        projectId: req.params.projectId,
+        keyHash,
+        keyPrefix,
+        id: `key_${Date.now()}`,
+        lastUsed: null,
+        status: 'active'
+      };
+      
+      const apiKey = await storage.createApiKey(apiKeyData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        actor: 'system',
+        action: 'apikey.created',
+        resource: 'apikey',
+        resourceId: apiKey.id,
+        details: { projectId: req.params.projectId, keyName: apiKey.name }
+      });
+      
+      // Return the full key only once (for display to user)
+      res.json({ ...apiKey, fullKey: keyId });
+    } catch (error) {
+      console.error('Error creating API key:', error);
+      res.status(500).json({ error: 'Failed to create API key' });
+    }
+  });
+
+  app.put('/api/api-keys/:id', async (req, res) => {
+    try {
+      const apiKey = await storage.updateApiKey(req.params.id, req.body);
+      if (!apiKey) {
+        return res.status(404).json({ error: 'API key not found' });
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        actor: 'system',
+        action: 'apikey.updated',
+        resource: 'apikey',
+        resourceId: apiKey.id,
+        details: { projectId: apiKey.projectId, status: apiKey.status }
+      });
+      
+      res.json(apiKey);
+    } catch (error) {
+      console.error('Error updating API key:', error);
+      res.status(500).json({ error: 'Failed to update API key' });
+    }
+  });
+
+  app.delete('/api/api-keys/:id', async (req, res) => {
+    try {
+      const success = await storage.deleteApiKey(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: 'API key not found' });
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        actor: 'system',
+        action: 'apikey.deleted',
+        resource: 'apikey',
+        resourceId: req.params.id,
+        details: { keyId: req.params.id }
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting API key:', error);
+      res.status(500).json({ error: 'Failed to delete API key' });
+    }
+  });
+  
+  // Regenerate API key endpoint
+  app.post('/api/projects/:id/regenerate-key', async (req, res) => {
+    try {
+      const projectId = req.params.id;
+      
+      // Get existing project
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+      
+      // Get existing API keys and deactivate the old production key
+      const existingKeys = await storage.getApiKeys(projectId);
+      const oldProductionKey = existingKeys.find(key => key.keyName === 'Production API Key' && key.isActive);
+      
+      if (oldProductionKey) {
+        await storage.updateApiKey(oldProductionKey.id, { isActive: false });
+      }
+      
+      // Generate new API key
+      const newApiKey = `oa3_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+      const keyHash = Buffer.from(newApiKey).toString('base64');
+      const keyPrefix = newApiKey.substring(0, 8);
+      
+      // Create new API key
+      const newApiKeyData = {
+        projectId: projectId,
+        keyName: 'Production API Key',
+        keyHash,
+        keyPrefix,
+        permissions: ['read', 'transfer'],
+        isActive: true
+      };
+      
+      await storage.createApiKey(newApiKeyData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        actor: project.owner,
+        action: 'apikey.regenerated',
+        resource: 'apikey',
+        resourceId: projectId,
+        details: { projectId, projectName: project.name }
+      });
+      
+      res.json({ apiKey: newApiKey });
+    } catch (error) {
+      console.error('Error regenerating API key:', error);
+      res.status(500).json({ error: 'Failed to regenerate API key' });
+    }
+  });
+
+  // Transfer Routes
+  app.get('/api/transfers', async (req, res) => {
+    try {
+      const timeRange = req.query.timeRange as string;
+      const transfers = await storage.getTransfers(timeRange);
+      res.json(transfers);
+    } catch (error) {
+      console.error('Error fetching transfers:', error);
+      res.status(500).json({ error: 'Failed to fetch transfers' });
+    }
+  });
+
+  app.post('/api/transfers', async (req, res) => {
+    try {
+      const validatedData = insertTransferSchema.parse(req.body);
+      const transfer = await storage.createTransfer(validatedData);
+      
+      // Create usage metric
+      await storage.createUsageMetric({
+        projectId: transfer.projectId,
+        apiKeyId: transfer.apiKeyId,
+        endpoint: 'transfer',
+        method: 'POST',
+        responseStatus: 200,
+        metadata: {
+          amount: transfer.amount,
+          toAddress: transfer.toAddress
+        }
+      });
+      
+      res.json(transfer);
+    } catch (error) {
+      console.error('Error creating transfer:', error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: 'Invalid transfer data', details: error.errors });
+      } else {
+        res.status(500).json({ error: 'Failed to create transfer' });
+      }
+    }
+  });
+
+  // Usage Metrics Routes
+  app.get('/api/usage-metrics', async (req, res) => {
+    try {
+      const { timeRange, projectId } = req.query;
+      const metrics = await storage.getUsageMetrics(
+        timeRange as string,
+        projectId as string
+      );
+      res.json(metrics);
+    } catch (error) {
+      console.error('Error fetching usage metrics:', error);
+      res.status(500).json({ error: 'Failed to fetch usage metrics' });
+    }
+  });
+
+  // Audit Logs Routes
+  app.get('/api/audit-logs', async (req, res) => {
+    try {
+      const timeRange = req.query.timeRange as string;
+      const logs = await storage.getAuditLogs(timeRange);
+      res.json(logs);
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+      res.status(500).json({ error: 'Failed to fetch audit logs' });
+    }
+  });
+
+  // Admin middleware
+  const requireAdmin = async (req: any, res: any, next: any) => {
+    const userId = req.session?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    const user = await storage.getUser(userId);
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    
+    next();
+  };
+
+  // Admin Routes
+  app.get('/api/admin/users', requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json({ success: true, users });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Failed to fetch users' });
+    }
+  });
+
+  app.post('/api/admin/users/:id/block', requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { block } = req.body;
+      
+      const user = await storage.updateUserBlockStatus(userId, block);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      res.json({ success: true, user });
+    } catch (error) {
+      console.error('Error updating user block status:', error);
+      res.status(500).json({ error: 'Failed to update user status' });
+    }
+  });
+
+  app.get('/api/admin/applications', requireAdmin, async (req, res) => {
+    try {
+      const applications = await storage.getAllApiApplications();
+      res.json({ success: true, applications });
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      res.status(500).json({ error: 'Failed to fetch applications' });
+    }
+  });
+
+  app.post('/api/admin/applications/:id/approve', requireAdmin, async (req, res) => {
+    try {
+      const applicationId = req.params.id;
+      const { status } = req.body;
+      
+      const application = await storage.updateApiApplicationStatus(applicationId, status);
+      if (!application) {
+        return res.status(404).json({ error: 'Application not found' });
+      }
+      
+      // API 신청이 승인되면 프로젝트 상태도 업데이트
+      if (status === 'approved' && application.projectId) {
+        await storage.updateProject(application.projectId, {
+          approvalStatus: 'approved',
+          status: 'active'
+        });
+      }
+      
+      res.json({ success: true, application });
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      res.status(500).json({ error: 'Failed to update application status' });
     }
   });
 

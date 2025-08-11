@@ -1,22 +1,97 @@
-import { users, contacts, tokens, chains, type User, type InsertUser, type Contact, type InsertContact, type Token, type InsertToken, type Chain, type InsertChain } from "@shared/schema";
+import { 
+  users, 
+  contacts, 
+  tokens, 
+  chains, 
+  projects, 
+  apiKeys, 
+  transfers, 
+  usageMetrics, 
+  auditLogs,
+  apiApplications,
+  type User, 
+  type InsertUser, 
+  type LoginUser,
+  type Contact, 
+  type InsertContact, 
+  type Token, 
+  type InsertToken, 
+  type Chain, 
+  type InsertChain,
+  type Project,
+  type InsertProject,
+  type ApiKey,
+  type InsertApiKey,
+  type Transfer,
+  type InsertTransfer,
+  type UsageMetric,
+  type AuditLog,
+  type ApiApplication,
+  type InsertApiApplication
+} from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
 
 export interface IStorage {
+  // User management
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  getAllUsers(): Promise<User[]>;
+  updateUserBlockStatus(id: number, isBlocked: boolean): Promise<User | undefined>;
+  
+  // Contact management
   createContact(contact: InsertContact): Promise<Contact>;
+  
+  // Token management
   getTokensByChain(chainId: number): Promise<Token[]>;
   createToken(token: InsertToken): Promise<Token>;
   deleteToken(id: number, userEmail: string): Promise<boolean>;
+  
+  // Chain management
   getChains(): Promise<Chain[]>;
   getActiveChain(): Promise<Chain | undefined>;
   getChainByNetworkName(networkName: string): Promise<Chain | undefined>;
   createChain(chain: InsertChain): Promise<Chain>;
   updateChain(id: number, chain: Partial<InsertChain>): Promise<Chain | undefined>;
   deleteChain(id: number): Promise<boolean>;
+  
+  // Project management
+  getProjects(): Promise<Project[]>;
+  getProject(id: string): Promise<Project | undefined>;
+  createProject(project: InsertProject): Promise<Project>;
+  updateProject(id: string, project: Partial<Project>): Promise<Project | undefined>;
+  deleteProject(id: string): Promise<boolean>;
+  
+  // API Key management
+  getApiKeys(projectId: string): Promise<ApiKey[]>;
+  createApiKey(apiKey: InsertApiKey & { keyHash: string; keyPrefix: string }): Promise<ApiKey>;
+  updateApiKey(id: string, apiKey: Partial<ApiKey>): Promise<ApiKey | undefined>;
+  deleteApiKey(id: string): Promise<boolean>;
+  getApiKeyByHash(keyHash: string): Promise<ApiKey | undefined>;
+  
+  // Transfer management
+  getTransfers(timeRange?: string): Promise<Transfer[]>;
+  getTransfer(id: string): Promise<Transfer | undefined>;
+  createTransfer(transfer: InsertTransfer): Promise<Transfer>;
+  updateTransfer(id: string, transfer: Partial<Transfer>): Promise<Transfer | undefined>;
+  
+  // Usage metrics
+  getUsageMetrics(timeRange?: string, projectId?: string): Promise<UsageMetric[]>;
+  createUsageMetric(metric: Omit<UsageMetric, 'id' | 'createdAt'>): Promise<UsageMetric>;
+  
+  // Audit logs
+  getAuditLogs(timeRange?: string): Promise<AuditLog[]>;
+  createAuditLog(log: Omit<AuditLog, 'id' | 'createdAt'>): Promise<AuditLog>;
+  
+  // API Applications
+  getApiApplications(userId: number): Promise<ApiApplication[]>;
+  createApiApplication(application: InsertApiApplication & { userId: number }): Promise<ApiApplication>;
+  updateApiApplication(id: string, application: Partial<ApiApplication>): Promise<ApiApplication | undefined>;
+  getAllApiApplications(): Promise<ApiApplication[]>;
+  updateApiApplicationStatus(id: string, status: string): Promise<ApiApplication | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -42,9 +117,25 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentId++;
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser,
+      id,
+      firstName: insertUser.firstName || null,
+      lastName: insertUser.lastName || null,
+      company: insertUser.company || null,
+      isVerified: false,
+      isAdmin: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
     this.users.set(id, user);
     return user;
   }
@@ -151,6 +242,15 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const { db } = await import("./db");
     const { users } = await import("@shared/schema");
@@ -160,6 +260,26 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    
+    return await db.select().from(users);
+  }
+
+  async updateUserBlockStatus(id: number, isBlocked: boolean): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [user] = await db
+      .update(users)
+      .set({ isBlocked, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   async createContact(insertContact: InsertContact): Promise<Contact> {
@@ -265,6 +385,390 @@ export class DatabaseStorage implements IStorage {
       .where(eq(chains.id, id));
     
     return !!result;
+  }
+
+  // Project management methods
+  async getProjects(): Promise<Project[]> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    
+    return await db.select().from(projects);
+  }
+
+  async getProject(id: string): Promise<Project | undefined> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    return project || undefined;
+  }
+
+  async createProject(insertProject: InsertProject): Promise<Project> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    
+    const [project] = await db
+      .insert(projects)
+      .values(insertProject)
+      .returning();
+    return project;
+  }
+
+  async updateProject(id: string, updateData: Partial<Project>): Promise<Project | undefined> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [project] = await db
+      .update(projects)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
+    return project || undefined;
+  }
+
+  async deleteProject(id: string): Promise<boolean> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const result = await db
+      .delete(projects)
+      .where(eq(projects.id, id));
+    
+    return !!result;
+  }
+
+  async getUserProjects(userEmail: string): Promise<Project[]> {
+    const { db } = await import("./db");
+    const { projects, apiKeys } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const userProjects = await db.select().from(projects).where(eq(projects.owner, userEmail));
+    
+    // Add API key to each project
+    for (const project of userProjects) {
+      const projectApiKeys = await db.select().from(apiKeys)
+        .where(eq(apiKeys.projectId, project.id))
+        .limit(1);
+      
+      if (projectApiKeys.length > 0) {
+        // Generate a display API key
+        (project as any).apiKey = `oa3_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+      }
+    }
+    
+    return userProjects;
+  }
+
+  // API Key management methods
+  async getApiKeys(projectId: string): Promise<ApiKey[]> {
+    const { db } = await import("./db");
+    const { apiKeys } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    return await db.select().from(apiKeys).where(eq(apiKeys.projectId, projectId));
+  }
+
+  async createApiKey(insertApiKey: InsertApiKey & { keyHash: string; keyPrefix: string }): Promise<ApiKey> {
+    const { db } = await import("./db");
+    const { apiKeys } = await import("@shared/schema");
+    
+    const [apiKey] = await db
+      .insert(apiKeys)
+      .values(insertApiKey)
+      .returning();
+    return apiKey;
+  }
+
+  async updateApiKey(id: string, updateData: Partial<ApiKey>): Promise<ApiKey | undefined> {
+    const { db } = await import("./db");
+    const { apiKeys } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [apiKey] = await db
+      .update(apiKeys)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(apiKeys.id, id))
+      .returning();
+    return apiKey || undefined;
+  }
+
+  async deleteApiKey(id: string): Promise<boolean> {
+    const { db } = await import("./db");
+    const { apiKeys } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const result = await db
+      .delete(apiKeys)
+      .where(eq(apiKeys.id, id));
+    
+    return !!result;
+  }
+
+  async getApiKeyByHash(keyHash: string): Promise<ApiKey | undefined> {
+    const { db } = await import("./db");
+    const { apiKeys } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [apiKey] = await db.select().from(apiKeys).where(eq(apiKeys.keyHash, keyHash));
+    return apiKey || undefined;
+  }
+
+  // Transfer management methods
+  async getTransfers(timeRange?: string): Promise<Transfer[]> {
+    const { db } = await import("./db");
+    const { transfers } = await import("@shared/schema");
+    const { gte } = await import("drizzle-orm");
+    
+    let query = db.select().from(transfers);
+    
+    if (timeRange) {
+      const now = new Date();
+      let cutoff: Date;
+      
+      switch (timeRange) {
+        case '24h':
+          cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          break;
+        case '7d':
+          cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case '30d':
+          cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      }
+      
+      query = query.where(gte(transfers.createdAt, cutoff));
+    }
+    
+    return await query;
+  }
+
+  async getTransfer(id: string): Promise<Transfer | undefined> {
+    const { db } = await import("./db");
+    const { transfers } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [transfer] = await db.select().from(transfers).where(eq(transfers.id, id));
+    return transfer || undefined;
+  }
+
+  async createTransfer(insertTransfer: InsertTransfer): Promise<Transfer> {
+    const { db } = await import("./db");
+    const { transfers } = await import("@shared/schema");
+    
+    const [transfer] = await db
+      .insert(transfers)
+      .values({
+        ...insertTransfer,
+        status: "submitted",
+        apiKeyId: "temp-api-key-id" // This would come from the API request context
+      })
+      .returning();
+    return transfer;
+  }
+
+  async updateTransfer(id: string, updateData: Partial<Transfer>): Promise<Transfer | undefined> {
+    const { db } = await import("./db");
+    const { transfers } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [transfer] = await db
+      .update(transfers)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(transfers.id, id))
+      .returning();
+    return transfer || undefined;
+  }
+
+  // Usage metrics methods
+  async getUsageMetrics(timeRange?: string, projectId?: string): Promise<UsageMetric[]> {
+    const { db } = await import("./db");
+    const { usageMetrics } = await import("@shared/schema");
+    const { gte, eq, and } = await import("drizzle-orm");
+    
+    let conditions = [];
+    
+    if (timeRange) {
+      const now = new Date();
+      let cutoff: Date;
+      
+      switch (timeRange) {
+        case '24h':
+          cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          break;
+        case '7d':
+          cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case '30d':
+          cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      }
+      
+      conditions.push(gte(usageMetrics.createdAt, cutoff));
+    }
+    
+    if (projectId) {
+      conditions.push(eq(usageMetrics.projectId, projectId));
+    }
+    
+    let query = db.select().from(usageMetrics);
+    if (conditions.length > 0) {
+      query = query.where(conditions.length === 1 ? conditions[0] : and(...conditions));
+    }
+    
+    return await query;
+  }
+
+  async createUsageMetric(insertMetric: Omit<UsageMetric, 'id' | 'createdAt'>): Promise<UsageMetric> {
+    const { db } = await import("./db");
+    const { usageMetrics } = await import("@shared/schema");
+    
+    const [metric] = await db
+      .insert(usageMetrics)
+      .values(insertMetric)
+      .returning();
+    return metric;
+  }
+
+  // Audit log methods
+  async getAuditLogs(timeRange?: string): Promise<AuditLog[]> {
+    const { db } = await import("./db");
+    const { auditLogs } = await import("@shared/schema");
+    const { gte, desc } = await import("drizzle-orm");
+    
+    let query = db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt));
+    
+    if (timeRange) {
+      const now = new Date();
+      let cutoff: Date;
+      
+      switch (timeRange) {
+        case '24h':
+          cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          break;
+        case '7d':
+          cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case '30d':
+          cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      }
+      
+      query = query.where(gte(auditLogs.createdAt, cutoff));
+    }
+    
+    return await query;
+  }
+
+  async createAuditLog(insertLog: Omit<AuditLog, 'id' | 'createdAt'>): Promise<AuditLog> {
+    const { db } = await import("./db");
+    const { auditLogs } = await import("@shared/schema");
+    
+    const [log] = await db
+      .insert(auditLogs)
+      .values(insertLog)
+      .returning();
+    return log;
+  }
+
+  // API Application methods
+  async getApiApplications(userId: number): Promise<ApiApplication[]> {
+    const { db } = await import("./db");
+    const { apiApplications } = await import("@shared/schema");
+    const { eq, desc } = await import("drizzle-orm");
+    
+    return await db.select().from(apiApplications)
+      .where(eq(apiApplications.userId, userId))
+      .orderBy(desc(apiApplications.createdAt));
+  }
+
+  async createApiApplication(insertApplication: InsertApiApplication & { userId: number }): Promise<ApiApplication> {
+    const { db } = await import("./db");
+    const { apiApplications } = await import("@shared/schema");
+    
+    const [application] = await db
+      .insert(apiApplications)
+      .values(insertApplication)
+      .returning();
+    return application;
+  }
+
+  async updateApiApplication(id: string, updateData: Partial<ApiApplication>): Promise<ApiApplication | undefined> {
+    const { db } = await import("./db");
+    const { apiApplications } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [application] = await db
+      .update(apiApplications)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(apiApplications.id, id))
+      .returning();
+    return application || undefined;
+  }
+
+  async getAllApiApplications(): Promise<ApiApplication[]> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    
+    // Return all projects as API applications
+    const allProjects = await db.select().from(projects);
+    
+    return allProjects.map(project => ({
+      id: project.id,
+      name: project.name,
+      owner: project.owner,
+      selectedPlan: project.selectedPlan || '',
+      approvalStatus: project.approvalStatus,
+      purpose: project.purpose,
+      createdAt: project.createdAt,
+      updatedAt: project.updatedAt,
+      projectId: project.id,
+      userId: 0, // Default value since we're using projects
+      description: project.description || '',
+      status: project.status
+    })) as ApiApplication[];
+  }
+
+  async updateApiApplicationStatus(id: string, status: string): Promise<ApiApplication | undefined> {
+    const { db } = await import("./db");
+    const { projects } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [updatedProject] = await db
+      .update(projects)
+      .set({ 
+        approvalStatus: status,
+        status: status === 'approved' ? 'active' : 'suspended',
+        updatedAt: new Date() 
+      })
+      .where(eq(projects.id, id))
+      .returning();
+    
+    if (!updatedProject) return undefined;
+    
+    return {
+      id: updatedProject.id,
+      name: updatedProject.name,
+      owner: updatedProject.owner,
+      selectedPlan: updatedProject.selectedPlan || '',
+      approvalStatus: updatedProject.approvalStatus,
+      purpose: updatedProject.purpose,
+      createdAt: updatedProject.createdAt,
+      updatedAt: updatedProject.updatedAt,
+      projectId: updatedProject.id,
+      userId: 0,
+      description: updatedProject.description || '',
+      status: updatedProject.status
+    } as ApiApplication;
   }
 }
 

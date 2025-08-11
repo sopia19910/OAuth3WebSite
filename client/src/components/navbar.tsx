@@ -1,21 +1,42 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile.tsx";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import logoImage from "@assets/image_1752117480535.png";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { user, isAuthenticated, logout, isLoggingOut } = useAuth();
 
-  const navItems = [
+  const publicNavItems = [
     { label: "About OAuth 3", href: "/about", isRoute: true },
     { label: "Technology", href: "/technology", isRoute: true },
     { label: "Services", href: "/services", isRoute: true },
     { label: "Docs", href: "/resources", isRoute: true },
     { label: "Contact Us", href: "/contact", isRoute: true },
   ];
+
+  const authenticatedNavItems = [
+    { label: "About OAuth 3", href: "/about", isRoute: true },
+    { label: "Technology", href: "/technology", isRoute: true },
+    { label: "Services", href: "/services", isRoute: true },
+    { label: "Docs", href: "/resources", isRoute: true },
+    { label: "Contact Us", href: "/contact", isRoute: true },
+  ];
+
+  const adminNavItems = [
+    { label: "Dashboard", href: "/dashboard", isRoute: true },
+    { label: "About OAuth 3", href: "/about", isRoute: true },
+    { label: "Technology", href: "/technology", isRoute: true },
+    { label: "Services", href: "/services", isRoute: true },
+    { label: "Docs", href: "/resources", isRoute: true },
+    { label: "Contact Us", href: "/contact", isRoute: true },
+  ];
+
+  const navItems = isAuthenticated ? (user?.isAdmin ? adminNavItems : authenticatedNavItems) : publicNavItems;
 
   const handleNavClick = (href: string, isRoute: boolean) => {
     if (isRoute) {
@@ -39,7 +60,7 @@ export default function Navbar() {
           </Link>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               item.isRoute ? (
                 <Link
@@ -59,6 +80,41 @@ export default function Navbar() {
                 </button>
               )
             ))}
+            
+            {/* Authentication Buttons */}
+            <div className="flex items-center space-x-4">
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                      <User size={14} className="text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-foreground">{user?.name || user?.email || 'User'}</span>
+                  </div>
+                  <Button 
+                    size="sm"
+                    onClick={logout}
+                    disabled={isLoggingOut}
+                    className="bg-black/20 hover:bg-black/30 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white dark:text-black font-semibold"
+                  >
+                    {isLoggingOut ? "Signing Out..." : "Sign Out"}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <Link href="/login">
+                    <Button variant="ghost" size="sm" className="bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button variant="default" size="sm" className="bg-black/20 hover:bg-black/30 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white dark:text-black">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -98,6 +154,55 @@ export default function Navbar() {
                   </button>
                 )
               ))}
+              
+              {/* Mobile Authentication Section */}
+              <div className="border-t border-border pt-3 mt-3">
+                {isAuthenticated ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 px-3 py-2">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                        <User size={14} className="text-white" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">{user?.name || user?.email || 'User'}</span>
+                    </div>
+                    <Button 
+                      size="sm"
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      disabled={isLoggingOut}
+                      className="w-full bg-black/20 hover:bg-black/30 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white dark:text-black font-semibold mx-3"
+                      style={{ width: 'calc(100% - 1.5rem)' }}
+                    >
+                      {isLoggingOut ? "Signing Out..." : "Sign Out"}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-2 px-3">
+                    <Link href="/login">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        className="w-full bg-black/20 hover:bg-black/30 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white dark:text-black"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
