@@ -252,6 +252,7 @@ export const insertProjectSchema = createInsertSchema(projects).pick({
   webhookUrl: true,
 }).extend({
   name: z.string().min(2, "Project name must be at least 2 characters").max(50, "Project name too long"),
+  description: z.string().min(1, "Description is required"),
   owner: z.string().email("Valid email required"),
   purpose: z.enum(["web", "mobile", "server", "other"]),
   defaultChainId: z.number().positive("Chain ID must be positive"),
