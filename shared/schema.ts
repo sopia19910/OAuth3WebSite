@@ -263,7 +263,7 @@ export const insertProjectSchema = createInsertSchema(projects).pick({
   dailyTransferLimit: z.number().min(1).max(10000).optional().default(100),
   dailyAmountLimit: z.string().optional().default("1000"),
   allowedChains: z.array(z.number()).optional().default([]),
-  webhookUrl: z.string().url().optional(),
+  webhookUrl: z.union([z.string().url(), z.literal(""), z.undefined()]).optional(),
 });
 
 export const insertApiKeySchema = createInsertSchema(apiKeys).pick({
