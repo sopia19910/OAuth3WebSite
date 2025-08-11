@@ -12,6 +12,8 @@ import Whitepaper from "@/pages/whitepaper";
 import Contact from "@/pages/contact";
 import PersonalService from "@/pages/personalservice";
 import Dashboard from "@/pages/dashboard";
+import DevelopersApply from "@/pages/developers-apply";
+import AdminApi from "@/pages/admin-api";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +28,8 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/personalservice" component={PersonalService} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/developers/apply" component={DevelopersApply} />
+      <Route path="/admin/api" component={AdminApi} />
       <Route component={NotFound} />
     </Switch>
   );

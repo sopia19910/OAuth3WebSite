@@ -2,7 +2,13 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { insertContactSchema, insertChainSchema } from "@shared/schema";
+import { 
+  insertContactSchema, 
+  insertChainSchema,
+  insertProjectSchema,
+  insertApiKeySchema,
+  insertTransferSchema
+} from "@shared/schema";
 import { getOAuth2Client, requireAuth, generateSecureCircuitInput, generateSecureZKProof } from "./auth";
 import { ethers } from "ethers";
 import fs from "fs";
@@ -747,6 +753,252 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         error: 'Failed to delete chain'
       });
+    }
+  });
+
+  // API Management Routes
+
+  // Developer Application Routes
+  app.get('/api/projects', async (req, res) => {
+    try {
+      const projects = await storage.getProjects();
+      res.json(projects);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      res.status(500).json({ error: 'Failed to fetch projects' });
+    }
+  });
+
+  app.post('/api/projects', async (req, res) => {
+    try {
+      const validatedData = insertProjectSchema.parse(req.body);
+      const project = await storage.createProject(validatedData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        action: 'project.created',
+        userId: project.id,
+        metadata: { projectName: project.name }
+      });
+      
+      res.json(project);
+    } catch (error) {
+      console.error('Error creating project:', error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: 'Invalid project data', details: error.errors });
+      } else {
+        res.status(500).json({ error: 'Failed to create project' });
+      }
+    }
+  });
+
+  app.get('/api/projects/:id', async (req, res) => {
+    try {
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+      res.json(project);
+    } catch (error) {
+      console.error('Error fetching project:', error);
+      res.status(500).json({ error: 'Failed to fetch project' });
+    }
+  });
+
+  app.put('/api/projects/:id', async (req, res) => {
+    try {
+      const project = await storage.updateProject(req.params.id, req.body);
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        action: 'project.updated',
+        userId: project.id,
+        metadata: { projectName: project.name }
+      });
+      
+      res.json(project);
+    } catch (error) {
+      console.error('Error updating project:', error);
+      res.status(500).json({ error: 'Failed to update project' });
+    }
+  });
+
+  app.delete('/api/projects/:id', async (req, res) => {
+    try {
+      const success = await storage.deleteProject(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        action: 'project.deleted',
+        userId: req.params.id,
+        metadata: { projectId: req.params.id }
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      res.status(500).json({ error: 'Failed to delete project' });
+    }
+  });
+
+  // API Key Management Routes
+  app.get('/api/projects/:projectId/api-keys', async (req, res) => {
+    try {
+      const apiKeys = await storage.getApiKeys(req.params.projectId);
+      res.json(apiKeys);
+    } catch (error) {
+      console.error('Error fetching API keys:', error);
+      res.status(500).json({ error: 'Failed to fetch API keys' });
+    }
+  });
+
+  app.post('/api/projects/:projectId/api-keys', async (req, res) => {
+    try {
+      // Generate API key
+      const keyId = `oa3_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const keyHash = Buffer.from(keyId).toString('base64');
+      const keyPrefix = keyId.substring(0, 8);
+      
+      const apiKeyData = {
+        ...req.body,
+        projectId: req.params.projectId,
+        keyHash,
+        keyPrefix,
+        id: `key_${Date.now()}`,
+        lastUsed: null,
+        status: 'active'
+      };
+      
+      const apiKey = await storage.createApiKey(apiKeyData);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        action: 'apikey.created',
+        userId: req.params.projectId,
+        metadata: { keyId: apiKey.id, keyName: apiKey.name }
+      });
+      
+      // Return the full key only once (for display to user)
+      res.json({ ...apiKey, fullKey: keyId });
+    } catch (error) {
+      console.error('Error creating API key:', error);
+      res.status(500).json({ error: 'Failed to create API key' });
+    }
+  });
+
+  app.put('/api/api-keys/:id', async (req, res) => {
+    try {
+      const apiKey = await storage.updateApiKey(req.params.id, req.body);
+      if (!apiKey) {
+        return res.status(404).json({ error: 'API key not found' });
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        action: 'apikey.updated',
+        userId: apiKey.projectId,
+        metadata: { keyId: apiKey.id, status: apiKey.status }
+      });
+      
+      res.json(apiKey);
+    } catch (error) {
+      console.error('Error updating API key:', error);
+      res.status(500).json({ error: 'Failed to update API key' });
+    }
+  });
+
+  app.delete('/api/api-keys/:id', async (req, res) => {
+    try {
+      const success = await storage.deleteApiKey(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: 'API key not found' });
+      }
+      
+      // Create audit log
+      await storage.createAuditLog({
+        action: 'apikey.deleted',
+        userId: 'system',
+        metadata: { keyId: req.params.id }
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting API key:', error);
+      res.status(500).json({ error: 'Failed to delete API key' });
+    }
+  });
+
+  // Transfer Routes
+  app.get('/api/transfers', async (req, res) => {
+    try {
+      const timeRange = req.query.timeRange as string;
+      const transfers = await storage.getTransfers(timeRange);
+      res.json(transfers);
+    } catch (error) {
+      console.error('Error fetching transfers:', error);
+      res.status(500).json({ error: 'Failed to fetch transfers' });
+    }
+  });
+
+  app.post('/api/transfers', async (req, res) => {
+    try {
+      const validatedData = insertTransferSchema.parse(req.body);
+      const transfer = await storage.createTransfer(validatedData);
+      
+      // Create usage metric
+      await storage.createUsageMetric({
+        projectId: transfer.projectId,
+        apiKeyId: transfer.apiKeyId,
+        endpoint: 'transfer',
+        method: 'POST',
+        responseStatus: 200,
+        metadata: {
+          amount: transfer.amount,
+          toAddress: transfer.toAddress
+        }
+      });
+      
+      res.json(transfer);
+    } catch (error) {
+      console.error('Error creating transfer:', error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: 'Invalid transfer data', details: error.errors });
+      } else {
+        res.status(500).json({ error: 'Failed to create transfer' });
+      }
+    }
+  });
+
+  // Usage Metrics Routes
+  app.get('/api/usage-metrics', async (req, res) => {
+    try {
+      const { timeRange, projectId } = req.query;
+      const metrics = await storage.getUsageMetrics(
+        timeRange as string,
+        projectId as string
+      );
+      res.json(metrics);
+    } catch (error) {
+      console.error('Error fetching usage metrics:', error);
+      res.status(500).json({ error: 'Failed to fetch usage metrics' });
+    }
+  });
+
+  // Audit Logs Routes
+  app.get('/api/audit-logs', async (req, res) => {
+    try {
+      const timeRange = req.query.timeRange as string;
+      const logs = await storage.getAuditLogs(timeRange);
+      res.json(logs);
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+      res.status(500).json({ error: 'Failed to fetch audit logs' });
     }
   });
 
