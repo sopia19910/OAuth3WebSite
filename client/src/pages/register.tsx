@@ -278,12 +278,7 @@ export default function Register() {
             </div>
           </div>
 
-          {/* Security notice */}
-          <div className="mt-8 text-center">
-            <p className="text-xs text-muted-foreground">
-              🔒 All personal information is encrypted and securely stored
-            </p>
-          </div>
+
         </div>
       </div>
     </div>
