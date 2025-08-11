@@ -1631,13 +1631,13 @@ export default function Dashboard() {
                                             </CardHeader>
                                             <CardContent>
                                                 <div className="text-2xl font-bold">
-                                                    {activeProject?.apiCallsUsed || 245}
+                                                    {activeProject?.apiCallsUsed || 0}
                                                 </div>
                                                 <p className="text-xs text-muted-foreground">
-                                                    of {activeProject?.apiCallsLimit || 1000} daily limit
+                                                    of {activeProject?.apiCallsLimit || 100000} daily limit
                                                 </p>
                                                 <Progress 
-                                                    value={(activeProject?.apiCallsUsed || 245) / (activeProject?.apiCallsLimit || 1000) * 100} 
+                                                    value={(activeProject?.apiCallsUsed || 0) / (activeProject?.apiCallsLimit || 100000) * 100} 
                                                     className="mt-2"
                                                 />
                                             </CardContent>
@@ -1679,13 +1679,13 @@ export default function Dashboard() {
                                         <h3 className="text-sm font-medium mb-4">API Calls Over Time (7 Days)</h3>
                                         <ResponsiveContainer width="100%" height={300}>
                                             <AreaChart data={[
-                                                { date: 'Mon', calls: 320, success: 318, errors: 2 },
-                                                { date: 'Tue', calls: 450, success: 448, errors: 2 },
-                                                { date: 'Wed', calls: 380, success: 379, errors: 1 },
-                                                { date: 'Thu', calls: 540, success: 538, errors: 2 },
-                                                { date: 'Fri', calls: 610, success: 607, errors: 3 },
-                                                { date: 'Sat', calls: 295, success: 294, errors: 1 },
-                                                { date: 'Sun', calls: 245, success: 244, errors: 1 },
+                                                { date: 'Mon', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Tue', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Wed', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Thu', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Fri', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Sat', calls: 0, success: 0, errors: 0 },
+                                                { date: 'Sun', calls: 0, success: 0, errors: 0 },
                                             ]}>
                                                 <CartesianGrid strokeDasharray="3 3" />
                                                 <XAxis dataKey="date" />
@@ -1719,11 +1719,11 @@ export default function Dashboard() {
                                         <h3 className="text-sm font-medium mb-4">Most Used Endpoints</h3>
                                         <ResponsiveContainer width="100%" height={200}>
                                             <BarChart data={[
-                                                { endpoint: '/accounts/create', calls: 450 },
-                                                { endpoint: '/accounts/:address', calls: 380 },
-                                                { endpoint: '/transfers/send', calls: 320 },
-                                                { endpoint: '/tokens/balance', calls: 290 },
-                                                { endpoint: '/auth/verify', calls: 180 },
+                                                { endpoint: '/accounts/create', calls: 0 },
+                                                { endpoint: '/accounts/:address', calls: 0 },
+                                                { endpoint: '/transfers/send', calls: 0 },
+                                                { endpoint: '/tokens/balance', calls: 0 },
+                                                { endpoint: '/auth/verify', calls: 0 },
                                             ]} layout="horizontal">
                                                 <CartesianGrid strokeDasharray="3 3" />
                                                 <XAxis type="number" />
