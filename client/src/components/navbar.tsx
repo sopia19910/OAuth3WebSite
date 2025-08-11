@@ -84,12 +84,12 @@ export default function Navbar() {
               ) : (
                 <div className="flex items-center space-x-3">
                   <Link href="/login">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" className="bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground">
                       Sign In
                     </Button>
                   </Link>
                   <Link href="/register">
-                    <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
+                    <Button variant="default" size="sm" className="bg-black/20 hover:bg-black/30 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white dark:text-black">
                       Sign Up
                     </Button>
                   </Link>
@@ -165,7 +165,7 @@ export default function Navbar() {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="w-full"
+                        className="w-full bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-sm border border-white/20 text-foreground"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Sign In
@@ -175,7 +175,7 @@ export default function Navbar() {
                       <Button 
                         variant="default" 
                         size="sm" 
-                        className="w-full bg-primary hover:bg-primary/90"
+                        className="w-full bg-black/20 hover:bg-black/30 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white dark:text-black"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Sign Up
